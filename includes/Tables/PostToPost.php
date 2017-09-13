@@ -15,7 +15,7 @@ class PostToPost extends BaseTable {
 	function get_schema() {
 		$table_name = $this->get_table_name();
 
-		$sql = "CREATE TABLE `{$table_name}` ( `from` bigint(20) unsigned NOT NULL, `to` bigint(20) unsigned NOT NULL, PRIMARY KEY (`from`,`to`) );";
+		$sql = "CREATE TABLE `{$table_name}` ( `id1` bigint(20) unsigned NOT NULL, `id2` bigint(20) unsigned NOT NULL, PRIMARY KEY (`id1`,`id2`) );";
 
 		return $sql;
 	}
