@@ -82,5 +82,22 @@ abstract class BaseTable {
 		return $wpdb;
 	}
 
+
+	/*
+	 * Database Methods
+	 */
+
+	public function replace( $data, $format = array() ) {
+		$db = $this->get_db();
+
+		$db->replace( $this->get_table_name(), $data, $format );
+	}
+
+	public function delete( $where, $where_format = null ) {
+		$db = $this->get_db();
+
+		$db->delete( $this->get_table_name(), $where, $where_format );
+	}
+
 }
 
