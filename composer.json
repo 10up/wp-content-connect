@@ -1,0 +1,19 @@
+{
+    "name": "10up/p2p",
+    "description": "Post to Post Library for WordPress",
+    "type": "wordpress-library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris Marslender",
+            "email": "chris.marslender@10up.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "TenUp\\P2P\\": "includes"
+        }
+    }
+}
