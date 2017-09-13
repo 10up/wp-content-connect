@@ -24,9 +24,16 @@ class Plugin {
 		return self::$instance;
 	}
 
-	public static function get_registry() {
-		$plugin = self::instance();
-		return $plugin->registry;
+	public function get_registry() {
+		return $this->registry;
+	}
+
+	public function get_table( $table ) {
+		if ( isset( $this->tables[ $table ] ) ) {
+			return $this->tables[ $table ];
+		}
+
+		return false;
 	}
 
 	public function setup() {
