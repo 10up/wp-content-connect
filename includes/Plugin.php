@@ -10,6 +10,11 @@ class Plugin {
 
 	public $tables = array();
 
+	/**
+	 * @var Registry
+	 */
+	public $registry;
+
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -19,8 +24,16 @@ class Plugin {
 		return self::$instance;
 	}
 
+	public static function get_registry() {
+		$plugin = self::instance();
+		return $plugin->registry;
+	}
+
 	public function setup() {
 		$this->register_tables();
+
+		$this->registry = new Registry();
+		$this->registry->setup();
 	}
 
 	public function register_tables() {
