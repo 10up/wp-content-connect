@@ -19,7 +19,7 @@ class RelationshipTest extends \PHPUnit_Framework_TestCase {
 
 		$this->expectException( \Exception::class );
 
-		$mock->__construct( 'post', 'car' );
+		$mock->__construct( 'post', 'fakecpt' );
 	}
 
 	public function test_valid_cpts_throw_no_exceptions() {

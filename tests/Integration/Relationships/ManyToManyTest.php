@@ -4,33 +4,20 @@ namespace TenUp\P2P\Tests\Unit\Relationships;
 
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Relationships\ManyToMany;
+use TenUp\P2P\Tests\P2PTestCase;
 
-class ManyToManyTest extends \PHPUnit_Framework_TestCase {
+class ManyToManyTest extends P2PTestCase {
 
 	public function setUp() {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
+
+		parent::setUp();
 	}
 
 	public function tearDown() {
-		global $wpdb;
-
-		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
-	}
-
-	/**
-	 * @return ManyToMany
-	 */
-	public function get_post_to_post_object() {
-		$registry = Plugin::instance()->get_registry();
-
-		$p2p = $registry->get_relationship( 'post', 'post' );
-		if ( $p2p ) {
-			return $p2p;
-		}
-
-		return $registry->add_many_to_many( 'post', 'post' );
+		parent::tearDown();
 	}
 
 	public function test_add_relationship() {
@@ -130,12 +117,55 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function test_related_object_ids_returns_correctly() {
-		// @todo need actual posts for this to work properly
+	public function test_that_posts_relate_to_posts() {
+		$this->add_known_relations();
+
+		/** @var ManyToMany $pp */
+		$pp = $this->get_relationship_object( 'post', 'post' );
+
+		$related = $pp->get_related_object_ids( 1 );
+
+		// Only post type 'post'
+		$this->assertEquals( array( 2, 3 ), $related );
+
+		// This would be true if it was ignoring post type
+		$this->assertNotEquals( array( 2, 3, 5 ), $related );
+
+		// Make sure that we can query starting from the inverse of the way we added the relationship
+		$this->assertEquals( array( 1 ), $pp->get_related_object_ids( 3 ) );
 	}
 
-	public function test_related_object_ids_returns_only_correct_post_types() {
-		// @todo need known test data for this
+	public function test_that_posts_relate_to_cars() {
+		$this->add_known_relations();
+
+		/** @var ManyToMany $pp */
+		$pp = $this->get_relationship_object( 'post', 'car' );
+
+		$this->assertEquals( array( 5 ), $pp->get_related_object_ids( 1 ) );
+
+		// Should return nothing, because wrong CPTs
+		$this->assertEquals( array(), $pp->get_related_object_ids( 12 ) );
+	}
+
+	public function test_that_posts_relate_to_tires() {
+		$this->add_known_relations();
+
+		/** @var ManyToMany $pp */
+		$pp = $this->get_relationship_object( 'post', 'tire' );
+
+		$this->assertEquals( array( 11 ), $pp->get_related_object_ids( 3 ) );
+		$this->assertEquals( array( 3 ), $pp->get_related_object_ids( 11 ) );
+	}
+
+	public function test_that_cars_relate_to_tires() {
+		$this->add_known_relations();
+
+		/** @var ManyToMany $pp */
+		$pp = $this->get_relationship_object( 'car', 'tire' );
+
+		$this->assertEquals( array( 9, 10 ), $pp->get_related_object_ids( 5 ) );
+		$this->assertEquals( array( 5 ), $pp->get_related_object_ids( 9 ) );
+		$this->assertEquals( array( 5 ), $pp->get_related_object_ids( 10 ) );
 	}
 
 }

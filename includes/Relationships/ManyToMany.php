@@ -27,6 +27,9 @@ class ManyToMany extends Relationship {
 
 		// Query either to or from, depending on the post type of the ID we're finding relationships for
 		$post_type = get_post_type( $post_id );
+		if ( $post_type != $this->from && $post_type != $this->to ) {
+			return array();
+		}
 		$where_post_type = $post_type === $this->from ? $this->to : $this->from;
 
 		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p.post_type = %s", $post_id, $where_post_type );

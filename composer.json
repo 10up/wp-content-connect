@@ -13,7 +13,8 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "TenUp\\P2P\\": "includes"
+            "TenUp\\P2P\\": "includes",
+            "TenUp\\P2P\\Tests\\": "tests"
         }
     },
     "require-dev": {
