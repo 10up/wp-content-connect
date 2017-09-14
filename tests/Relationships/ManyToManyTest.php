@@ -1,8 +1,7 @@
 <?php
 
-namespace TenUp\P2P\Tests\Unit\Relationships;
+namespace TenUp\P2P\Tests\Relationships;
 
-use TenUp\P2P\Plugin;
 use TenUp\P2P\Relationships\ManyToMany;
 use TenUp\P2P\Tests\P2PTestCase;
 

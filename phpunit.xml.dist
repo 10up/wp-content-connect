@@ -8,11 +8,8 @@
 		convertWarningsToExceptions="true"
 >
 	<testsuites>
-		<testsuite name="unit">
-			<directory>tests/Unit</directory>
-		</testsuite>
-		<testsuite name="integration">
-			<directory>tests/integration</directory>
+		<testsuite>
+			<directory>tests</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

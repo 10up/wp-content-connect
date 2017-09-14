@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\P2P\Tests\Unit\Relationships;
+namespace TenUp\P2P\Tests\Relationships;
 
 use TenUp\P2P\Relationships\Relationship;
 

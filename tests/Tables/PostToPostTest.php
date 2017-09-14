@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\P2P\Tests\Integration\Tables;
+namespace TenUp\P2P\Tests\Tables;
 
 class PostToPostTest extends \PHPUnit_Framework_TestCase {
 

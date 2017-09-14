@@ -48,7 +48,9 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 		);
 
 		foreach( $types as $type ) {
-			$registry->add_many_to_many( $type[0], $type[1] );
+			if ( ! $registry->relationship_exists( $type[0], $type[1] ) ) {
+				$registry->add_many_to_many( $type[0], $type[1] );
+			}
 		}
 	}
 
