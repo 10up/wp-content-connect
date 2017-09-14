@@ -12,8 +12,7 @@ class WP_Query {
 	public function posts_where( $where, $query ) {
 		global $wpdb;
 
-		if ( isset( $query->query['related_to'] ) ) {
-			// @todo check that its a valid post type, and get the proper relationship
+		if ( isset( $query->query['related_to'] ) && $this->get_relationship_for_query( $query ) ) {
 			$where .= $wpdb->prepare( " and p2p.id2 = %d", $query->query['related_to'] );
 		}
 
@@ -23,11 +22,30 @@ class WP_Query {
 	public function posts_join( $join, $query ) {
 		global $wpdb;
 
-		if ( isset( $query->query['related_to'] ) ) {
+		if ( isset( $query->query['related_to'] ) && $this->get_relationship_for_query( $query ) ) {
 			$join .= " INNER JOIN {$wpdb->prefix}post_to_post as p2p on {$wpdb->posts}.ID = p2p.id1";
 		}
 
 		return $join;
+	}
+
+	public function get_relationship_for_query( $query ) {
+		if ( ! isset( $query->query['related_to'] ) ) {
+			return false;
+		}
+
+		$related_to = get_post( $query->query['related_to'] );
+		if ( ! $related_to ) {
+			return false;
+		}
+
+		$registry = Plugin::instance()->get_registry();
+
+		$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : 'post';
+
+		$relationship = $registry->get_relationship( $post_type, $related_to->post_type );
+
+		return $relationship;
 	}
 
 }
