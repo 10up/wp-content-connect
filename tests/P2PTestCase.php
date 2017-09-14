@@ -49,7 +49,7 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 
 		foreach( $types as $type ) {
 			if ( ! $registry->relationship_exists( $type[0], $type[1] ) ) {
-				$registry->add_many_to_many( $type[0], $type[1] );
+				$registry->define_many_to_many( $type[0], $type[1] );
 			}
 		}
 	}
@@ -81,7 +81,7 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 			return $p2p;
 		}
 
-		return $registry->add_many_to_many( 'post', 'post' );
+		return $registry->define_many_to_many( 'post', 'post' );
 	}
 
 	public function get_relationship_object( $from, $to ) {

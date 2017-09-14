@@ -20,7 +20,7 @@ class RegistryTest extends P2PTestCase {
 	public function test_relationship_can_be_added() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( ManyToMany::class, $registry->add_many_to_many( 'post', 'post' ) );
+		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post' ) );
 	}
 
 	public function test_doesnt_add_duplicates() {
@@ -28,8 +28,8 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->add_many_to_many( 'post', 'post' );
-		$registry->add_many_to_many( 'post', 'post' );
+		$registry->define_many_to_many( 'post', 'post' );
+		$registry->define_many_to_many( 'post', 'post' );
 	}
 
 	public function test_flipped_order_is_still_duplicate() {
@@ -37,20 +37,20 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->add_many_to_many( 'post', 'car' );
-		$registry->add_many_to_many( 'car', 'post' );
+		$registry->define_many_to_many( 'post', 'car' );
+		$registry->define_many_to_many( 'car', 'post' );
 	}
 
 	public function test_retreival_of_relationship() {
 		$registry = new Registry();
 
 		// Add all the relationship types so we know we aren't just lucky in the return values
-		$pp = $registry->add_many_to_many( 'post', 'post' );
-		$pc = $registry->add_many_to_many( 'post', 'car' );
-		$pt = $registry->add_many_to_many( 'post', 'tire' );
-		$ct = $registry->add_many_to_many( 'car', 'tire' );
-		$cc = $registry->add_many_to_many( 'car', 'car' );
-		$tt = $registry->add_many_to_many( 'tire', 'tire' );
+		$pp = $registry->define_many_to_many( 'post', 'post' );
+		$pc = $registry->define_many_to_many( 'post', 'car' );
+		$pt = $registry->define_many_to_many( 'post', 'tire' );
+		$ct = $registry->define_many_to_many( 'car', 'tire' );
+		$cc = $registry->define_many_to_many( 'car', 'car' );
+		$tt = $registry->define_many_to_many( 'tire', 'tire' );
 
 		$tt2 = new ManyToMany( 'tire', 'tire' );
 

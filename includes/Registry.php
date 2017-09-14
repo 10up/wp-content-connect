@@ -72,6 +72,8 @@ class Registry {
 	}
 
 	/**
+	 * Defines a new many to many relationship between two post types
+	 *
 	 * @param $from
 	 * @param $to
 	 *
@@ -79,7 +81,7 @@ class Registry {
 	 *
 	 * @return Relationship
 	 */
-	public function add_many_to_many( $from, $to ) {
+	public function define_many_to_many( $from, $to ) {
 		if ( $this->relationship_exists( $from, $to ) ) {
 			throw new \Exception( "A relationship already exists between {$from} and {$to}" );
 		}

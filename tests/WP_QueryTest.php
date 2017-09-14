@@ -21,7 +21,7 @@ class WP_QueryTest extends P2PTestCase {
 
 	public function define_post_to_post_relationship() {
 		$registry = Plugin::instance()->get_registry();
-		$registry->add_many_to_many( 'post', 'post' );
+		$registry->define_many_to_many( 'post', 'post' );
 	}
 
 	public function tearDown() {
