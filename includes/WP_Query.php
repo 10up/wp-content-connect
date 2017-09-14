@@ -12,8 +12,8 @@ class WP_Query {
 	public function posts_where( $where, $query ) {
 		global $wpdb;
 
-		if ( isset( $query->query['related_to'] ) && $this->get_relationship_for_query( $query ) ) {
-			$where .= $wpdb->prepare( " and p2p.id2 = %d", $query->query['related_to'] );
+		if ( isset( $query->query['related_to_post'] ) && $this->get_relationship_for_query( $query ) ) {
+			$where .= $wpdb->prepare( " and p2p.id2 = %d", $query->query['related_to_post'] );
 		}
 
 		return $where;
@@ -22,7 +22,7 @@ class WP_Query {
 	public function posts_join( $join, $query ) {
 		global $wpdb;
 
-		if ( isset( $query->query['related_to'] ) && $this->get_relationship_for_query( $query ) ) {
+		if ( isset( $query->query['related_to_post'] ) && $this->get_relationship_for_query( $query ) ) {
 			$join .= " INNER JOIN {$wpdb->prefix}post_to_post as p2p on {$wpdb->posts}.ID = p2p.id1";
 		}
 
@@ -30,12 +30,12 @@ class WP_Query {
 	}
 
 	public function get_relationship_for_query( $query ) {
-		if ( ! isset( $query->query['related_to'] ) ) {
+		if ( ! isset( $query->query['related_to_post'] ) ) {
 			return false;
 		}
 
-		$related_to = get_post( $query->query['related_to'] );
-		if ( ! $related_to ) {
+		$related_to_post = get_post( $query->query['related_to_post'] );
+		if ( ! $related_to_post ) {
 			return false;
 		}
 
@@ -43,7 +43,7 @@ class WP_Query {
 
 		$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : 'post';
 
-		$relationship = $registry->get_relationship( $post_type, $related_to->post_type );
+		$relationship = $registry->get_relationship( $post_type, $related_to_post->post_type );
 
 		return $relationship;
 	}
