@@ -15,5 +15,8 @@
         "psr-4": {
             "TenUp\\P2P\\": "includes"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7"
     }
 }
