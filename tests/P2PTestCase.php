@@ -64,27 +64,10 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 	 * Post Type Tire: 9, 10, 11, 12
 	 */
 	public function add_known_relations() {
-		$table = Plugin::instance()->get_table( 'p2p' );
+		global $wpdb;
 
-		// This encompasses all possible combinations of post type to post type relationships
-		$relationships = array(
-			array( 1, 2 ),
-			array( 1, 3 ),
-			array( 1, 5 ),
-			array( 5, 9 ),
-			array( 5, 10 ),
-			array( 5, 6 ),
-			array( 3, 11 ),
-			array( 11, 12 ),
-		);
-
-		foreach( $relationships as $relationship ) {
-			$data = array( 'id1' => $relationship[0], 'id2' => $relationship[1] );
-			$table->replace( $data, array( '%d', '%d' ) );
-
-			$data = array( 'id1' => $relationship[1], 'id2' => $relationship[0] );
-			$table->replace( $data, array( '%d', '%d' ) );
-		}
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post" );
+		$wpdb->query( "INSERT INTO `{$wpdb->prefix}post_to_post` " . file_get_contents( __DIR__ . '/data/relationships.sql' ) );
 	}
 
 	/**
