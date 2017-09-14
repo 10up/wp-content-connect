@@ -15,6 +15,11 @@ class Plugin {
 	 */
 	public $registry;
 
+	/**
+	 * @var WP_Query
+	 */
+	public $wp_query;
+
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -41,6 +46,9 @@ class Plugin {
 
 		$this->registry = new Registry();
 		$this->registry->setup();
+
+		$this->wp_query = new WP_Query();
+		$this->wp_query->setup();
 	}
 
 	public function register_tables() {
