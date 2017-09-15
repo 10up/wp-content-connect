@@ -2,7 +2,7 @@
 
 namespace TenUp\P2P;
 
-class WP_Query {
+class WP_Query_Integration {
 
 	public function setup() {
 		add_filter( 'posts_where', array( $this, 'posts_where' ), 10, 2 );

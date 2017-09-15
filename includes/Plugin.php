@@ -16,9 +16,9 @@ class Plugin {
 	public $registry;
 
 	/**
-	 * @var WP_Query
+	 * @var WP_Query_Integration
 	 */
-	public $wp_query;
+	public $wp_query_integration;
 
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -47,8 +47,8 @@ class Plugin {
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query = new WP_Query();
-		$this->wp_query->setup();
+		$this->wp_query_integration = new WP_Query_Integration();
+		$this->wp_query_integration->setup();
 	}
 
 	public function register_tables() {
