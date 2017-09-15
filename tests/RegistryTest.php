@@ -14,13 +14,13 @@ class RegistryTest extends P2PTestCase {
 	public function test_relationship_doesnt_exist() {
 		$registry = new Registry();
 
-		$this->assertFalse( $registry->relationship_exists( 'post', 'post' ) );
+		$this->assertFalse( $registry->relationship_exists( 'post', 'post', 'basic' ) );
 	}
 
 	public function test_relationship_can_be_added() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post' ) );
+		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'basic' ) );
 	}
 
 	public function test_doesnt_add_duplicates() {
@@ -28,8 +28,15 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->define_many_to_many( 'post', 'post' );
-		$registry->define_many_to_many( 'post', 'post' );
+		$registry->define_many_to_many( 'post', 'post', 'basic' );
+		$registry->define_many_to_many( 'post', 'post', 'basic' );
+	}
+
+	public function test_can_define_different_types_for_same_cpts() {
+		$registry = new Registry();
+
+		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'type1' ) );
+		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'type2' ) );
 	}
 
 	public function test_flipped_order_is_still_duplicate() {
@@ -37,34 +44,44 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->define_many_to_many( 'post', 'car' );
-		$registry->define_many_to_many( 'car', 'post' );
+		$registry->define_many_to_many( 'post', 'car', 'basic' );
+		$registry->define_many_to_many( 'car', 'post', 'basic' );
 	}
 
 	public function test_retreival_of_relationship() {
 		$registry = new Registry();
 
 		// Add all the relationship types so we know we aren't just lucky in the return values
-		$pp = $registry->define_many_to_many( 'post', 'post' );
-		$pc = $registry->define_many_to_many( 'post', 'car' );
-		$pt = $registry->define_many_to_many( 'post', 'tire' );
-		$ct = $registry->define_many_to_many( 'car', 'tire' );
-		$cc = $registry->define_many_to_many( 'car', 'car' );
-		$tt = $registry->define_many_to_many( 'tire', 'tire' );
+		$pp = $registry->define_many_to_many( 'post', 'post', 'basic' );
+		$pc = $registry->define_many_to_many( 'post', 'car', 'basic' );
+		$pt = $registry->define_many_to_many( 'post', 'tire', 'basic' );
+		$ct = $registry->define_many_to_many( 'car', 'tire', 'basic' );
+		$cc = $registry->define_many_to_many( 'car', 'car', 'basic' );
+		$tt = $registry->define_many_to_many( 'tire', 'tire', 'basic' );
 
-		$tt2 = new ManyToMany( 'tire', 'tire' );
+		$tt2 = new ManyToMany( 'tire', 'tire', 'basic' );
 
 		// Verify that two separate objects are NOT the same (sanity check)
 		$this->assertNotSame( $tt, $tt2 );
 
-		$this->assertSame( $pp, $registry->get_relationship( 'post', 'post' ) );
+		$this->assertSame( $pp, $registry->get_relationship( 'post', 'post', 'basic' ) );
 
 		// Check that it doesn't matter the order of args
-		$this->assertSame( $pc, $registry->get_relationship( 'post', 'car' ) );
-		$this->assertSame( $pc, $registry->get_relationship( 'car', 'post' ) );
+		$this->assertSame( $pc, $registry->get_relationship( 'post', 'car', 'basic' ) );
+		$this->assertSame( $pc, $registry->get_relationship( 'car', 'post', 'basic' ) );
 
 		// Check that calling inverse args returns the same as well (it should, based on above two tests)
-		$this->assertSame( $registry->get_relationship( 'post', 'car' ), $registry->get_relationship( 'car', 'post' ) );
+		$this->assertSame( $registry->get_relationship( 'post', 'car', 'basic' ), $registry->get_relationship( 'car', 'post', 'basic' ) );
+	}
+
+	public function test_retreival_of_unique_types_on_same_cpt() {
+		$registry = new Registry();
+
+		$pp1 = $registry->define_many_to_many( 'post', 'post', 'type1' );
+		$pp2 = $registry->define_many_to_many( 'post', 'post', 'type2' );
+
+		$this->assertSame( $pp1, $registry->get_relationship( 'post', 'post', 'type1' ) );
+		$this->assertSame( $pp2, $registry->get_relationship( 'post', 'post', 'type2' ) );
 	}
 
 }

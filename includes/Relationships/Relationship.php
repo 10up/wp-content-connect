@@ -19,6 +19,13 @@ abstract class Relationship {
 	public $to;
 
 	/**
+	 * Relationship Type. Used to enable multiple relationships between the same combinations of objects.
+	 *
+	 * @var string
+	 */
+	public $type;
+
+	/**
 	 * Unique ID string for the relationship
 	 *
 	 * Used for IDs in the DOM and other places we need a unique ID
@@ -34,7 +41,7 @@ abstract class Relationship {
 	 */
 	public $enable_ui;
 
-	public function __construct( $from, $to, $args = array() ) {
+	public function __construct( $from, $to, $type, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
 			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
 		}
@@ -45,7 +52,8 @@ abstract class Relationship {
 
 		$this->from = $from;
 		$this->to = $to;
-		$this->id = strtolower( get_class( $this ) ) . "-{$from}-{$to}";
+		$this->type = $type;
+		$this->id = strtolower( get_class( $this ) ) . "-{$type}-{$from}-{$to}";
 
 		$defaults = array(
 			'enable_ui' => true,

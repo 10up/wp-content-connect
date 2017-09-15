@@ -32,7 +32,7 @@ class ManyToMany extends Relationship {
 		}
 		$where_post_type = $post_type === $this->from ? $this->to : $this->from;
 
-		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p.post_type = %s", $post_id, $where_post_type );
+		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p2p.type = %s and p.post_type = %s", $post_id, $this->type, $where_post_type );
 
 		$objects = $db->get_results( $query );
 
@@ -52,12 +52,12 @@ class ManyToMany extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
-			array( 'id1' => $pid1, 'id2' => $pid2 ),
-			array( '%d', '%d' )
+			array( 'id1' => $pid1, 'id2' => $pid2, 'type' => $this->type ),
+			array( '%d', '%d', '%s' )
 		);
 		$table->replace(
-			array( 'id1' => $pid2, 'id2' => $pid1 ),
-			array( '%d', '%d' )
+			array( 'id1' => $pid2, 'id2' => $pid1, 'type' => $this->type ),
+			array( '%d', '%d', '%s' )
 		);
 	}
 
@@ -66,12 +66,12 @@ class ManyToMany extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(
-			array( 'id1' => $pid1, 'id2' => $pid2 ),
-			array( '%d', '%d' )
+			array( 'id1' => $pid1, 'id2' => $pid2, 'type' => $this->type ),
+			array( '%d', '%d', '%s' )
 		);
 		$table->delete(
-			array( 'id1' => $pid2, 'id2' => $pid1 ),
-			array( '%d', '%d' )
+			array( 'id1' => $pid2, 'id2' => $pid1, 'type' => $this->type ),
+			array( '%d', '%d', '%s' )
 		);
 	}
 

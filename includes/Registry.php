@@ -17,13 +17,14 @@ class Registry {
 	/**
 	 * Gets a key that uniquely identifies a relationship between two CPTs
 	 *
-	 * @param $from
-	 * @param $to
+	 * @param string $from
+	 * @param string $to
+	 * @param string $type
 	 *
 	 * @return string
 	 */
-	public function get_relationship_key( $from, $to ) {
-		return "{$from}_{$to}";
+	public function get_relationship_key( $from, $to, $type ) {
+		return "{$from}_{$to}_{$type}";
 	}
 
 	/**
@@ -33,11 +34,12 @@ class Registry {
 	 *
 	 * @param string $cpt1
 	 * @param string $cpt2
+	 * @param string $type
 	 *
 	 * @return bool
 	 */
-	public function relationship_exists( $cpt1, $cpt2 ) {
-		$relationship = $this->get_relationship( $cpt1, $cpt2 );
+	public function relationship_exists( $cpt1, $cpt2, $type ) {
+		$relationship = $this->get_relationship( $cpt1, $cpt2, $type );
 
 		if ( ! $relationship ) {
 			return false;
@@ -49,20 +51,21 @@ class Registry {
 	/**
 	 * Returns the relationship object for the post types provided. Order of CPT args is unimportant.
 	 *
-	 * @param $cpt1
-	 * @param $cpt2
+	 * @param string $cpt1
+	 * @param string $cpt2
+	 * @param string $type
 	 *
 	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
 	 */
-	public function get_relationship( $cpt1, $cpt2 ) {
-		$key = $this->get_relationship_key( $cpt1, $cpt2 );
+	public function get_relationship( $cpt1, $cpt2, $type ) {
+		$key = $this->get_relationship_key( $cpt1, $cpt2, $type );
 
 		if ( isset( $this->relationships[ $key ] ) ) {
 			return $this->relationships[ $key ];
 		}
 
 		// Try the inverse
-		$key = $this->get_relationship_key( $cpt2, $cpt1 );
+		$key = $this->get_relationship_key( $cpt2, $cpt1, $type );
 
 		if ( isset( $this->relationships[ $key ] ) ) {
 			return $this->relationships[ $key ];
@@ -74,21 +77,22 @@ class Registry {
 	/**
 	 * Defines a new many to many relationship between two post types
 	 *
-	 * @param $from
-	 * @param $to
+	 * @param string $from
+	 * @param string $to
+	 * @param string $type
 	 *
 	 * @throws \Exception
 	 *
 	 * @return Relationship
 	 */
-	public function define_many_to_many( $from, $to ) {
-		if ( $this->relationship_exists( $from, $to ) ) {
-			throw new \Exception( "A relationship already exists between {$from} and {$to}" );
+	public function define_many_to_many( $from, $to, $type, $args = array() ) {
+		if ( $this->relationship_exists( $from, $to, $type ) ) {
+			throw new \Exception( "A relationship already exists between {$from} and {$to} for type {$type}" );
 		}
 
-		$key = $this->get_relationship_key( $from, $to );
+		$key = $this->get_relationship_key( $from, $to, $type );
 
-		$this->relationships[ $key ] = new ManyToMany( $from, $to );
+		$this->relationships[ $key ] = new ManyToMany( $from, $to, $type, $args );
 
 		return $this->relationships[ $key ];
 	}

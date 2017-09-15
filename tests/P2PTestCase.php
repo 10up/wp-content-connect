@@ -4,13 +4,13 @@ namespace TenUp\P2P\Tests;
 
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Registry;
+use TenUp\P2P\Relationships\ManyToMany;
 
 class P2PTestCase extends \PHPUnit_Framework_TestCase {
 
 	public static function setupBeforeClass() {
 		self::insert_dummy_data();
 		self::register_post_types();
-		self::register_relationship_types();
 
 		parent::setUpBeforeClass();
 	}
@@ -35,25 +35,6 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public static function register_relationship_types() {
-		$registry = Plugin::instance()->get_registry();
-
-		$types = array(
-			array( 'post', 'post' ),
-			array( 'post', 'car' ),
-			array( 'post', 'tire' ),
-			array( 'car', 'tire' ),
-			array( 'car', 'car' ),
-			array( 'tire', 'tire' ),
-		);
-
-		foreach( $types as $type ) {
-			if ( ! $registry->relationship_exists( $type[0], $type[1] ) ) {
-				$registry->define_many_to_many( $type[0], $type[1] );
-			}
-		}
-	}
-
 	/**
 	 * Adds known relationships that we can then test against
 	 *
@@ -67,26 +48,54 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post" );
-		$wpdb->query( "INSERT INTO `{$wpdb->prefix}post_to_post` " . file_get_contents( __DIR__ . '/data/relationships.sql' ) );
-	}
+		//$wpdb->query( "INSERT INTO `{$wpdb->prefix}post_to_post` " . file_get_contents( __DIR__ . '/data/relationships.sql' ) );
 
-	/**
-	 * @return ManyToMany
-	 */
-	public function get_post_to_post_object() {
-		$registry = Plugin::instance()->get_registry();
+		// post to post "basic" type
+		$ppb = new ManyToMany( 'post', 'post', 'basic' );
+		// post to post "complex" type
+		$ppc = new ManyToMany( 'post', 'post', 'complex' );
+		$pcb = new ManyToMany( 'post', 'car', 'basic' );
+		$pcc = new ManyToMany( 'post', 'car', 'complex' );
+		$ptb = new ManyToMany( 'post', 'tire', 'basic' );
+		$ptc = new ManyToMany( 'post', 'tire', 'complex' );
+		$ctb = new ManyToMany( 'car', 'tire', 'basic' );
+		$ctc = new ManyToMany( 'car', 'tire', 'complex' );
 
-		$p2p = $registry->get_relationship( 'post', 'post' );
-		if ( $p2p ) {
-			return $p2p;
+		$ppb->add_relationship( 1, 2 );
+		$ppb->add_relationship( 1, 3 );
+		$ppc->add_relationship( 1, 3 );
+		$ppc->add_relationship( 1, 4 );
+		$pcb->add_relationship( 1, 11 );
+		$pcb->add_relationship( 1, 12 );
+		$pcc->add_relationship( 1, 13 );
+		$pcc->add_relationship( 1, 14 );
+		$ptb->add_relationship( 1, 21 );
+		$ptb->add_relationship( 1, 22 );
+		$ptc->add_relationship( 1, 23 );
+		$ptc->add_relationship( 1, 24 );
+		$ctb->add_relationship( 11, 21 );
+		$ctc->add_relationship( 13, 23 );
+
+		// for pagination tests, we'll use "page1" and "page2" types to make sure we have different types
+		$p1 = new ManyToMany( 'post', 'post', 'page1' );
+		$p2 = new ManyToMany( 'post', 'post', 'page2' );
+
+		for ( $i = 35; $i <= 90; $i++ ) {
+			switch( $i % 4 ) {
+				case 0:
+					$p1->add_relationship( 31, $i );
+					break;
+				case 1:
+					$p1->add_relationship( 32, $i );
+					break;
+				case 2:
+					$p2->add_relationship( 33, $i );
+					break;
+				case 3:
+					$p2->add_relationship( 34, $i );
+					break;
+			}
 		}
-
-		return $registry->define_many_to_many( 'post', 'post' );
-	}
-
-	public function get_relationship_object( $from, $to ) {
-		$reg = Plugin::instance()->get_registry();
-		return $reg->get_relationship( $from, $to );
 	}
 
 }

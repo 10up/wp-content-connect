@@ -19,13 +19,13 @@ class RelationshipTest extends \PHPUnit_Framework_TestCase {
 
 		$this->expectException( \Exception::class );
 
-		$mock->__construct( 'post', 'fakecpt' );
+		$mock->__construct( 'post', 'fakecpt', 'basic' );
 	}
 
 	public function test_valid_cpts_throw_no_exceptions() {
 		$mock = $this->get_mock();
 
-		$mock->__construct( 'post', 'post' );
+		$mock->__construct( 'post', 'post', 'basic' );
 
 		$this->assertEquals( 'post', $mock->from );
 		$this->assertEquals( 'post', $mock->to );
