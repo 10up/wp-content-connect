@@ -13,7 +13,7 @@ class WP_Query_Integration {
 		global $wpdb;
 
 		if ( isset( $query->query['related_to_post'] ) && $this->get_relationship_for_query( $query ) ) {
-			$where .= $wpdb->prepare( " and p2p.id2 = %d", $query->query['related_to_post'] );
+			$where .= $wpdb->prepare( " and p2p.id2 = %d and p2p.type = %s", $query->query['related_to_post'], $query->query['relationship_type'] );
 		}
 
 		return $where;
@@ -34,6 +34,10 @@ class WP_Query_Integration {
 			return false;
 		}
 
+		if ( ! isset( $query->query['relationship_type'] ) ) {
+			return false;
+		}
+
 		$related_to_post = get_post( $query->query['related_to_post'] );
 		if ( ! $related_to_post ) {
 			return false;
@@ -43,7 +47,7 @@ class WP_Query_Integration {
 
 		$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : 'post';
 
-		$relationship = $registry->get_relationship( $post_type, $related_to_post->post_type );
+		$relationship = $registry->get_relationship( $post_type, $related_to_post->post_type, $query->query['relationship_type'] );
 
 		return $relationship;
 	}
