@@ -40,8 +40,8 @@ class Registry {
 	 *
 	 * @return bool
 	 */
-	public function post_relationship_exists( $cpt1, $cpt2, $type ) {
-		$relationship = $this->get_post_relationship( $cpt1, $cpt2, $type );
+	public function post_to_post_relationship_exists( $cpt1, $cpt2, $type ) {
+		$relationship = $this->get_post_to_post_relationship( $cpt1, $cpt2, $type );
 
 		if ( ! $relationship ) {
 			return false;
@@ -59,7 +59,7 @@ class Registry {
 	 *
 	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
 	 */
-	public function get_post_relationship( $cpt1, $cpt2, $type ) {
+	public function get_post_to_post_relationship( $cpt1, $cpt2, $type ) {
 		$key = $this->get_relationship_key( $cpt1, $cpt2, $type );
 
 		if ( isset( $this->post_post_relationships[ $key ] ) ) {
@@ -88,7 +88,7 @@ class Registry {
 	 * @return Relationship
 	 */
 	public function define_post_to_post( $from, $to, $type, $args = array() ) {
-		if ( $this->post_relationship_exists( $from, $to, $type ) ) {
+		if ( $this->post_to_post_relationship_exists( $from, $to, $type ) ) {
 			throw new \Exception( "A relationship already exists between {$from} and {$to} for type {$type}" );
 		}
 
@@ -98,5 +98,4 @@ class Registry {
 
 		return $this->post_post_relationships[ $key ];
 	}
-
 }
