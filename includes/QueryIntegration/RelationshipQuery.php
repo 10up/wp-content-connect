@@ -174,7 +174,7 @@ class RelationshipQuery{
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationship = $registry->get_relationship( $this->post_type, $related_to_post->post_type, $segment['type'] );
+		$relationship = $registry->get_post_relationship( $this->post_type, $related_to_post->post_type, $segment['type'] );
 
 		return $relationship;
 	}

@@ -10,7 +10,9 @@ use TenUp\P2P\Relationships\Relationship;
  */
 class Registry {
 
-	protected $post_relationships = array();
+	protected $post_post_relationships = array();
+
+	protected $post_user_relationship = array();
 
 	public function setup() {}
 
@@ -38,8 +40,8 @@ class Registry {
 	 *
 	 * @return bool
 	 */
-	public function relationship_exists( $cpt1, $cpt2, $type ) {
-		$relationship = $this->get_relationship( $cpt1, $cpt2, $type );
+	public function post_relationship_exists( $cpt1, $cpt2, $type ) {
+		$relationship = $this->get_post_relationship( $cpt1, $cpt2, $type );
 
 		if ( ! $relationship ) {
 			return false;
@@ -57,18 +59,18 @@ class Registry {
 	 *
 	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
 	 */
-	public function get_relationship( $cpt1, $cpt2, $type ) {
+	public function get_post_relationship( $cpt1, $cpt2, $type ) {
 		$key = $this->get_relationship_key( $cpt1, $cpt2, $type );
 
-		if ( isset( $this->post_relationships[ $key ] ) ) {
-			return $this->post_relationships[ $key ];
+		if ( isset( $this->post_post_relationships[ $key ] ) ) {
+			return $this->post_post_relationships[ $key ];
 		}
 
 		// Try the inverse
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $type );
 
-		if ( isset( $this->post_relationships[ $key ] ) ) {
-			return $this->post_relationships[ $key ];
+		if ( isset( $this->post_post_relationships[ $key ] ) ) {
+			return $this->post_post_relationships[ $key ];
 		}
 
 		return false;
@@ -86,15 +88,15 @@ class Registry {
 	 * @return Relationship
 	 */
 	public function define_post_to_post( $from, $to, $type, $args = array() ) {
-		if ( $this->relationship_exists( $from, $to, $type ) ) {
+		if ( $this->post_relationship_exists( $from, $to, $type ) ) {
 			throw new \Exception( "A relationship already exists between {$from} and {$to} for type {$type}" );
 		}
 
 		$key = $this->get_relationship_key( $from, $to, $type );
 
-		$this->post_relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
+		$this->post_post_relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
 
-		return $this->post_relationships[ $key ];
+		return $this->post_post_relationships[ $key ];
 	}
 
 }

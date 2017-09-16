@@ -14,7 +14,7 @@ class RegistryTest extends P2PTestCase {
 	public function test_relationship_doesnt_exist() {
 		$registry = new Registry();
 
-		$this->assertFalse( $registry->relationship_exists( 'post', 'post', 'basic' ) );
+		$this->assertFalse( $registry->post_relationship_exists( 'post', 'post', 'basic' ) );
 	}
 
 	public function test_relationship_can_be_added() {
@@ -64,14 +64,14 @@ class RegistryTest extends P2PTestCase {
 		// Verify that two separate objects are NOT the same (sanity check)
 		$this->assertNotSame( $tt, $tt2 );
 
-		$this->assertSame( $pp, $registry->get_relationship( 'post', 'post', 'basic' ) );
+		$this->assertSame( $pp, $registry->get_post_relationship( 'post', 'post', 'basic' ) );
 
 		// Check that it doesn't matter the order of args
-		$this->assertSame( $pc, $registry->get_relationship( 'post', 'car', 'basic' ) );
-		$this->assertSame( $pc, $registry->get_relationship( 'car', 'post', 'basic' ) );
+		$this->assertSame( $pc, $registry->get_post_relationship( 'post', 'car', 'basic' ) );
+		$this->assertSame( $pc, $registry->get_post_relationship( 'car', 'post', 'basic' ) );
 
 		// Check that calling inverse args returns the same as well (it should, based on above two tests)
-		$this->assertSame( $registry->get_relationship( 'post', 'car', 'basic' ), $registry->get_relationship( 'car', 'post', 'basic' ) );
+		$this->assertSame( $registry->get_post_relationship( 'post', 'car', 'basic' ), $registry->get_post_relationship( 'car', 'post', 'basic' ) );
 	}
 
 	public function test_retreival_of_unique_types_on_same_cpt() {
@@ -80,8 +80,8 @@ class RegistryTest extends P2PTestCase {
 		$pp1 = $registry->define_post_to_post( 'post', 'post', 'type1' );
 		$pp2 = $registry->define_post_to_post( 'post', 'post', 'type2' );
 
-		$this->assertSame( $pp1, $registry->get_relationship( 'post', 'post', 'type1' ) );
-		$this->assertSame( $pp2, $registry->get_relationship( 'post', 'post', 'type2' ) );
+		$this->assertSame( $pp1, $registry->get_post_relationship( 'post', 'post', 'type1' ) );
+		$this->assertSame( $pp2, $registry->get_post_relationship( 'post', 'post', 'type2' ) );
 	}
 
 }
