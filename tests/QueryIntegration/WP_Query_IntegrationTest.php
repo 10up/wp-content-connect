@@ -4,6 +4,8 @@ namespace TenUp\P2P\Tests\QueryIntegration;
 
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Registry;
+use TenUp\P2P\Relationships\PostToPost;
+use TenUp\P2P\Relationships\PostToUser;
 use TenUp\P2P\Tests\P2PTestCase;
 
 class WP_Query_IntegrationTest extends P2PTestCase {
@@ -12,6 +14,7 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
+		$wpdb->query( "delete from {$wpdb->prefix}post_to_user" );
 
 		$plugin = Plugin::instance();
 		$plugin->registry = new Registry();
@@ -284,16 +287,112 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$this->assertEquals( array( 3 ), $query->posts );
 	}
 
+	public function add_small_relationship_set() {
+		$p2p = new PostToPost( 'post', 'post', 'basic' );
+		$postowner = new PostToUser( 'post', 'owner' );
+
+		$postowner->add_relationship( 1, 2 );
+		$postowner->add_relationship( 2, 2 );
+		$postowner->add_relationship( 3, 3 );
+		$postowner->add_relationship( 4, 3 );
+		$postowner->add_relationship( 5, 2 );
+		$postowner->add_relationship( 5, 3 );
+
+		$p2p->add_relationship( 1, 3 );
+		$p2p->add_relationship( 1, 4 );
+		$p2p->add_relationship( 2, 4 );
+		$p2p->add_relationship( 3, 4 );
+	}
+
 	public function test_basic_post_to_user_query_integration() {
-		// @todo
+		$this->define_relationships();
+		$this->add_small_relationship_set();
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 10,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => 2,
+					'type' => 'owner',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2, 5 ), $query->posts );
+
+		$args['relationship_query'][0]['related_to_user'] = 3;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 3, 4, 5 ), $query->posts );
 	}
 
 	public function test_compound_post_to_user_queries() {
-		// @todo
+		$this->define_relationships();
+		$this->add_small_relationship_set();
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 10,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => 2,
+					'type' => 'owner',
+				),
+				array(
+					'related_to_user' => 3,
+					'type' => 'owner',
+				),
+				'relation' => 'OR',
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2, 3, 4, 5 ), $query->posts );
+
+		$args['relationship_query']['relation'] = 'AND';
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 5 ), $query->posts );
 	}
 
 	public function test_mixed_post_to_post_and_post_to_user_queries() {
-		// @todo
+		$this->define_relationships();
+		$this->add_small_relationship_set();
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 10,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => 2,
+					'type' => 'owner',
+				),
+				array(
+					'related_to_post' => 3,
+					'type' => 'basic',
+				),
+				'relation' => 'AND',
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1 ), $query->posts );
+
+		$args['relationship_query']['relation'] = 'OR';
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2, 4, 5 ), $query->posts );
 	}
 
 }
