@@ -5,20 +5,6 @@ namespace TenUp\P2P\Relationships;
 abstract class Relationship {
 
 	/**
-	 * CPT Name of the first post type in the relationship
-	 *
-	 * @var string
-	 */
-	public $from;
-
-	/**
-	 * CPT Name of the second post type in the relationship
-	 *
-	 * @var string
-	 */
-	public $to;
-
-	/**
 	 * Relationship Type. Used to enable multiple relationships between the same combinations of objects.
 	 *
 	 * @var string
@@ -41,19 +27,8 @@ abstract class Relationship {
 	 */
 	public $enable_ui;
 
-	public function __construct( $from, $to, $type, $args = array() ) {
-		if ( ! post_type_exists( $from ) ) {
-			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
-		}
-
-		if ( ! post_type_exists( $to ) ) {
-			throw new \Exception( "Post Type {$to} does not exist. Post types must exist to create a relationship" );
-		}
-
-		$this->from = $from;
-		$this->to = $to;
+	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
-		$this->id = strtolower( get_class( $this ) ) . "-{$type}-{$from}-{$to}";
 
 		$defaults = array(
 			'enable_ui' => true,

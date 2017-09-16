@@ -2,7 +2,7 @@
 
 namespace TenUp\P2P;
 
-use TenUp\P2P\Relationships\ManyToMany;
+use TenUp\P2P\Relationships\PostToPost;
 use TenUp\P2P\Relationships\Relationship;
 
 /**
@@ -92,7 +92,7 @@ class Registry {
 
 		$key = $this->get_relationship_key( $from, $to, $type );
 
-		$this->relationships[ $key ] = new ManyToMany( $from, $to, $type, $args );
+		$this->relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
 
 		return $this->relationships[ $key ];
 	}

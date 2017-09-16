@@ -3,7 +3,7 @@
 namespace TenUp\P2P\Tests;
 
 use TenUp\P2P\Registry;
-use TenUp\P2P\Relationships\ManyToMany;
+use TenUp\P2P\Relationships\PostToPost;
 
 class RegistryTest extends P2PTestCase {
 
@@ -20,7 +20,7 @@ class RegistryTest extends P2PTestCase {
 	public function test_relationship_can_be_added() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'basic' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'basic' ) );
 	}
 
 	public function test_doesnt_add_duplicates() {
@@ -35,8 +35,8 @@ class RegistryTest extends P2PTestCase {
 	public function test_can_define_different_types_for_same_cpts() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'type1' ) );
-		$this->assertInstanceOf( ManyToMany::class, $registry->define_many_to_many( 'post', 'post', 'type2' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'type1' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'type2' ) );
 	}
 
 	public function test_flipped_order_is_still_duplicate() {
@@ -59,7 +59,7 @@ class RegistryTest extends P2PTestCase {
 		$cc = $registry->define_many_to_many( 'car', 'car', 'basic' );
 		$tt = $registry->define_many_to_many( 'tire', 'tire', 'basic' );
 
-		$tt2 = new ManyToMany( 'tire', 'tire', 'basic' );
+		$tt2 = new PostToPost( 'tire', 'tire', 'basic' );
 
 		// Verify that two separate objects are NOT the same (sanity check)
 		$this->assertNotSame( $tt, $tt2 );

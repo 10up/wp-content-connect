@@ -3,9 +3,38 @@
 namespace TenUp\P2P\Relationships;
 
 use TenUp\P2P\Plugin;
-use TenUp\P2P\Tables\PostToPost;
 
-class ManyToMany extends Relationship {
+class PostToPost extends Relationship {
+
+	/**
+	 * CPT Name of the first post type in the relationship
+	 *
+	 * @var string
+	 */
+	public $from;
+
+	/**
+	 * CPT Name of the second post type in the relationship
+	 *
+	 * @var string
+	 */
+	public $to;
+
+	public function __construct( $from, $to, $type, $args = array() ) {
+		if ( ! post_type_exists( $from ) ) {
+			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
+		}
+
+		if ( ! post_type_exists( $to ) ) {
+			throw new \Exception( "Post Type {$to} does not exist. Post types must exist to create a relationship" );
+		}
+
+		$this->from = $from;
+		$this->to = $to;
+		$this->id = strtolower( get_class( $this ) ) . "-{$type}-{$from}-{$to}";
+		
+		parent::__construct( $type, $args );
+	}
 
 	public function setup() {
 		// @todo hook up the metabox and save actions for the default UI
@@ -19,7 +48,7 @@ class ManyToMany extends Relationship {
 	 * @return array
 	 */
 	public function get_related_object_ids( $post_id ) {
-		/** @var PostToPost $table */
+		/** @var \TenUp\P2P\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 		$db = $table->get_db();
 
@@ -48,7 +77,7 @@ class ManyToMany extends Relationship {
 	 * @param $pid2
 	 */
 	public function add_relationship( $pid1, $pid2 ) {
-		/** @var PostToPost $table */
+		/** @var \TenUp\P2P\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
@@ -62,7 +91,7 @@ class ManyToMany extends Relationship {
 	}
 
 	public function delete_relationship( $pid1, $pid2 ) {
-		/** @var PostToPost $table */
+		/** @var \TenUp\P2P\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(

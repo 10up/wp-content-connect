@@ -4,7 +4,7 @@ namespace TenUp\P2P\Tests;
 
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Registry;
-use TenUp\P2P\Relationships\ManyToMany;
+use TenUp\P2P\Relationships\PostToPost;
 
 class P2PTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -51,15 +51,15 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 		//$wpdb->query( "INSERT INTO `{$wpdb->prefix}post_to_post` " . file_get_contents( __DIR__ . '/data/relationships.sql' ) );
 
 		// post to post "basic" type
-		$ppb = new ManyToMany( 'post', 'post', 'basic' );
+		$ppb = new PostToPost( 'post', 'post', 'basic' );
 		// post to post "complex" type
-		$ppc = new ManyToMany( 'post', 'post', 'complex' );
-		$pcb = new ManyToMany( 'post', 'car', 'basic' );
-		$pcc = new ManyToMany( 'post', 'car', 'complex' );
-		$ptb = new ManyToMany( 'post', 'tire', 'basic' );
-		$ptc = new ManyToMany( 'post', 'tire', 'complex' );
-		$ctb = new ManyToMany( 'car', 'tire', 'basic' );
-		$ctc = new ManyToMany( 'car', 'tire', 'complex' );
+		$ppc = new PostToPost( 'post', 'post', 'complex' );
+		$pcb = new PostToPost( 'post', 'car', 'basic' );
+		$pcc = new PostToPost( 'post', 'car', 'complex' );
+		$ptb = new PostToPost( 'post', 'tire', 'basic' );
+		$ptc = new PostToPost( 'post', 'tire', 'complex' );
+		$ctb = new PostToPost( 'car', 'tire', 'basic' );
+		$ctc = new PostToPost( 'car', 'tire', 'complex' );
 
 		$ppb->add_relationship( 1, 2 );
 		$ppb->add_relationship( 1, 3 );
@@ -77,8 +77,8 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 		$ctc->add_relationship( 13, 23 );
 
 		// for pagination tests, we'll use "page1" and "page2" types to make sure we have different types
-		$p1 = new ManyToMany( 'post', 'post', 'page1' );
-		$p2 = new ManyToMany( 'post', 'post', 'page2' );
+		$p1 = new PostToPost( 'post', 'post', 'page1' );
+		$p2 = new PostToPost( 'post', 'post', 'page2' );
 
 		for ( $i = 35; $i <= 90; $i++ ) {
 			switch( $i % 4 ) {
