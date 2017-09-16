@@ -171,4 +171,38 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$this->assertEquals( array( 46, 50 ), $query->posts );
 	}
 
+	public function test_compound_queries() {
+		$this->add_known_relations();
+		$this->define_post_to_post_relationship();
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 3,
+			'paged' => 1,
+		);
+
+
+		$args['relationship_query'] = array(
+			'relation' => 'OR',
+			array(
+				'related_to_post' => 1,
+				'type' => 'basic',
+			),
+			array(
+				'related_to_post' => 1,
+				'type' => 'complex'
+			)
+		);
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 2, 3, 4 ), $query->posts );
+
+
+		$args['relationship_query']['relation'] = 'AND';
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 3 ), $query->posts );
+	}
+
 }
