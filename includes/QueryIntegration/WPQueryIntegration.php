@@ -2,7 +2,7 @@
 
 namespace TenUp\P2P\QueryIntegration;
 
-class WP_Query_Integration {
+class WPQueryIntegration {
 
 	public function setup() {
 		// posts_where is first, posts_join is after

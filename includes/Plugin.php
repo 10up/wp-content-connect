@@ -2,7 +2,7 @@
 
 namespace TenUp\P2P;
 
-use TenUp\P2P\QueryIntegration\WP_Query_Integration;
+use TenUp\P2P\QueryIntegration\WPQueryIntegration;
 use TenUp\P2P\Tables\PostToPost;
 
 class Plugin {
@@ -17,7 +17,7 @@ class Plugin {
 	public $registry;
 
 	/**
-	 * @var WP_Query_Integration
+	 * @var WPQueryIntegration
 	 */
 	public $wp_query_integration;
 
@@ -48,7 +48,7 @@ class Plugin {
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query_integration = new WP_Query_Integration();
+		$this->wp_query_integration = new WPQueryIntegration();
 		$this->wp_query_integration->setup();
 	}
 
