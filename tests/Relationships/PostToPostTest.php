@@ -184,4 +184,26 @@ class PostToPostTest extends P2PTestCase {
 		$this->assertEquals( array( 13 ), $ctc->get_related_object_ids( 23 ) );
 	}
 
+	/**
+	 * Makes sure that even if a relationship for a post that no longer exists (or never existed) is still present in the
+	 * relationship table, it isn't returned as part of the related ID list
+	 */
+	public function test_that_only_real_post_ids_are_returned() {
+		global $wpdb;
+
+		$this->add_post_relations();
+
+		// Add a really high ID (1000) to the relationships table that shouldn't exist in our valid test data
+		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1', 'id2' => '1000', 'type' => 'basic' ) );
+		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1000', 'id2' => '1', 'type' => 'basic' ) );
+
+		// Make sure post ID 1000 doesn't exist (sanity check)
+		$this->assertNull( get_post( 1000 ) );
+
+		$ppb = new PostToPost( 'post', 'post', 'basic' );
+
+		$related = $ppb->get_related_object_ids( 1 );
+		$this->assertEquals( array( 2, 3 ), $related );
+	}
+
 }
