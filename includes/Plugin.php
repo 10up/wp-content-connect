@@ -4,6 +4,7 @@ namespace TenUp\P2P;
 
 use TenUp\P2P\QueryIntegration\WPQueryIntegration;
 use TenUp\P2P\Tables\PostToPost;
+use TenUp\P2P\Tables\PostToUser;
 
 class Plugin {
 
@@ -55,6 +56,9 @@ class Plugin {
 	public function register_tables() {
 		$this->tables['p2p'] = new PostToPost();
 		$this->tables['p2p']->setup();
+
+		$this->tables['p2u'] = new PostToUser();
+		$this->tables['p2u']->setup();
 	}
 
 }
