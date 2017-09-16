@@ -20,12 +20,15 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		parent::setUp();
 	}
 
-	public function define_post_to_post_relationship() {
+	public function define_relationships() {
 		$registry = Plugin::instance()->get_registry();
 		$registry->define_post_to_post( 'post', 'post', 'basic' );
 		$registry->define_post_to_post( 'post', 'post', 'complex' );
 		$registry->define_post_to_post( 'post', 'post', 'page1' );
 		$registry->define_post_to_post( 'post', 'post', 'page2' );
+
+		$registry->define_post_to_user( 'post', 'owner' );
+		$registry->define_post_to_user( 'post', 'contrib' );
 	}
 
 	public function tearDown() {
@@ -54,9 +57,34 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$args['paged'] = 2;
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->posts );
+
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 2,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => '2',
+					'type' => 'owner',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2 ), $query->posts );
+
+		$args['paged'] = 2;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
 	public function test_that_nothing_happens_without_required_params() {
+		$this->define_relationships();
+
 		$args = array(
 			'post_type' => 'post',
 			'fields' => 'ids',
@@ -75,6 +103,8 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 	}
 
 	public function test_that_nothing_happens_without_related_to_post() {
+		$this->define_relationships();
+
 		$args = array(
 			'post_type' => 'post',
 			'fields' => 'ids',
@@ -97,7 +127,34 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
+	public function test_that_nothing_happens_without_related_to_user() {
+		$this->define_relationships();
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 2,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'type' => 'owner',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2 ), $query->posts );
+
+		$args['paged'] = 2;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 3, 4 ), $query->posts );
+	}
+
 	public function test_that_nothing_happens_without_relationship_type() {
+		$this->define_relationships();
+
 		$args = array(
 			'post_type' => 'post',
 			'fields' => 'ids',
@@ -118,11 +175,33 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$args['paged'] = 2;
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->posts );
+
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'posts_per_page' => 2,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => '2',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 2 ), $query->posts );
+
+		$args['paged'] = 2;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_basic_query_integration() {
+	public function test_basic_post_to_post_query_integration() {
 		$this->add_post_relations();
-		$this->define_post_to_post_relationship();
+		$this->define_relationships();
 
 		$args = array(
 			'post_type' => 'post',
@@ -171,9 +250,9 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$this->assertEquals( array( 46, 50 ), $query->posts );
 	}
 
-	public function test_compound_queries() {
+	public function test_compound_post_to_post_queries() {
 		$this->add_post_relations();
-		$this->define_post_to_post_relationship();
+		$this->define_relationships();
 
 		$args = array(
 			'post_type' => 'post',
@@ -203,6 +282,18 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 		$args['relationship_query']['relation'] = 'AND';
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 3 ), $query->posts );
+	}
+
+	public function test_basic_post_to_user_query_integration() {
+		// @todo
+	}
+
+	public function test_compound_post_to_user_queries() {
+		// @todo
+	}
+
+	public function test_mixed_post_to_post_and_post_to_user_queries() {
+		// @todo
 	}
 
 }
