@@ -3,6 +3,8 @@
 namespace TenUp\P2P\QueryIntegration;
 
 use TenUp\P2P\Plugin;
+use TenUp\P2P\Relationships\PostToPost;
+use TenUp\P2P\Relationships\PostToUser;
 
 class RelationshipQuery{
 
@@ -22,6 +24,24 @@ class RelationshipQuery{
 	public $where = '';
 
 	public $join = '';
+
+	/**
+	 * Have we already joined the p2p table?
+	 *
+	 * on an "OR" relation, we don't need a join for each clause, so this enables us to track that
+	 *
+	 * @var bool
+	 */
+	protected $p2p_join = false;
+
+	/**
+	 * Have we already joined the p2u table?
+	 *
+	 * on an "OR" relation, we don't need a join for each clause, so this enables us to track that
+	 *
+	 * @var bool
+	 */
+	protected $p2u_join = false;
 
 	public function __construct( $relationship_query, $post_type = '' ) {
 		$this->relationship_query = $relationship_query;
@@ -117,15 +137,23 @@ class RelationshipQuery{
 		global $wpdb;
 		$where = '';
 
-		$wherecount = 0;
+		$wherecount = 1;
 
 		$where_parts = array();
 
 		foreach( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
-			if ( $this->get_relationship_for_segment( $segment ) ) {
-				$wherecount++;
-				$where_parts[] = $wpdb->prepare( "(p2p{$wherecount}.id2 = %d and p2p{$wherecount}.type = %s)", $segment['related_to_post'], $segment['type'] );
+			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
+				if ( $relationship instanceof PostToPost ) {
+					$where_parts[] = $wpdb->prepare( "(p2p{$wherecount}.id2 = %d and p2p{$wherecount}.type = %s)", $segment['related_to_post'], $segment['type'] );
+				} else if ( $relationship instanceof PostToUser ) {
+					$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.user_id = %d and p2u{$wherecount}.type = %s)", $segment['related_to_user'], $segment['type'] );
+				}
+
+				// Only increment counter no "AND" relations, when we are joining a table for each segment
+				if ( $this->relation === 'AND' ) {
+					$wherecount++;
+				}
 			}
 		}
 
@@ -143,15 +171,33 @@ class RelationshipQuery{
 		global $wpdb;
 		$join = '';
 
-		$joincount = 0;
+		$joincount = 1;
 
 		$join_parts = array();
 
 		foreach( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
-			if ( $this->get_relationship_for_segment( $segment ) ) {
-				$joincount++;
-				$join_parts[] = " inner join {$wpdb->prefix}post_to_post as p2p{$joincount} on {$wpdb->posts}.ID = p2p{$joincount}.id1";
+			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
+				if ( $relationship instanceof PostToPost ) {
+					if ( $this->relation === 'AND' || $this->p2p_join === false ) {
+						$join_parts[] = " left join {$wpdb->prefix}post_to_post as p2p{$joincount} on {$wpdb->posts}.ID = p2p{$joincount}.id1";
+
+						// Track that we've joined the p2p table
+						$this->p2p_join = true;
+					}
+				} else if ( $relationship instanceof PostToUser ) {
+					if ( $this->relation === 'AND' || $this->p2u_join === false ) {
+						$join_parts[] = " left join {$wpdb->prefix}post_to_user as p2u{$joincount} on {$wpdb->posts}.ID = p2u{$joincount}.post_id";
+
+						// Track that we've joined the p2u table
+						$this->p2u_join = true;
+					}
+				}
+
+				// Only increment counter no "AND" relations, when we are joining a table for each segment
+				if ( $this->relation === 'AND' ) {
+					$joincount++;
+				}
 			}
 		}
 
@@ -163,22 +209,29 @@ class RelationshipQuery{
 	}
 
 	public function get_relationship_for_segment( $segment ) {
-		if ( ! isset( $segment['related_to_post'] ) ) {
-			return false;
-		}
-
-		if ( ! isset( $segment['type'] ) ) {
-			return false;
-		}
-
-		$related_to_post = get_post( $segment['related_to_post'] );
-		if ( ! $related_to_post ) {
+		if ( ! $this->is_valid_segment( $segment ) ) {
 			return false;
 		}
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationship = $registry->get_post_to_post_relationship( $this->post_type, $related_to_post->post_type, $segment['type'] );
+		if ( isset( $segment['related_to_post'] ) ) {
+			$related_to_post = get_post( $segment['related_to_post'] );
+
+			if ( ! $related_to_post ) {
+				return false;
+			}
+
+			$relationship = $registry->get_post_to_post_relationship( $this->post_type, $related_to_post->post_type, $segment['type'] );
+		} else {
+			$related_to_user = get_user_by( 'id', $segment['related_to_user'] );
+
+			if ( ! $related_to_user ) {
+				return false;
+			}
+
+			$relationship = $registry->get_post_to_user_relationship( $this->post_type, $segment['type'] );
+		}
 
 		return $relationship;
 	}
