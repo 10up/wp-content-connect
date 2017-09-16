@@ -5,6 +5,7 @@ namespace TenUp\P2P\Tests;
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Registry;
 use TenUp\P2P\Relationships\PostToPost;
+use TenUp\P2P\Relationships\PostToUser;
 
 class P2PTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -20,6 +21,9 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 
 		$wpdb->query( "DELETE FROM {$wpdb->posts}" );
 		$wpdb->query( "INSERT INTO `{$wpdb->posts}` " . file_get_contents( __DIR__ . '/data/posts.sql' ) );
+
+		$wpdb->query( "DELETE FROM {$wpdb->users}" );
+		$wpdb->query( "INSERT INTO `{$wpdb->users}` " . file_get_contents( __DIR__ . '/data/users.sql' ) );
 	}
 
 	public static function register_post_types() {
@@ -40,15 +44,14 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * Post Type to Post ID Mapping:
 	 *
-	 * Post Type Post: 1, 2, 3, 4
-	 * Post Type Car:  5, 6, 7, 8
-	 * Post Type Tire: 9, 10, 11, 12
+	 * Post Type Post: 1-10
+	 * Post Type Car:  11-20
+	 * Post Type Tire: 21-30
 	 */
-	public function add_known_relations() {
+	public function add_post_relations() {
 		global $wpdb;
 
-		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post" );
-		//$wpdb->query( "INSERT INTO `{$wpdb->prefix}post_to_post` " . file_get_contents( __DIR__ . '/data/relationships.sql' ) );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post;" );
 
 		// post to post "basic" type
 		$ppb = new PostToPost( 'post', 'post', 'basic' );
@@ -96,6 +99,81 @@ class P2PTestCase extends \PHPUnit_Framework_TestCase {
 					break;
 			}
 		}
+	}
+
+	public function add_user_relations() {
+		global $wpdb;
+
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_user;" );
+
+		$postowner = new PostToUser( 'post', 'owner' );
+		$postcontrib = new PostToUser( 'post', 'contrib' );
+		$carowner = new PostToUser( 'car', 'owner' );
+		$carcontrib = new PostToUser( 'car', 'contrib' );
+
+		$postowner->add_relationship( 1, 1 );
+		$postowner->add_relationship( 2, 1 );
+		$postowner->add_relationship( 3, 1 );
+		$postowner->add_relationship( 4, 1 );
+		$postowner->add_relationship( 5, 1 );
+		$postowner->add_relationship( 3, 2 );
+		$postowner->add_relationship( 4, 2 );
+		$postowner->add_relationship( 5, 2 );
+		$postowner->add_relationship( 6, 2 );
+		$postowner->add_relationship( 7, 2 );
+		$postowner->add_relationship( 5, 3 );
+		$postowner->add_relationship( 6, 3 );
+		$postowner->add_relationship( 7, 3 );
+		$postowner->add_relationship( 8, 3 );
+		$postowner->add_relationship( 9, 3 );
+
+		$postcontrib->add_relationship( 2, 1 );
+		$postcontrib->add_relationship( 3, 1 );
+		$postcontrib->add_relationship( 4, 1 );
+		$postcontrib->add_relationship( 5, 1 );
+		$postcontrib->add_relationship( 6, 1 );
+		$postcontrib->add_relationship( 4, 2 );
+		$postcontrib->add_relationship( 5, 2 );
+		$postcontrib->add_relationship( 6, 2 );
+		$postcontrib->add_relationship( 7, 2 );
+		$postcontrib->add_relationship( 8, 2 );
+		$postcontrib->add_relationship( 6, 3 );
+		$postcontrib->add_relationship( 7, 3 );
+		$postcontrib->add_relationship( 8, 3 );
+		$postcontrib->add_relationship( 9, 3 );
+		$postcontrib->add_relationship( 10, 3 );
+
+		$carowner->add_relationship( 16, 1 );
+		$carowner->add_relationship( 17, 1 );
+		$carowner->add_relationship( 18, 1 );
+		$carowner->add_relationship( 19, 1 );
+		$carowner->add_relationship( 20, 1 );
+		$carowner->add_relationship( 14, 2 );
+		$carowner->add_relationship( 15, 2 );
+		$carowner->add_relationship( 16, 2 );
+		$carowner->add_relationship( 17, 2 );
+		$carowner->add_relationship( 18, 2 );
+		$carowner->add_relationship( 12, 3 );
+		$carowner->add_relationship( 13, 3 );
+		$carowner->add_relationship( 14, 3 );
+		$carowner->add_relationship( 15, 3 );
+		$carowner->add_relationship( 16, 3 );
+
+		$carcontrib->add_relationship( 15, 1 );
+		$carcontrib->add_relationship( 16, 1 );
+		$carcontrib->add_relationship( 17, 1 );
+		$carcontrib->add_relationship( 18, 1 );
+		$carcontrib->add_relationship( 19, 1 );
+		$carcontrib->add_relationship( 13, 2 );
+		$carcontrib->add_relationship( 14, 2 );
+		$carcontrib->add_relationship( 15, 2 );
+		$carcontrib->add_relationship( 16, 2 );
+		$carcontrib->add_relationship( 17, 2 );
+		$carcontrib->add_relationship( 11, 3 );
+		$carcontrib->add_relationship( 12, 3 );
+		$carcontrib->add_relationship( 13, 3 );
+		$carcontrib->add_relationship( 14, 3 );
+		$carcontrib->add_relationship( 15, 3 );
 	}
 
 }

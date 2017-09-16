@@ -121,7 +121,7 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 	}
 
 	public function test_basic_query_integration() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 		$this->define_post_to_post_relationship();
 
 		$args = array(
@@ -172,7 +172,7 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 	}
 
 	public function test_compound_queries() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 		$this->define_post_to_post_relationship();
 
 		$args = array(

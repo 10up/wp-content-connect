@@ -5,7 +5,7 @@ namespace TenUp\P2P\Tests\Relationships;
 use TenUp\P2P\Relationships\PostToPost;
 use TenUp\P2P\Tests\P2PTestCase;
 
-class ManyToManyTest extends P2PTestCase {
+class PostToPostTest extends P2PTestCase {
 
 	public function setUp() {
 		global $wpdb;
@@ -130,7 +130,7 @@ class ManyToManyTest extends P2PTestCase {
 	}
 
 	public function test_that_posts_relate_to_posts() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 
 		$ppb = new PostToPost( 'post', 'post', 'basic' );
 		$ppc = new PostToPost( 'post', 'post', 'complex' );
@@ -144,7 +144,7 @@ class ManyToManyTest extends P2PTestCase {
 	}
 
 	public function test_that_posts_relate_to_cars() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 
 		$pcb = new PostToPost( 'post', 'car', 'basic' );
 		$pcc = new PostToPost( 'post', 'car', 'complex' );
@@ -158,7 +158,7 @@ class ManyToManyTest extends P2PTestCase {
 	}
 
 	public function test_that_posts_relate_to_tires() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 
 		$ptb = new PostToPost( 'post', 'tire', 'basic' );
 		$ptc = new PostToPost( 'post', 'tire', 'complex' );
@@ -172,7 +172,7 @@ class ManyToManyTest extends P2PTestCase {
 	}
 
 	public function test_that_cars_relate_to_tires() {
-		$this->add_known_relations();
+		$this->add_post_relations();
 
 		$ctb = new PostToPost( 'car', 'tire', 'basic' );
 		$ctc = new PostToPost( 'car', 'tire', 'complex' );
