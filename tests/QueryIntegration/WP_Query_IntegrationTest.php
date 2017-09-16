@@ -22,10 +22,10 @@ class WP_Query_IntegrationTest extends P2PTestCase {
 
 	public function define_post_to_post_relationship() {
 		$registry = Plugin::instance()->get_registry();
-		$registry->define_many_to_many( 'post', 'post', 'basic' );
-		$registry->define_many_to_many( 'post', 'post', 'complex' );
-		$registry->define_many_to_many( 'post', 'post', 'page1' );
-		$registry->define_many_to_many( 'post', 'post', 'page2' );
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'post', 'complex' );
+		$registry->define_post_to_post( 'post', 'post', 'page1' );
+		$registry->define_post_to_post( 'post', 'post', 'page2' );
 	}
 
 	public function tearDown() {

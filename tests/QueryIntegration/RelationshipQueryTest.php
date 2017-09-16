@@ -130,8 +130,8 @@ class RelationshipQueryTest extends P2PTestCase {
 
 
 		$registry = Plugin::instance()->get_registry();
-		$registry->define_many_to_many( 'post', 'post', 'basic' );
-		$registry->define_many_to_many( 'post', 'post', 'complex' );
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'post', 'complex' );
 
 
 		// If we end up with all invalid segments, we should have no changes to where
@@ -191,8 +191,8 @@ class RelationshipQueryTest extends P2PTestCase {
 
 
 		$registry = Plugin::instance()->get_registry();
-		$registry->define_many_to_many( 'post', 'post', 'basic' );
-		$registry->define_many_to_many( 'post', 'post', 'complex' );
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'post', 'complex' );
 
 
 		$query = new RelationshipQuery( array(

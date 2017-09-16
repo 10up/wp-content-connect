@@ -85,7 +85,7 @@ class Registry {
 	 *
 	 * @return Relationship
 	 */
-	public function define_many_to_many( $from, $to, $type, $args = array() ) {
+	public function define_post_to_post( $from, $to, $type, $args = array() ) {
 		if ( $this->relationship_exists( $from, $to, $type ) ) {
 			throw new \Exception( "A relationship already exists between {$from} and {$to} for type {$type}" );
 		}

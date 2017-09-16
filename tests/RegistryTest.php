@@ -20,7 +20,7 @@ class RegistryTest extends P2PTestCase {
 	public function test_relationship_can_be_added() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'basic' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_post_to_post( 'post', 'post', 'basic' ) );
 	}
 
 	public function test_doesnt_add_duplicates() {
@@ -28,15 +28,15 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->define_many_to_many( 'post', 'post', 'basic' );
-		$registry->define_many_to_many( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
 	}
 
 	public function test_can_define_different_types_for_same_cpts() {
 		$registry = new Registry();
 
-		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'type1' ) );
-		$this->assertInstanceOf( PostToPost::class, $registry->define_many_to_many( 'post', 'post', 'type2' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_post_to_post( 'post', 'post', 'type1' ) );
+		$this->assertInstanceOf( PostToPost::class, $registry->define_post_to_post( 'post', 'post', 'type2' ) );
 	}
 
 	public function test_flipped_order_is_still_duplicate() {
@@ -44,20 +44,20 @@ class RegistryTest extends P2PTestCase {
 
 		$this->expectException( \Exception::class );
 
-		$registry->define_many_to_many( 'post', 'car', 'basic' );
-		$registry->define_many_to_many( 'car', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', 'car', 'basic' );
+		$registry->define_post_to_post( 'car', 'post', 'basic' );
 	}
 
 	public function test_retreival_of_relationship() {
 		$registry = new Registry();
 
 		// Add all the relationship types so we know we aren't just lucky in the return values
-		$pp = $registry->define_many_to_many( 'post', 'post', 'basic' );
-		$pc = $registry->define_many_to_many( 'post', 'car', 'basic' );
-		$pt = $registry->define_many_to_many( 'post', 'tire', 'basic' );
-		$ct = $registry->define_many_to_many( 'car', 'tire', 'basic' );
-		$cc = $registry->define_many_to_many( 'car', 'car', 'basic' );
-		$tt = $registry->define_many_to_many( 'tire', 'tire', 'basic' );
+		$pp = $registry->define_post_to_post( 'post', 'post', 'basic' );
+		$pc = $registry->define_post_to_post( 'post', 'car', 'basic' );
+		$pt = $registry->define_post_to_post( 'post', 'tire', 'basic' );
+		$ct = $registry->define_post_to_post( 'car', 'tire', 'basic' );
+		$cc = $registry->define_post_to_post( 'car', 'car', 'basic' );
+		$tt = $registry->define_post_to_post( 'tire', 'tire', 'basic' );
 
 		$tt2 = new PostToPost( 'tire', 'tire', 'basic' );
 
@@ -77,8 +77,8 @@ class RegistryTest extends P2PTestCase {
 	public function test_retreival_of_unique_types_on_same_cpt() {
 		$registry = new Registry();
 
-		$pp1 = $registry->define_many_to_many( 'post', 'post', 'type1' );
-		$pp2 = $registry->define_many_to_many( 'post', 'post', 'type2' );
+		$pp1 = $registry->define_post_to_post( 'post', 'post', 'type1' );
+		$pp2 = $registry->define_post_to_post( 'post', 'post', 'type2' );
 
 		$this->assertSame( $pp1, $registry->get_relationship( 'post', 'post', 'type1' ) );
 		$this->assertSame( $pp2, $registry->get_relationship( 'post', 'post', 'type2' ) );
