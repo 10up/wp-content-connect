@@ -65,6 +65,19 @@ class RelationshipQueryTest extends P2PTestCase {
 		$this->assertEquals( $expected, $query->segments );
 
 
+		$query = new RelationshipQuery( array(
+			'related_to_user' => '1',
+			'type' => 'owner',
+		) );
+		$expected = array(
+			array(
+				'related_to_user' => '1',
+				'type' => 'owner',
+			)
+		);
+		$this->assertEquals( $expected, $query->segments );
+
+
 		// Test top level keys AND segments in arrays
 		$query = new RelationshipQuery( array(
 			'related_to_post' => '25',
@@ -87,16 +100,36 @@ class RelationshipQueryTest extends P2PTestCase {
 		$this->assertEquals( $expected, $query->segments );
 	}
 
-	public function test_segments_are_recognized_as_valid() {
+	public function test_invalid_segments_are_recognized_as_invalid() {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array() ) );
 		$this->assertFalse( $query->is_valid_segment( array( 'type' => 'basic' ) ) );
-		$this->assertFalse( $query->is_valid_segment( array( 'relates_to_post' ) ) );
+		$this->assertFalse( $query->is_valid_segment( array( 'related_to_post' ) ) );
+		$this->assertFalse( $query->is_valid_segment( array( 'related_to_user' ) ) );
+	}
+
+	public function test_valid_segments_are_recognized_as_valid() {
+		$query = new RelationshipQuery( array() );
 
 		$this->assertTrue( $query->is_valid_segment( array(
 			'type' => 'basic',
 			'related_to_post' => 45,
+		) ) );
+
+		$this->assertTrue( $query->is_valid_segment( array(
+			'type' => 'owner',
+			'related_to_user' => 1,
+		) ) );
+	}
+
+	public function test_combined_segments_are_invalid() {
+		$query = new RelationshipQuery( array() );
+
+		$this->assertFalse( $query->is_valid_segment( array(
+			'type' => 'basic',
+			'related_to_post' => 45,
+			'related_to_user' => 2,
 		) ) );
 	}
 
@@ -117,6 +150,14 @@ class RelationshipQueryTest extends P2PTestCase {
 			)
 		) );
 		$this->assertTrue( $query->has_valid_segments() );
+
+		$query = new RelationshipQuery( array(
+			array(
+				'related_to_user' => 2,
+				'type' => 'owner',
+			)
+		) );
+		$this->assertTrue( $query->has_valid_segments() );
 	}
 
 	public function test_generate_where_clause() {
@@ -124,6 +165,14 @@ class RelationshipQueryTest extends P2PTestCase {
 		$query = new RelationshipQuery(array(
 			'type' => 'basic',
 			'related_to_post' => 1,
+		));
+		$expected = '';
+		$this->assertEquals( $expected, $query->where );
+
+		// Should also return nothing, since also not defined
+		$query = new RelationshipQuery(array(
+			'type' => 'owner',
+			'related_to_user' => 2,
 		));
 		$expected = '';
 		$this->assertEquals( $expected, $query->where );

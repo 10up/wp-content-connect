@@ -46,6 +46,7 @@ class RelationshipQuery{
 		// Check for any top level keys that should be moved into a nested segment
 		$valid_keys = array(
 			'related_to_post',
+			'related_to_user',
 			'type',
 		);
 		$new_segment = array();
@@ -66,23 +67,26 @@ class RelationshipQuery{
 				$this->relation = in_array( strtolower( $segment ), array( 'and', 'or' ) ) ? strtoupper( $segment ) : 'AND';
 			}
 		}
-
-		// @todo What about AND / OR ?
 	}
 
 	/**
 	 * Determines if the segment is valid or not.
 	 *
 	 * A valid segment requires both a 'type' property AND one of the following additional properties:
-	 *  - relates_to_post
+	 *  - related_to_post
+	 *  - related_to_user
 	 *
 	 * @param $segment
 	 *
 	 * @return bool
 	 */
 	public function is_valid_segment( $segment ) {
+		// Not allowed to have user AND post on the same segment
+		if ( isset( $segment['related_to_post'] ) && isset( $segment['related_to_user'] ) ) {
+			return false;
+		}
 
-		if ( isset( $segment['related_to_post'] ) && isset( $segment['type'] ) ) {
+		if ( ( isset( $segment['related_to_post'] ) || isset( $segment['related_to_user'] ) ) && isset( $segment['type'] ) ) {
 			return true;
 		}
 
