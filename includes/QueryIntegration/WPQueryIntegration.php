@@ -14,6 +14,8 @@ class WPQueryIntegration {
 	public function posts_where( $where, $query ) {
 		if ( isset( $query->query['relationship_query'] ) ) {
 			$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : '';
+
+			// Adding to the query, so that we can fetch it from the other filter methods below and be dealing with the same data
 			$query->relationship_query = new RelationshipQuery( $query->query['relationship_query'], $post_type );
 
 			$where .= $query->relationship_query->where;

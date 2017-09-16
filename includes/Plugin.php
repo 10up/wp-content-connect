@@ -2,6 +2,7 @@
 
 namespace TenUp\P2P;
 
+use TenUp\P2P\QueryIntegration\UserQueryIntegration;
 use TenUp\P2P\QueryIntegration\WPQueryIntegration;
 use TenUp\P2P\Tables\PostToPost;
 use TenUp\P2P\Tables\PostToUser;
@@ -21,6 +22,11 @@ class Plugin {
 	 * @var WPQueryIntegration
 	 */
 	public $wp_query_integration;
+
+	/**
+	 * @var UserQueryIntegration
+	 */
+	public $user_query_integration;
 
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -51,6 +57,9 @@ class Plugin {
 
 		$this->wp_query_integration = new WPQueryIntegration();
 		$this->wp_query_integration->setup();
+
+		$this->user_query_integration = new UserQueryIntegration();
+		$this->user_query_integration->setup();
 	}
 
 	public function register_tables() {
