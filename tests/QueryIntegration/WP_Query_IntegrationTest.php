@@ -1,11 +1,12 @@
 <?php
 
-namespace TenUp\P2P\Tests;
+namespace TenUp\P2P\Tests\QueryIntegration;
 
 use TenUp\P2P\Plugin;
 use TenUp\P2P\Registry;
+use TenUp\P2P\Tests\P2PTestCase;
 
-class WP_QueryTest extends P2PTestCase {
+class WP_Query_IntegrationTest extends P2PTestCase {
 
 	public function setUp() {
 		global $wpdb;
@@ -21,6 +22,8 @@ class WP_QueryTest extends P2PTestCase {
 
 	public function define_post_to_post_relationship() {
 		$registry = Plugin::instance()->get_registry();
+		$registry->define_many_to_many( 'post', 'post', 'basic' );
+		$registry->define_many_to_many( 'post', 'post', 'complex' );
 		$registry->define_many_to_many( 'post', 'post', 'page1' );
 		$registry->define_many_to_many( 'post', 'post', 'page2' );
 	}
@@ -32,13 +35,17 @@ class WP_QueryTest extends P2PTestCase {
 	public function test_that_nothing_happens_without_relationship_defined() {
 		$args = array(
 			'post_type' => 'post',
-			'related_to_post' => '20',
-			'relationship_type' => 'page1',
 			'fields' => 'ids',
 			'orderby' => 'ID',
 			'order' => 'ASC',
 			'posts_per_page' => 2,
 			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_post' => '20',
+					'type' => 'page1',
+				),
+			),
 		);
 
 		$query = new \WP_Query( $args );
@@ -75,7 +82,11 @@ class WP_QueryTest extends P2PTestCase {
 			'order' => 'ASC',
 			'posts_per_page' => 2,
 			'paged' => 1,
-			'relationship_type' => 'page1',
+			'relationship_query' => array(
+				array(
+					'type' => 'page1',
+				),
+			),
 		);
 
 		$query = new \WP_Query( $args );
@@ -94,7 +105,11 @@ class WP_QueryTest extends P2PTestCase {
 			'order' => 'ASC',
 			'posts_per_page' => 2,
 			'paged' => 1,
-			'related_to_post' => '31',
+			'relationship_query' => array(
+				array(
+					'related_to_post' => '31',
+				),
+			),
 		);
 
 		$query = new \WP_Query( $args );
@@ -116,8 +131,13 @@ class WP_QueryTest extends P2PTestCase {
 			'order' => 'ASC',
 			'posts_per_page' => 2,
 			'paged' => 1,
-			'related_to_post' => '31',
-			'relationship_type' => 'page1',
+			'relationship_query' => array(
+				array(
+					'related_to_post' => '31',
+					'type' => 'page1',
+				),
+			),
+
 		);
 
 		$query = new \WP_Query( $args );
@@ -127,7 +147,7 @@ class WP_QueryTest extends P2PTestCase {
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 44, 48 ), $query->posts );
 
-		$args['related_to_post'] = 32;
+		$args['relationship_query'][0]['related_to_post'] = 32;
 		$args['paged'] = 1;
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 37, 41 ), $query->posts );
@@ -137,12 +157,12 @@ class WP_QueryTest extends P2PTestCase {
 		$this->assertEquals( array( 45, 49 ), $query->posts );
 
 		// Different type, so should come back empty
-		$args['related_to_post'] = 33;
+		$args['relationship_query'][0]['related_to_post'] = 33;
 		$args['paged'] = 1;
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array(), $query->posts );
 
-		$args['relationship_type'] = 'page2';
+		$args['relationship_query'][0]['type'] = 'page2';
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 38, 42 ), $query->posts );
 
