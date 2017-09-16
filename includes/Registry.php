@@ -3,6 +3,7 @@
 namespace TenUp\P2P;
 
 use TenUp\P2P\Relationships\PostToPost;
+use TenUp\P2P\Relationships\PostToUser;
 use TenUp\P2P\Relationships\Relationship;
 
 /**
@@ -12,7 +13,7 @@ class Registry {
 
 	protected $post_post_relationships = array();
 
-	protected $post_user_relationship = array();
+	protected $post_user_relationships = array();
 
 	public function setup() {}
 
@@ -98,4 +99,63 @@ class Registry {
 
 		return $this->post_post_relationships[ $key ];
 	}
+
+	/* POST TO USER RELATIONSHIPS */
+
+	/**
+	 * Checks if a relationship exists between a post type and users
+	 *
+	 * @param string $post_type
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	public function post_to_user_relationship_exists( $post_type, $type ) {
+		$relationship = $this->get_post_to_user_relationship( $post_type, $type );
+
+		if ( ! $relationship ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the relationship object between users and the post type provided.
+	 *
+	 * @param string $post_type
+	 * @param string $type
+	 */
+	public function get_post_to_user_relationship( $post_type, $type ) {
+		$key = $this->get_relationship_key( $post_type, 'user', $type );
+
+		if ( isset( $this->post_user_relationships[ $key ] ) ) {
+			return $this->post_user_relationships[ $key ];
+		}
+
+		return false;
+	}
+
+	/**
+	 * Defines a new many to many relationship between users and a post type
+	 *
+	 * @param string $post_type
+	 * @param string $type
+	 * @param array $args
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function define_post_to_user( $post_type, $type, $args = array() ) {
+		if ( $this->post_to_user_relationship_exists( $post_type, $type ) ) {
+			throw new \Exception( "A relationship already exists between users and post type {$post_type} for type {$type}" );
+		}
+
+		$key = $this->get_relationship_key( $post_type, 'user', $type );
+
+		$this->post_user_relationships[ $key ] = new PostToUser( $post_type, $type, $args );
+
+		return $this->post_user_relationships[ $key ];
+	}
+
 }
