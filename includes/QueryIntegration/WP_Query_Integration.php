@@ -1,8 +1,6 @@
 <?php
 
-namespace TenUp\P2P;
-
-use TenUp\P2P\QueryIntegration\RelationshipQuery;
+namespace TenUp\P2P\QueryIntegration;
 
 class WP_Query_Integration {
 

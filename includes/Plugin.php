@@ -2,6 +2,7 @@
 
 namespace TenUp\P2P;
 
+use TenUp\P2P\QueryIntegration\WP_Query_Integration;
 use TenUp\P2P\Tables\PostToPost;
 
 class Plugin {
