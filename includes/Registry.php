@@ -10,7 +10,7 @@ use TenUp\P2P\Relationships\Relationship;
  */
 class Registry {
 
-	protected $relationships = array();
+	protected $post_relationships = array();
 
 	public function setup() {}
 
@@ -60,15 +60,15 @@ class Registry {
 	public function get_relationship( $cpt1, $cpt2, $type ) {
 		$key = $this->get_relationship_key( $cpt1, $cpt2, $type );
 
-		if ( isset( $this->relationships[ $key ] ) ) {
-			return $this->relationships[ $key ];
+		if ( isset( $this->post_relationships[ $key ] ) ) {
+			return $this->post_relationships[ $key ];
 		}
 
 		// Try the inverse
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $type );
 
-		if ( isset( $this->relationships[ $key ] ) ) {
-			return $this->relationships[ $key ];
+		if ( isset( $this->post_relationships[ $key ] ) ) {
+			return $this->post_relationships[ $key ];
 		}
 
 		return false;
@@ -92,9 +92,9 @@ class Registry {
 
 		$key = $this->get_relationship_key( $from, $to, $type );
 
-		$this->relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
+		$this->post_relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
 
-		return $this->relationships[ $key ];
+		return $this->post_relationships[ $key ];
 	}
 
 }
