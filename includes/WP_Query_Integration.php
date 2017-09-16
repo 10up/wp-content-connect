@@ -2,54 +2,44 @@
 
 namespace TenUp\P2P;
 
+use TenUp\P2P\QueryIntegration\RelationshipQuery;
+
 class WP_Query_Integration {
 
 	public function setup() {
+		// posts_where is first, posts_join is after
 		add_filter( 'posts_where', array( $this, 'posts_where' ), 10, 2 );
 		add_filter( 'posts_join', array( $this, 'posts_join' ), 10, 2 );
+		add_filter( 'posts_groupby', array( $this, 'posts_groupby' ), 10, 2 );
 	}
 
 	public function posts_where( $where, $query ) {
-		global $wpdb;
+		if ( isset( $query->query['relationship_query'] ) ) {
+			$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : '';
+			$query->relationship_query = new RelationshipQuery( $query->query['relationship_query'], $post_type );
 
-		if ( isset( $query->query['related_to_post'] ) && $this->get_relationship_for_query( $query ) ) {
-			$where .= $wpdb->prepare( " and p2p.id2 = %d and p2p.type = %s", $query->query['related_to_post'], $query->query['relationship_type'] );
+			$where .= $query->relationship_query->where;
 		}
 
 		return $where;
 	}
 
 	public function posts_join( $join, $query ) {
-		global $wpdb;
-
-		if ( isset( $query->query['related_to_post'] ) && $this->get_relationship_for_query( $query ) ) {
-			$join .= " INNER JOIN {$wpdb->prefix}post_to_post as p2p on {$wpdb->posts}.ID = p2p.id1";
+		if ( isset( $query->relationship_query ) ) {
+			$join .= $query->relationship_query->join;
 		}
 
 		return $join;
 	}
 
-	public function get_relationship_for_query( $query ) {
-		if ( ! isset( $query->query['related_to_post'] ) ) {
-			return false;
+	public function posts_groupby( $groupby, $query ) {
+		global $wpdb;
+
+		if ( isset( $query->relationship_query ) && ! empty( $query->relationship_query->where ) ) {
+			$groupby = "{$wpdb->posts}.ID";
 		}
 
-		if ( ! isset( $query->query['relationship_type'] ) ) {
-			return false;
-		}
-
-		$related_to_post = get_post( $query->query['related_to_post'] );
-		if ( ! $related_to_post ) {
-			return false;
-		}
-
-		$registry = Plugin::instance()->get_registry();
-
-		$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : 'post';
-
-		$relationship = $registry->get_relationship( $post_type, $related_to_post->post_type, $query->query['relationship_type'] );
-
-		return $relationship;
+		return $groupby;
 	}
 
 }
