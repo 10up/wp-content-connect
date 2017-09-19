@@ -6,6 +6,7 @@ use TenUp\P2P\QueryIntegration\UserQueryIntegration;
 use TenUp\P2P\QueryIntegration\WPQueryIntegration;
 use TenUp\P2P\Tables\PostToPost;
 use TenUp\P2P\Tables\PostToUser;
+use TenUp\P2P\UI\MetaBox;
 
 class Plugin {
 
@@ -28,6 +29,25 @@ class Plugin {
 	 */
 	public $user_query_integration;
 
+	/**
+	 * @var MetaBox
+	 */
+	public $meta_box;
+
+	/**
+	 * URL to the Plugin
+	 *
+	 * @var string
+	 */
+	public $url;
+
+	/**
+	 * Current plugin version
+	 *
+	 * @var string
+	 */
+	public $version;
+
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -35,6 +55,11 @@ class Plugin {
 		}
 
 		return self::$instance;
+	}
+
+	public function __construct() {
+		$this->url = plugin_dir_url( dirname( __FILE__ ) );
+		$this->version = '1.0.0';
 	}
 
 	public function get_registry() {
@@ -60,6 +85,9 @@ class Plugin {
 
 		$this->user_query_integration = new UserQueryIntegration();
 		$this->user_query_integration->setup();
+
+		$this->meta_box = new MetaBox();
+		$this->meta_box->setup();
 	}
 
 	public function register_tables() {

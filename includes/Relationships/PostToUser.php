@@ -13,6 +13,13 @@ class PostToUser extends Relationship {
 	 */
 	public $post_type;
 
+	/**
+	 * The UI object for the relationship, if the UI is enabled
+	 *
+	 * @var \TenUp\P2P\UI\PostToUser
+	 */
+	public $ui;
+
 	public function __construct( $post_type, $type, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
 			throw new \Exception( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" );
@@ -26,6 +33,10 @@ class PostToUser extends Relationship {
 
 	public function setup() {
 		// @todo hook up the metabox and save actions for the default UI
+		if ( $this->enable_ui ) {
+			$this->ui = new \TenUp\P2P\UI\PostToUser( $this );
+			$this->ui->setup();
+		}
 	}
 
 	/**

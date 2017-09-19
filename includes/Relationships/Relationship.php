@@ -27,16 +27,29 @@ abstract class Relationship {
 	 */
 	public $enable_ui;
 
+	/**
+	 * Various labels used for default UIs
+	 *
+	 * @var Array
+	 */
+	public $labels;
+
 	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
 
 		$defaults = array(
 			'enable_ui' => true,
+			'labels' => array(
+				'name' => $type,
+			),
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
 		$this->enable_ui = $args['enable_ui'];
+		$this->labels = $args['labels'];
 	}
+
+	abstract function setup();
 
 }

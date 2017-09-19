@@ -1,0 +1,25 @@
+{
+  "name": "p2p",
+  "version": "1.0.0",
+  "description": "Post to Post Library for WordPress",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-js": "browserify -t vueify -e assets/js/src/p2p.js -o assets/js/p2p.js",
+    "watch-js": "watchify -v -t vueify -e assets/js/src/p2p.js -o assets/js/p2p.js"
+  },
+  "author": "Chris Marslender <chris.marslender@10up.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-runtime": "^6.26.0",
+    "node-sass": "^4.5.3",
+    "vue": "^2.4.4",
+    "vueify": "^9.4.1"
+  }
+}

@@ -20,6 +20,13 @@ class PostToPost extends Relationship {
 	 */
 	public $to;
 
+	/**
+	 * The UI Object for the relationship, if the UI is enabled
+	 *
+	 * @var \TenUp\P2P\UI\PostToPost
+	 */
+	public $ui;
+
 	public function __construct( $from, $to, $type, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
 			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
@@ -38,6 +45,10 @@ class PostToPost extends Relationship {
 
 	public function setup() {
 		// @todo hook up the metabox and save actions for the default UI
+		if ( $this->enable_ui ) {
+			$this->ui = new \TenUp\P2P\UI\PostToPost( $this );
+			$this->ui->setup();
+		}
 	}
 
 	/**

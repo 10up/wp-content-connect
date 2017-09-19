@@ -27,3 +27,6 @@ sassdoc
 scss-lint-report.xml
 config.codekit
 
+/assets/js/p2p.js
+/assets/js/p2p.min.js
+

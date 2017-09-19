@@ -96,6 +96,7 @@ class Registry {
 		$key = $this->get_relationship_key( $from, $to, $type );
 
 		$this->post_post_relationships[ $key ] = new PostToPost( $from, $to, $type, $args );
+		$this->post_post_relationships[ $key ]->setup();
 
 		return $this->post_post_relationships[ $key ];
 	}
@@ -154,6 +155,7 @@ class Registry {
 		$key = $this->get_relationship_key( $post_type, 'user', $type );
 
 		$this->post_user_relationships[ $key ] = new PostToUser( $post_type, $type, $args );
+		$this->post_user_relationships[ $key ]->setup();
 
 		return $this->post_user_relationships[ $key ];
 	}
