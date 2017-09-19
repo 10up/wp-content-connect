@@ -5,7 +5,7 @@
 				<li v-for="item in items" class="p2p-picker-list-item">
 					<span class="p2p-grab-icon dashicons dashicons-move"></span>
 					<span class="p2p-selected-item-name">{{ item.name }}</span>
-					<span class="delete-item p2p-delete-button">delete</span>
+					<span class="delete-item p2p-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
 				</li>
 			</draggable>
 		</ul>
@@ -74,6 +74,11 @@
 				set( items ) {
 					this.$emit( 'reorder-items', items );
 				}
+			}
+		},
+		methods: {
+			deleteItem( item ) {
+				this.$emit( 'delete-item', item );
 			}
 		}
 	}
