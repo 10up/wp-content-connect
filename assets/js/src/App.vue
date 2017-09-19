@@ -1,6 +1,6 @@
 <template>
 	<div class="Post To Post vtab-frame">
-		<div class="vtab-left">
+		<div class="vtab-left" v-if="relationships.length > 1">
 			<div class="vtab-frame-menu">
 				<div class="vtab-menu">
 					<template v-if="relationships.length">
