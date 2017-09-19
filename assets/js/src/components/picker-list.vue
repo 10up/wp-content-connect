@@ -1,7 +1,7 @@
 <template>
 	<div class="p2p-picker-list-container">
 		<ul class="p2p-picker">
-			<draggable v-model="localItems">
+			<draggable v-model="localItems" :options="{ghostClass: 'ghost'}" @start="drag=true" @end="drag=false">
 				<li v-for="item in items" class="p2p-picker-list-item">
 					<span class="p2p-grab-icon dashicons dashicons-move"></span>
 					<span class="p2p-selected-item-name">{{ item.name }}</span>
@@ -21,10 +21,16 @@
 		width: 100%;
 		position: relative;
 		padding: 1em 1em 1em 0.5em;
+		cursor: move;
 	}
 
 	.p2p-picker-list-item:nth-child(odd) {
 		background-color: #f9f9f9;
+	}
+
+	.p2p-picker-list-item.ghost {
+		opacity: 0.5;
+		background: #c8ebfb;
 	}
 
 	.p2p-grab-icon {
