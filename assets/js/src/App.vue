@@ -33,6 +33,11 @@
 				<!--<div class="vtab-frame-toolbar"></div>-->
 			</template>
 		</div>
+		<br>
+		<div>
+			<input type="hidden" v-model="saveData" name="tenup-p2p-relationships">
+		</div>
+
 	</div>
 </template>
 
@@ -204,20 +209,39 @@
 			PickerList: PickerList,
 			PickerSearch: PickerSearch
 		},
+		computed: {
+			saveData() {
+				var data = {},
+					relationship,
+					i, j;
+
+				for ( i = 0; i < this.relationships.length; i++ ) {
+					relationship = this.relationships[ i ];
+
+					data[ relationship.relid ] = [];
+
+					for( j = 0; j < relationship.selected.length; j++ ) {
+						data[ relationship.relid ].push( relationship.selected[j].ID );
+					}
+				}
+
+				return JSON.stringify( data );
+			}
+		},
 		methods: {
-			activeMenuItem: function( relationship ) {
+			activeMenuItem( relationship ) {
 				return {
 					active: ( relationship === this.activeRelationship )
 				};
 
 			},
-			setActiveRelationship: function( relationship ) {
+			setActiveRelationship( relationship ) {
 				this.activeRelationship = relationship;
 			},
-			addSearchItem: function( item ) {
+			addSearchItem( item ) {
 				this.activeRelationship.selected.push( item );
 			},
-			reorderItems: function( items ) {
+			reorderItems( items ) {
 				this.activeRelationship.selected = items;
 			},
 			deleteItem( item ) {

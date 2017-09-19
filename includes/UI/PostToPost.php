@@ -54,6 +54,7 @@ class PostToPost {
 		if ( ! empty( $final_posts ) ) {
 			$data[] = array(
 				'reltype' => 'post-to-post',
+				'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->type}", // @todo should probably get this from the registry
 				'type' => $this->relationship->type,
 				'labels' => $this->relationship->labels,
 				'selected' => $final_posts,
