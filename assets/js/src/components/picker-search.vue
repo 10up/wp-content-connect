@@ -65,12 +65,12 @@
 		props: {
 			'items': {},
 			'object_type': { // post or user
-				default: function() {
+				default() {
 					return 'post';
 				}
 			},
 			'post_type': {
-				default: function() {
+				default() {
 					return 'post';
 				}
 			}
@@ -82,11 +82,11 @@
 			}
 		},
 		methods: {
-			search: function() {
+			search() {
 				// @todo implement searching for the text
 				this.results = [ { ID: "random" + Math.random(), name: this.searchtext } ];
 			},
-			add: function( item ) {
+			add( item ) {
 				this.$emit( 'add-item', item );
 				// @todo make sure this is removed from "results"
 				// ^^ should be, if we make sure not to render any results that match the selected IDs
