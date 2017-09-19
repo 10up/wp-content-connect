@@ -1,11 +1,13 @@
 <template>
 	<div class="p2p-picker-list-container">
 		<ul class="p2p-picker">
-			<li v-for="item in items" class="p2p-picker-list-item">
-				<span class="p2p-grab-icon dashicons dashicons-move"></span>
-				<span class="p2p-selected-item-name">{{ item.name }}</span>
-				<span class="delete-item p2p-delete-button">delete</span>
-			</li>
+			<draggable v-model="localItems">
+				<li v-for="item in items" class="p2p-picker-list-item">
+					<span class="p2p-grab-icon dashicons dashicons-move"></span>
+					<span class="p2p-selected-item-name">{{ item.name }}</span>
+					<span class="delete-item p2p-delete-button">delete</span>
+				</li>
+			</draggable>
 		</ul>
 	</div>
 </template>
@@ -49,9 +51,24 @@
 </style>
 
 <script>
+	var draggable = require( 'vuedraggable' );
+
 	export default {
 		props: {
 			items: {}
+		},
+		components: {
+			draggable
+		},
+		computed: {
+			localItems: {
+				get() {
+					return this.items;
+				},
+				set( items ) {
+					this.$emit( 'reorder-items', items );
+				}
+			}
 		}
 	}
 </script>

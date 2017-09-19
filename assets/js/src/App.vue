@@ -22,7 +22,7 @@
 
 				<div class="vtab-frame-content">
 					<div class="vtab-content-area">
-						<picker-list :items="activeRelationship.selected"></picker-list>
+						<picker-list :items="activeRelationship.selected" v-on:reorder-items="reorderItems"></picker-list>
 						<picker-search v-on:add-item="addSearchItem"></picker-search>
 					</div>
 				</div>
@@ -213,6 +213,9 @@
 			},
 			addSearchItem: function( item ) {
 				this.activeRelationship.selected.push( item );
+			},
+			reorderItems: function( items ) {
+				this.activeRelationship.selected = items;
 			}
 		}
 	}
