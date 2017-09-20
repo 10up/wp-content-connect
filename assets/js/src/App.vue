@@ -23,6 +23,7 @@
 				<div class="vtab-frame-content">
 					<div class="vtab-content-area">
 						<picker-list
+								:sortable="activeRelationship.sortable"
 								:items="activeRelationship.selected"
 								v-on:reorder-items="reorderItems"
 								v-on:delete-item="deleteItem"></picker-list>

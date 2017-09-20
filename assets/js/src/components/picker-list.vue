@@ -1,13 +1,18 @@
 <template>
 	<div class="p2p-picker-list-container">
 		<ul class="p2p-picker">
-			<draggable v-model="localItems" :options="{ghostClass: 'ghost'}" @start="drag=true" @end="drag=false">
-				<li v-for="item in items" class="p2p-picker-list-item">
+			<draggable v-if="sortable === true" v-model="localItems" :options="{ghostClass: 'ghost'}" @start="drag=true" @end="drag=false">
+				<li v-for="item in items" class="p2p-picker-list-item sortable">
 					<span class="p2p-grab-icon dashicons dashicons-move"></span>
 					<span class="p2p-selected-item-name">{{ item.name }}</span>
 					<span class="delete-item p2p-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
 				</li>
 			</draggable>
+
+			<li v-if="sortable === false" v-for="item in items" class="p2p-picker-list-item">
+				<span class="p2p-selected-item-name">{{ item.name }}</span>
+				<span class="delete-item p2p-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
+			</li>
 		</ul>
 	</div>
 </template>
@@ -21,6 +26,9 @@
 		width: 100%;
 		position: relative;
 		padding: 1em 1em 1em 0.5em;
+	}
+
+	.p2p-picker-list-item.sortable {
 		cursor: move;
 	}
 
@@ -61,7 +69,8 @@
 
 	export default {
 		props: {
-			items: {}
+			items: {},
+			sortable: {},
 		},
 		components: {
 			draggable

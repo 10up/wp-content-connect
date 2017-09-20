@@ -2,35 +2,7 @@
 
 namespace TenUp\P2P\UI;
 
-class PostToUser {
-
-	/**
-	 * @var \TenUp\P2P\Relationships\PostToUser
-	 */
-	public $relationship;
-
-	/**
-	 * The post type to render the UI on
-	 *
-	 * @var String
-	 */
-	public $render_post_type;
-
-	/**
-	 * Labels for this UI
-	 *
-	 * @var Array
-	 */
-	public $labels;
-
-	/**
-	 * @param PostToUser $relationship
-	 */
-	public function __construct( $relationship, $render_post_type, $labels ) {
-		$this->relationship = $relationship;
-		$this->render_post_type = $render_post_type;
-		$this->labels = $labels;
-	}
+class PostToUser extends PostUI {
 
 	public function setup() {
 		add_filter( 'tenup_p2p_post_relationship_data', array( $this, 'filter_data' ), 10, 2 );
@@ -70,6 +42,7 @@ class PostToUser {
 			'relid' => "{$this->relationship->post_type}_user_{$this->relationship->type}", // @todo should probably get this from the registry
 			'type' => $this->relationship->type,
 			'labels' => $this->labels,
+			'sortable' => $this->sortable,
 			'selected' => $final_users,
 		);
 

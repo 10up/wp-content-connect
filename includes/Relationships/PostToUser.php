@@ -33,7 +33,7 @@ class PostToUser extends Relationship {
 
 	public function setup() {
 		if ( $this->enable_from_ui ) {
-			$this->from_ui = new \TenUp\P2P\UI\PostToUser( $this, $this->post_type, $this->from_labels );
+			$this->from_ui = new \TenUp\P2P\UI\PostToUser( $this, $this->post_type, $this->from_labels, $this->from_sortable );
 			$this->from_ui->setup();
 		}
 	}

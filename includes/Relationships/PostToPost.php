@@ -52,12 +52,12 @@ class PostToPost extends Relationship {
 
 	public function setup() {
 		if ( $this->enable_from_ui === true ) {
-			$this->from_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->from, $this->from_labels );
+			$this->from_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->from, $this->from_labels, $this->from_sortable );
 			$this->from_ui->setup();
 		}
 
 		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			$this->to_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->to, $this->to_labels );
+			$this->to_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->to, $this->to_labels, $this->to_sortable );
 			$this->to_ui->setup();
 		}
 	}

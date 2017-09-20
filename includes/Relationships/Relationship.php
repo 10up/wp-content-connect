@@ -48,18 +48,34 @@ abstract class Relationship {
 	 */
 	public $to_labels;
 
+	/**
+	 * Is the "from" UI for this sortable
+	 *
+	 * @var bool
+	 */
+	public $from_sortable;
+
+	/**
+	 * Is the "to" UI for this sortable
+	 *
+	 * @var bool
+	 */
+	public $to_sortable;
+
 	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
 
 		$defaults = array(
 			'from_ui' => array(
 				'enabled' => true,
+				'sortable' => false,
 				'labels' => array(
 					'name' => $type,
 				),
 			),
 			'to_ui' => array(
 				'enabled' => false,
+				'sortable' => false,
 				'labels' => array(
 					'name' => $type,
 				)
@@ -69,9 +85,11 @@ abstract class Relationship {
 		$args = array_replace_recursive( $defaults, $args );
 
 		$this->enable_from_ui = $args['from_ui']['enabled'];
+		$this->from_sortable = $args['from_ui']['sortable'];
 		$this->from_labels = $args['from_ui']['labels'];
 
 		$this->enable_to_ui = $args['to_ui']['enabled'];
+		$this->to_sortable = $args['to_ui']['sortable'];
 		$this->to_labels = $args['to_ui']['labels'];
 	}
 
