@@ -26,7 +26,10 @@
 								:items="activeRelationship.selected"
 								v-on:reorder-items="reorderItems"
 								v-on:delete-item="deleteItem"></picker-list>
-						<picker-search v-on:add-item="addSearchItem"></picker-search>
+						<picker-search
+								v-on:add-item="addSearchItem"
+								v-on:search="search"
+								:results="searchResults"></picker-search>
 					</div>
 				</div>
 
@@ -203,6 +206,7 @@
 		data: function() {
 			return Object.assign({}, {
 				"activeRelationship": P2PData.relationships[0],
+				"searchResults": [],
 			}, window.P2PData);
 		},
 		components: {
@@ -233,13 +237,52 @@
 				return {
 					active: ( relationship === this.activeRelationship )
 				};
-
 			},
 			setActiveRelationship( relationship ) {
 				this.activeRelationship = relationship;
+
+				// Make sure we don't carry over old results to new view
+				this.searchResults = [];
+			},
+			search( searchText ) {
+				this.$http.post( this.endpoints.search, {
+					"object_type": this.activeRelationship.object_type,
+					"post_type": this.activeRelationship.post_type,
+					"search": searchText
+				} ).then( response => {
+					// success
+					var i, result;
+
+					this.searchResults = [];
+
+					// Don't add already selected IDs
+					for ( i = 0; i < response.body.length; i++ ) {
+						result = response.body[ i ];
+
+						if ( this.isSelected( result.ID ) === false ) {
+							this.searchResults.push( result );
+						}
+					}
+				}, response => {
+					// @todo handle error response
+				});
+			},
+			// Checks if the ID is already present in the list of items
+			isSelected( id ) {
+				var key, item;
+				for ( key in this.activeRelationship.selected ) {
+					item = this.activeRelationship.selected[ key ];
+					if ( parseInt( item.ID, 10 ) === parseInt( id, 10 ) ) {
+						return true;
+					}
+				}
+
+				return false;
 			},
 			addSearchItem( item ) {
 				this.activeRelationship.selected.push( item );
+				var index = this.searchResults.indexOf( item );
+				this.searchResults.splice( index, 1 );
 			},
 			reorderItems( items ) {
 				this.activeRelationship.selected = items;

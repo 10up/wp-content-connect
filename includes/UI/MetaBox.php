@@ -16,6 +16,7 @@ class MetaBox {
 
 		$relationship_data = array(
 			'nonce' => wp_create_nonce( 'save-p2p-data' ),
+			'endpoints' => array(),
 			'relationships' => $relationships,
 		);
 
@@ -26,7 +27,7 @@ class MetaBox {
 		\add_meta_box( 'tenup-p2p-relationships', __( "Relationships", "tenup-p2p" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 
 		wp_enqueue_script( 'tenup-p2p', Plugin::instance()->url . 'assets/js/p2p.js', array(), Plugin::instance()->version, true );
-		wp_localize_script( 'tenup-p2p', 'P2PData', $relationship_data );
+		wp_localize_script( 'tenup-p2p', 'P2PData', apply_filters( 'tenup_p2p_localize_data', $relationship_data ) );
 	}
 
 	public function render( $post, $metabox ) {

@@ -2,6 +2,7 @@
 
 namespace TenUp\P2P;
 
+use TenUp\P2P\API\Search;
 use TenUp\P2P\QueryIntegration\UserQueryIntegration;
 use TenUp\P2P\QueryIntegration\WPQueryIntegration;
 use TenUp\P2P\Tables\PostToPost;
@@ -12,6 +13,23 @@ class Plugin {
 
 	private static $instance;
 
+	/**
+	 * URL to the Plugin
+	 *
+	 * @var string
+	 */
+	public $url;
+
+	/**
+	 * Current plugin version
+	 *
+	 * @var string
+	 */
+	public $version;
+
+	/**
+	 * @var array
+	 */
 	public $tables = array();
 
 	/**
@@ -35,18 +53,9 @@ class Plugin {
 	public $meta_box;
 
 	/**
-	 * URL to the Plugin
-	 *
-	 * @var string
+	 * @var Search
 	 */
-	public $url;
-
-	/**
-	 * Current plugin version
-	 *
-	 * @var string
-	 */
-	public $version;
+	public $search;
 
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -88,6 +97,9 @@ class Plugin {
 
 		$this->meta_box = new MetaBox();
 		$this->meta_box->setup();
+
+		$this->search = new Search();
+		$this->search->setup();
 	}
 
 	public function register_tables() {

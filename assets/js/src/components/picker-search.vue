@@ -63,36 +63,19 @@
 <script>
 	export default {
 		props: {
-			'items': {},
-			'object_type': { // post or user
-				default() {
-					return 'post';
-				}
-			},
-			'post_type': {
-				default() {
-					return 'post';
-				}
-			}
+			results: {}
 		},
 		data: function() {
 			return {
-				searchtext: '',
-				results: [],
+				searchtext: ''
 			}
 		},
 		methods: {
 			search() {
-				// @todo implement searching for the text
-				this.results = [ { ID: "random" + Math.random(), name: this.searchtext } ];
+				this.$emit( 'search', this.searchtext );
 			},
 			add( item ) {
 				this.$emit( 'add-item', item );
-				// @todo make sure this is removed from "results"
-				// ^^ should be, if we make sure not to render any results that match the selected IDs
-				// Below is a hacky workaround, for now
-				this.results = [];
-				this.searchtext = '';
 			}
 		}
 	}

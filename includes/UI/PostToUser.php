@@ -52,6 +52,7 @@ class PostToUser {
 		if ( ! empty( $final_users ) ) {
 			$data[] = array(
 				'reltype' => 'post-to-user',
+				'object_type' => 'user', // The object type we'll be querying for in searches on the front end
 				'relid' => "{$this->relationship->post_type}_user_{$this->relationship->type}", // @todo should probably get this from the registry
 				'type' => $this->relationship->type,
 				'labels' => $this->relationship->labels,
