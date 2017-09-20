@@ -21,33 +21,58 @@ abstract class Relationship {
 	public $id;
 
 	/**
-	 * Should the default UI for this relationship be enabled
+	 * Should the from UI for this relationship be enabled
 	 *
 	 * @var bool
 	 */
-	public $enable_ui;
+	public $enable_from_ui;
 
 	/**
-	 * Various labels used for default UIs
+	 * Should the to UI for this relationship be enabled
+	 *
+	 * @var bool
+	 */
+	public $enable_to_ui;
+
+	/**
+	 * Various labels used for from UI
 	 *
 	 * @var Array
 	 */
-	public $labels;
+	public $from_labels;
+
+	/**
+	 * Various labels used for to UI
+	 *
+	 * @var Array
+	 */
+	public $to_labels;
 
 	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
 
 		$defaults = array(
-			'enable_ui' => true,
-			'labels' => array(
-				'name' => $type,
+			'from_ui' => array(
+				'enabled' => true,
+				'labels' => array(
+					'name' => $type,
+				),
+			),
+			'to_ui' => array(
+				'enabled' => false,
+				'labels' => array(
+					'name' => $type,
+				)
 			),
 		);
 
-		$args = wp_parse_args( $args, $defaults );
+		$args = array_replace_recursive( $defaults, $args );
 
-		$this->enable_ui = $args['enable_ui'];
-		$this->labels = $args['labels'];
+		$this->enable_from_ui = $args['from_ui']['enabled'];
+		$this->from_labels = $args['from_ui']['labels'];
+
+		$this->enable_to_ui = $args['to_ui']['enabled'];
+		$this->to_labels = $args['to_ui']['labels'];
 	}
 
 	abstract function setup();

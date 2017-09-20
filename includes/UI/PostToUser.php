@@ -10,11 +10,26 @@ class PostToUser {
 	public $relationship;
 
 	/**
+	 * The post type to render the UI on
+	 *
+	 * @var String
+	 */
+	public $render_post_type;
+
+	/**
+	 * Labels for this UI
+	 *
+	 * @var Array
+	 */
+	public $labels;
+
+	/**
 	 * @param PostToUser $relationship
 	 */
-	public function __construct( $relationship ) {
+	public function __construct( $relationship, $render_post_type, $labels ) {
 		$this->relationship = $relationship;
-
+		$this->render_post_type = $render_post_type;
+		$this->labels = $labels;
 	}
 
 	public function setup() {
@@ -22,12 +37,12 @@ class PostToUser {
 	}
 
 	public function filter_data( $data, $post ) {
-		// Determine the other post type in the relationship
-		$other_post_type = $this->relationship->post_type;
+		// Don't add any data if we aren't on the post type we're supposed to render for
+		if ( $post->post_type !== $this->render_post_type ) {
+			return $data;
+		}
 
-		$final_users = array(
-
-		);
+		$final_users = array();
 
 		// @todo if order is supported, we need to respect the order
 		$query = new \WP_User_Query( array(
@@ -49,16 +64,14 @@ class PostToUser {
 
 		// @Todo add pagination
 
-		if ( ! empty( $final_users ) ) {
-			$data[] = array(
-				'reltype' => 'post-to-user',
-				'object_type' => 'user', // The object type we'll be querying for in searches on the front end
-				'relid' => "{$this->relationship->post_type}_user_{$this->relationship->type}", // @todo should probably get this from the registry
-				'type' => $this->relationship->type,
-				'labels' => $this->relationship->labels,
-				'selected' => $final_users,
-			);
-		}
+		$data[] = array(
+			'reltype' => 'post-to-user',
+			'object_type' => 'user', // The object type we'll be querying for in searches on the front end
+			'relid' => "{$this->relationship->post_type}_user_{$this->relationship->type}", // @todo should probably get this from the registry
+			'type' => $this->relationship->type,
+			'labels' => $this->labels,
+			'selected' => $final_users,
+		);
 
 		return $data;
 	}

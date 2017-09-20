@@ -14,11 +14,11 @@ class PostToUser extends Relationship {
 	public $post_type;
 
 	/**
-	 * The UI object for the relationship, if the UI is enabled
+	 * The UI object for the "from" (post) relationship, if the UI is enabled
 	 *
 	 * @var \TenUp\P2P\UI\PostToUser
 	 */
-	public $ui;
+	public $from_ui;
 
 	public function __construct( $post_type, $type, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
@@ -32,10 +32,9 @@ class PostToUser extends Relationship {
 	}
 
 	public function setup() {
-		// @todo hook up the metabox and save actions for the default UI
-		if ( $this->enable_ui ) {
-			$this->ui = new \TenUp\P2P\UI\PostToUser( $this );
-			$this->ui->setup();
+		if ( $this->enable_from_ui ) {
+			$this->from_ui = new \TenUp\P2P\UI\PostToUser( $this, $this->post_type, $this->from_labels );
+			$this->from_ui->setup();
 		}
 	}
 

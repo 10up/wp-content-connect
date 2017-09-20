@@ -10,11 +10,26 @@ class PostToPost {
 	public $relationship;
 
 	/**
+	 * The post type to render this UI on
+	 *
+	 * @var String
+	 */
+	public $render_post_type;
+
+	/**
+	 * Labels for this UI
+	 *
+	 * @var Array
+	 */
+	public $labels;
+
+	/**
 	 * @param PostToPost $relationship
 	 */
-	public function __construct( $relationship ) {
+	public function __construct( $relationship, $render_post_type, $labels ) {
 		$this->relationship = $relationship;
-
+		$this->render_post_type = $render_post_type;
+		$this->labels = $labels;
 	}
 
 	public function setup() {
@@ -22,12 +37,15 @@ class PostToPost {
 	}
 
 	public function filter_data( $data, $post ) {
+		// Don't add any data if we aren't on the post type we're supposed to render for
+		if ( $post->post_type !== $this->render_post_type ) {
+			return $data;
+		}
+
 		// Determine the other post type in the relationship
-		$other_post_type = $this->relationship->from == $post->post_type ? $this->relationship->to : $this->relationship->from;
+		$other_post_type = $this->relationship->from == $this->render_post_type ? $this->relationship->to : $this->relationship->from;
 
-		$final_posts = array(
-
-		);
+		$final_posts = array();
 
 		// @todo if order is supported, we need to respect the order
 		$query = new \WP_Query( array (
@@ -51,17 +69,15 @@ class PostToPost {
 
 		// @Todo add pagination
 
-		if ( ! empty( $final_posts ) ) {
-			$data[] = array(
-				'reltype' => 'post-to-post',
-				'object_type' => 'post', // The object type we'll be querying for in searches on the front end
-				'post_type' => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship)
-				'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->type}", // @todo should probably get this from the registry
-				'type' => $this->relationship->type,
-				'labels' => $this->relationship->labels,
-				'selected' => $final_posts,
-			);
-		}
+		$data[] = array(
+			'reltype' => 'post-to-post',
+			'object_type' => 'post', // The object type we'll be querying for in searches on the front end
+			'post_type' => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship)
+			'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->type}", // @todo should probably get this from the registry
+			'type' => $this->relationship->type,
+			'labels' => $this->labels,
+			'selected' => $final_posts,
+		);
 
 		return $data;
 	}
