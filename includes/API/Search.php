@@ -13,13 +13,37 @@ class Search {
 		register_rest_route( 'p2p/v1', '/search', array(
 			'methods' => 'POST',
 			'callback' => array( $this, 'process_search' ),
+			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 	}
 
 	public function localize_endpoints( $data ) {
 		$data['endpoints']['search'] = get_rest_url( get_current_blog_id(), 'p2p/v1/search' );
+		$data['nonces']['search'] = wp_create_nonce( 'p2p-search' );
 
 		return $data;
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return bool
+	 */
+	public function check_permission( $request ) {
+		$user = wp_get_current_user();
+
+		if ( $user->ID === 0 ) {
+			return false;
+		}
+
+		$nonce = $request->get_param( 'nonce' );
+
+		// If the user got the nonce, they were on the proper edit page
+		if ( ! wp_verify_nonce( $nonce, 'p2p-search' ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

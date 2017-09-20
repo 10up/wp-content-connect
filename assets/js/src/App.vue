@@ -246,6 +246,7 @@
 			},
 			search( searchText ) {
 				this.$http.post( this.endpoints.search, {
+					"nonce": this.nonces.search,
 					"object_type": this.activeRelationship.object_type,
 					"post_type": this.activeRelationship.post_type,
 					"search": searchText

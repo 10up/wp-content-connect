@@ -15,7 +15,9 @@ class MetaBox {
 		$relationships = apply_filters( 'tenup_p2p_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
-			'nonce' => wp_create_nonce( 'save-p2p-data' ),
+			'nonces' => array(
+				'wp_rest' => wp_create_nonce( 'wp_rest' ),
+			),
 			'endpoints' => array(),
 			'relationships' => $relationships,
 		);
