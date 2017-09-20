@@ -59,7 +59,14 @@ class MetaBox {
 					break;
 			}
 
-			$relationship->ui->handle_save( $relationship_data, $post_id );
+			// Deteremine save direction and call proper save function
+			$post_type = get_post_type( $post_id );
+			if ( $relationship->from_ui->render_post_type === $post_type ) {
+				$relationship->from_ui->handle_save( $relationship_data, $post_id );
+			} else if ( is_object( $relationship->to_ui ) && $relationship->to_ui->render_post_type === $post_type ) {
+				$relationship->to_ui->handle_save( $relationship_data, $post_id );
+			}
+
 		}
 	}
 
