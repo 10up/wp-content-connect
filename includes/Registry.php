@@ -51,6 +51,14 @@ class Registry {
 		return true;
 	}
 
+	public function get_post_to_post_relationship_by_key( $key ) {
+		if ( isset( $this->post_post_relationships[ $key ] ) ) {
+			return $this->post_post_relationships[ $key ];
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns the relationship object for the post types provided. Order of CPT args is unimportant.
 	 *
@@ -63,18 +71,18 @@ class Registry {
 	public function get_post_to_post_relationship( $cpt1, $cpt2, $type ) {
 		$key = $this->get_relationship_key( $cpt1, $cpt2, $type );
 
-		if ( isset( $this->post_post_relationships[ $key ] ) ) {
-			return $this->post_post_relationships[ $key ];
+		$relationship = $this->get_post_to_post_relationship_by_key( $key );
+
+		if ( $relationship ) {
+			return $relationship;
 		}
 
 		// Try the inverse
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $type );
 
-		if ( isset( $this->post_post_relationships[ $key ] ) ) {
-			return $this->post_post_relationships[ $key ];
-		}
+		$relationship = $this->get_post_to_post_relationship_by_key( $key );
 
-		return false;
+		return $relationship;
 	}
 
 	/**
@@ -121,6 +129,14 @@ class Registry {
 		return true;
 	}
 
+	public function get_post_to_user_relationship_by_key( $key ) {
+		if ( isset( $this->post_user_relationships[ $key ] ) ) {
+			return $this->post_user_relationships[ $key ];
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns the relationship object between users and the post type provided.
 	 *
@@ -130,11 +146,7 @@ class Registry {
 	public function get_post_to_user_relationship( $post_type, $type ) {
 		$key = $this->get_relationship_key( $post_type, 'user', $type );
 
-		if ( isset( $this->post_user_relationships[ $key ] ) ) {
-			return $this->post_user_relationships[ $key ];
-		}
-
-		return false;
+		return $this->get_post_to_user_relationship_by_key( $key );
 	}
 
 	/**
