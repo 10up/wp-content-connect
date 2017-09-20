@@ -222,10 +222,14 @@
 				for ( i = 0; i < this.relationships.length; i++ ) {
 					relationship = this.relationships[ i ];
 
-					data[ relationship.relid ] = [];
+					data[ relationship.relid ] = {
+						"reltype": relationship.reltype,
+						"relid": relationship.relid,
+						"add_items": []
+					};
 
 					for( j = 0; j < relationship.selected.length; j++ ) {
-						data[ relationship.relid ].push( relationship.selected[j].ID );
+						data[ relationship.relid ].add_items.push( relationship.selected[j].ID );
 					}
 				}
 
