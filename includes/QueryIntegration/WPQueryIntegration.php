@@ -66,7 +66,14 @@ class WPQueryIntegration {
 			return $orderby;
 		}
 
-		// @Todo not supported for user -> post variant
+		/*
+		 * Since we don't have a UI for anything on user screens, its not possible to order there
+		 * Therefore, if we are finding things related by a user ID, we ignore this param, since it would do nothing
+		 * and just over complicate the query
+		 */
+		if ( isset( $query->relationship_query->segments[0]['related_to_user'] ) ) {
+			return $orderby;
+		}
 
 		/*
 		 * We're doing this CASE and FIELD method, in case we switched from a non-sortable relationship to a
