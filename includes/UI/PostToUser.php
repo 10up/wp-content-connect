@@ -16,13 +16,19 @@ class PostToUser extends PostUI {
 
 		$final_users = array();
 
-		// @todo if order is supported, we need to respect the order
-		$query = new \WP_User_Query( array(
+		$args = array(
 			'relationship_query' => array(
 				'type' => $this->relationship->type,
 				'related_to_post' => $post->ID,
 			)
-		) );
+		);
+
+		$query = new \WP_User_Query( $args );
+
+		if ( $this->sortable ) {
+			$args['orderby'] = 'relationship';
+			$args['order'] = 'ASC';
+		}
 
 		$users = $query->get_results();
 		if ( ! empty( $users ) ) {
@@ -62,6 +68,10 @@ class PostToUser extends PostUI {
 
 		foreach( $add_ids as $add ) {
 			$this->relationship->add_relationship( $post_id, $add );
+		}
+
+		if ( $this->sortable ) {
+			$this->relationship->save_sort_data( $post_id, $current_ids );
 		}
 	}
 

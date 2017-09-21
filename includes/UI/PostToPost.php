@@ -19,14 +19,20 @@ class PostToPost extends PostUI {
 
 		$final_posts = array();
 
-		// @todo if order is supported, we need to respect the order
-		$query = new \WP_Query( array (
+		$args = array (
 			'post_type' => $other_post_type,
 			'relationship_query' => array(
 				'type' => $this->relationship->type,
 				'related_to_post' => $post->ID,
 			),
-		) );
+		);
+
+		if ( $this->sortable ) {
+			$args['orderby'] = 'relationship';
+			$args['order'] = 'ASC';
+		}
+
+		$query = new \WP_Query( $args );
 
 		if ( $query->have_posts() ) {
 			while( $query->have_posts() ) {
@@ -68,6 +74,10 @@ class PostToPost extends PostUI {
 
 		foreach( $add_ids as $add ) {
 			$this->relationship->add_relationship( $post_id, $add );
+		}
+
+		if ( $this->sortable ) {
+			$this->relationship->save_sort_data( $post_id, $current_ids );
 		}
 	}
 

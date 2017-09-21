@@ -55,13 +55,6 @@ abstract class Relationship {
 	 */
 	public $from_sortable;
 
-	/**
-	 * Is the "to" UI for this sortable
-	 *
-	 * @var bool
-	 */
-	public $to_sortable;
-
 	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
 
@@ -75,7 +68,6 @@ abstract class Relationship {
 			),
 			'to_ui' => array(
 				'enabled' => false,
-				'sortable' => false,
 				'labels' => array(
 					'name' => $type,
 				)
@@ -89,10 +81,11 @@ abstract class Relationship {
 		$this->from_labels = $args['from_ui']['labels'];
 
 		$this->enable_to_ui = $args['to_ui']['enabled'];
-		$this->to_sortable = $args['to_ui']['sortable'];
 		$this->to_labels = $args['to_ui']['labels'];
 	}
 
 	abstract function setup();
+
+	abstract function save_sort_data( $object_id, $ordered_ids );
 
 }

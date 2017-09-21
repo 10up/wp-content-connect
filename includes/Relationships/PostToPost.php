@@ -56,10 +56,20 @@ class PostToPost extends Relationship {
 			$this->from_ui->setup();
 		}
 
-		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			$this->to_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->to, $this->to_labels, $this->to_sortable );
-			$this->to_ui->setup();
+		/*
+		 * Only register "TO" UI if the following are met:
+		 * - CPTs are not the same
+		 * - TO UI is enabled
+		 * - FROM is not sortable (we can't have multiple UIs when one of them is sortable).
+		 *      If from marked as sortable, we also make sure its enabled, or else it doesn't matter
+		 */
+		if ( ! ( $this->from_sortable === true && $this->enable_from_ui === true ) ) {
+			if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
+				$this->to_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->to, $this->to_labels, false );
+				$this->to_ui->setup();
+			}
 		}
+
 	}
 
 	/**
@@ -124,6 +134,18 @@ class PostToPost extends Relationship {
 			array( 'id1' => $pid2, 'id2' => $pid1, 'type' => $this->type ),
 			array( '%d', '%d', '%s' )
 		);
+	}
+
+	public function get_sort_meta_key() {
+		return "p2p_{$this->from}_{$this->to}_{$this->type}-sort-data";
+	}
+
+	public function save_sort_data( $object_id, $ordered_ids ) {
+		update_post_meta( $object_id, $this->get_sort_meta_key(), array_map( 'intval', $ordered_ids ) );
+	}
+
+	public function get_sort_data( $object_id ) {
+		return get_post_meta( $object_id, $this->get_sort_meta_key(), true );
 	}
 
 }

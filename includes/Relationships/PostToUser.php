@@ -118,4 +118,16 @@ class PostToUser extends Relationship {
 		);
 	}
 
+	public function get_sort_meta_key() {
+		return "p2u_{$this->from}_{$this->to}_{$this->type}-sort-data";
+	}
+
+	public function save_sort_data( $object_id, $ordered_ids ) {
+		update_post_meta( $object_id, $this->get_sort_meta_key(), array_map( 'intval', $ordered_ids ) );
+	}
+
+	public function get_sort_data( $object_id ) {
+		return get_post_meta( $object_id, $this->get_sort_meta_key(), true );
+	}
+
 }
