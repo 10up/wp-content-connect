@@ -1,8 +1,8 @@
 <?php
 
-namespace TenUp\P2P\UI;
+namespace TenUp\ContentConnect\UI;
 
-use TenUp\P2P\Plugin;
+use TenUp\ContentConnect\Plugin;
 
 class MetaBox {
 
@@ -13,7 +13,7 @@ class MetaBox {
 
 	public function add_meta_boxes( $post_type, $post ) {
 		// If we have any relationships to show on this page, their data will be injected here by filters
-		$relationships = apply_filters( 'tenup_p2p_post_relationship_data', array(), $post );
+		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
 			'nonces' => array(
@@ -27,27 +27,27 @@ class MetaBox {
 			return;
 		}
 
-		\add_meta_box( 'tenup-p2p-relationships', __( "Relationships", "tenup-p2p" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
+		\add_meta_box( 'tenup-content-connect-relationships', __( "Relationships", "tenup-content-connect" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 
-		wp_enqueue_script( 'tenup-p2p', Plugin::instance()->url . 'assets/js/p2p.js', array(), Plugin::instance()->version, true );
-		wp_localize_script( 'tenup-p2p', 'P2PData', apply_filters( 'tenup_p2p_localize_data', $relationship_data ) );
+		wp_enqueue_script( 'tenup-content-connect', Plugin::instance()->url . 'assets/js/content-connect.js', array(), Plugin::instance()->version, true );
+		wp_localize_script( 'tenup-content-connect', 'ContentConnectData', apply_filters( 'tenup_content_connect_localize_data', $relationship_data ) );
 	}
 
 	public function render( $post, $metabox ) {
-		wp_nonce_field( 'p2p-save', 'tenup-p2p-save' );
+		wp_nonce_field( 'content-connect-save', 'tenup-content-connect-save' );
 		?>
-		<div id="tenup-p2p-app"></div>
+		<div id="tenup-content-connect-app"></div>
 		<?php
 	}
 
 	public function save_post( $post_id ) {
-		if ( ! isset( $_POST['tenup-p2p-save'] ) || ! wp_verify_nonce( $_POST['tenup-p2p-save' ], 'p2p-save' ) ) {
+		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( $_POST['tenup-content-connect-save' ], 'content-connect-save' ) ) {
 			return false;
 		}
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationships = json_decode( wp_unslash( $_POST['tenup-p2p-relationships'] ), true );
+		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
 
 		foreach ( $relationships as $relationship_data ) {
 			switch( $relationship_data['reltype'] ) {

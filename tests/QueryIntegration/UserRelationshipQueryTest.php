@@ -1,13 +1,13 @@
 <?php
 
-namespace TenUp\P2P\Tests\QueryIntegration;
+namespace TenUp\ContentConnect\Tests\QueryIntegration;
 
-use TenUp\P2P\Plugin;
-use TenUp\P2P\QueryIntegration\UserRelationshipQuery;
-use TenUp\P2P\Registry;
-use TenUp\P2P\Tests\P2PTestCase;
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\QueryIntegration\UserRelationshipQuery;
+use TenUp\ContentConnect\Registry;
+use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
-class UserRelationshipQueryTest extends P2PTestCase {
+class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 	public function setUp() {
 		parent::setUp();

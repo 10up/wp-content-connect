@@ -1,11 +1,11 @@
 <?php
 
-namespace TenUp\P2P\UI;
+namespace TenUp\ContentConnect\UI;
 
 class PostToPost extends PostUI {
 
 	public function setup() {
-		add_filter( 'tenup_p2p_post_relationship_data', array( $this, 'filter_data' ), 10, 2 );
+		add_filter( 'tenup_content_connect_post_relationship_data', array( $this, 'filter_data' ), 10, 2 );
 	}
 
 	public function filter_data( $data, $post ) {

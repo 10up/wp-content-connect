@@ -1,13 +1,13 @@
 <?php
 
-namespace TenUp\P2P\Tests;
+namespace TenUp\ContentConnect\Tests;
 
-use TenUp\P2P\Plugin;
-use TenUp\P2P\Registry;
-use TenUp\P2P\Relationships\PostToPost;
-use TenUp\P2P\Relationships\PostToUser;
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Registry;
+use TenUp\ContentConnect\Relationships\PostToPost;
+use TenUp\ContentConnect\Relationships\PostToUser;
 
-class P2PTestCase extends \PHPUnit_Framework_TestCase {
+class ContentConnectTestCase extends \PHPUnit_Framework_TestCase {
 
 	public static function setupBeforeClass() {
 		self::insert_dummy_data();

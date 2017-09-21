@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\P2P\Relationships;
+namespace TenUp\ContentConnect\Relationships;
 
 abstract class Relationship {
 

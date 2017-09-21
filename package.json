@@ -1,15 +1,15 @@
 {
-  "name": "p2p",
+  "name": "wp-content-connect",
   "version": "1.0.0",
-  "description": "Post to Post Library for WordPress",
+  "description": "Post to Post and Post to User Library for WordPress",
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-js": "browserify -t vueify -e assets/js/src/p2p.js -o assets/js/p2p.js",
-    "watch-js": "watchify -v -t vueify -e assets/js/src/p2p.js -o assets/js/p2p.js"
+    "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
+    "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
   },
   "author": "Chris Marslender <chris.marslender@10up.com>",
   "license": "MIT",

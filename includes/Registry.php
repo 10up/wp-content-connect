@@ -1,10 +1,10 @@
 <?php
 
-namespace TenUp\P2P;
+namespace TenUp\ContentConnect;
 
-use TenUp\P2P\Relationships\PostToPost;
-use TenUp\P2P\Relationships\PostToUser;
-use TenUp\P2P\Relationships\Relationship;
+use TenUp\ContentConnect\Relationships\PostToPost;
+use TenUp\ContentConnect\Relationships\PostToUser;
+use TenUp\ContentConnect\Relationships\Relationship;
 
 /**
  * Creates and Tracks any relationships between post types

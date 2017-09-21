@@ -1,8 +1,8 @@
 <?php
 
-namespace TenUp\P2P\Relationships;
+namespace TenUp\ContentConnect\Relationships;
 
-use TenUp\P2P\Plugin;
+use TenUp\ContentConnect\Plugin;
 
 class PostToUser extends Relationship {
 
@@ -16,7 +16,7 @@ class PostToUser extends Relationship {
 	/**
 	 * The UI object for the "from" (post) relationship, if the UI is enabled
 	 *
-	 * @var \TenUp\P2P\UI\PostToUser
+	 * @var \TenUp\ContentConnect\UI\PostToUser
 	 */
 	public $from_ui;
 
@@ -33,7 +33,7 @@ class PostToUser extends Relationship {
 
 	public function setup() {
 		if ( $this->enable_from_ui ) {
-			$this->from_ui = new \TenUp\P2P\UI\PostToUser( $this, $this->post_type, $this->from_labels, $this->from_sortable );
+			$this->from_ui = new \TenUp\ContentConnect\UI\PostToUser( $this, $this->post_type, $this->from_labels, $this->from_sortable );
 			$this->from_ui->setup();
 		}
 	}
@@ -46,7 +46,7 @@ class PostToUser extends Relationship {
 	 * @return array
 	 */
 	public function get_related_post_ids( $user_id ) {
-		/** @var \TenUp\P2p\Tables\PostToUser $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 		$db = $table->get_db();
 
@@ -73,7 +73,7 @@ class PostToUser extends Relationship {
 			return array();
 		}
 
-		/** @var \TenUp\P2p\Tables\PostToUser $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 		$db = $table->get_db();
 
@@ -93,7 +93,7 @@ class PostToUser extends Relationship {
 	 * @param int $user_id
 	 */
 	public function add_relationship( $post_id, $user_id ) {
-		/** @var \TenUp\P2P\Tables\PostToUser $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 
 		$table->replace(
@@ -109,7 +109,7 @@ class PostToUser extends Relationship {
 	 * @param $user_id
 	 */
 	public function delete_relationship( $post_id, $user_id ) {
-		/** @var \TenUp\P2P\Tables\PostToUser $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 
 		$table->delete(

@@ -1,17 +1,17 @@
 <template>
-	<div class="p2p-picker-list-container">
-		<ul class="p2p-picker">
+	<div class="content-connect-picker-list-container">
+		<ul class="content-connect-picker">
 			<draggable v-if="sortable === true" v-model="localItems" :options="{ghostClass: 'ghost'}" @start="drag=true" @end="drag=false">
-				<li v-for="item in items" class="p2p-picker-list-item sortable">
-					<span class="p2p-grab-icon dashicons dashicons-move"></span>
-					<span class="p2p-selected-item-name">{{ item.name }}</span>
-					<span class="delete-item p2p-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
+				<li v-for="item in items" class="content-connect-picker-list-item sortable">
+					<span class="content-connect-grab-icon dashicons dashicons-move"></span>
+					<span class="content-connect-selected-item-name">{{ item.name }}</span>
+					<span class="delete-item content-connect-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
 				</li>
 			</draggable>
 
-			<li v-if="sortable === false" v-for="item in items" class="p2p-picker-list-item">
-				<span class="p2p-selected-item-name">{{ item.name }}</span>
-				<span class="delete-item p2p-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
+			<li v-if="sortable === false" v-for="item in items" class="content-connect-picker-list-item">
+				<span class="content-connect-selected-item-name">{{ item.name }}</span>
+				<span class="delete-item content-connect-delete-button" v-on:click.prevent="deleteItem(item)">delete</span>
 			</li>
 		</ul>
 	</div>
@@ -22,31 +22,31 @@
 		box-sizing: border-box;
 	}
 
-	.p2p-picker-list-item {
+	.content-connect-picker-list-item {
 		width: 100%;
 		position: relative;
 		padding: 1em 1em 1em 0.5em;
 	}
 
-	.p2p-picker-list-item.sortable {
+	.content-connect-picker-list-item.sortable {
 		cursor: move;
 	}
 
-	.p2p-picker-list-item:nth-child(odd) {
+	.content-connect-picker-list-item:nth-child(odd) {
 		background-color: #f9f9f9;
 	}
 
-	.p2p-picker-list-item.ghost {
+	.content-connect-picker-list-item.ghost {
 		opacity: 0.5;
 		background: #c8ebfb;
 	}
 
-	.p2p-grab-icon {
+	.content-connect-grab-icon {
 		font-size: 16px;
 		color: #bbb;
 	}
 
-	.p2p-delete-button {
+	.content-connect-delete-button {
 		color: #a00;
 		visibility: hidden;
 		display: inline-block;
@@ -55,11 +55,11 @@
 		cursor: pointer;
 	}
 
-	.p2p-delete-button:hover {
+	.content-connect-delete-button:hover {
 		color: #dc3232;
 	}
 
-	.p2p-picker-list-item:hover .p2p-delete-button {
+	.content-connect-picker-list-item:hover .content-connect-delete-button {
 		visibility: visible;
 	}
 </style>

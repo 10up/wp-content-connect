@@ -1,11 +1,11 @@
 <?php
 
-namespace TenUp\P2P\Tests\Relationships;
+namespace TenUp\ContentConnect\Tests\Relationships;
 
-use TenUp\P2P\Relationships\PostToUser;
-use TenUp\P2P\Tests\P2PTestCase;
+use TenUp\ContentConnect\Relationships\PostToUser;
+use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
-class PostToUserTest extends P2PTestCase {
+class PostToUserTest extends ContentConnectTestCase {
 
 	public function setUp() {
 		global $wpdb;

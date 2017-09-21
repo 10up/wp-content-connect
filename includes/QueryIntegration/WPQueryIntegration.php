@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\P2P\QueryIntegration;
+namespace TenUp\ContentConnect\QueryIntegration;
 
 class WPQueryIntegration {
 

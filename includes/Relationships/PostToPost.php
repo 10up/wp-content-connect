@@ -1,8 +1,8 @@
 <?php
 
-namespace TenUp\P2P\Relationships;
+namespace TenUp\ContentConnect\Relationships;
 
-use TenUp\P2P\Plugin;
+use TenUp\ContentConnect\Plugin;
 
 class PostToPost extends Relationship {
 
@@ -23,14 +23,14 @@ class PostToPost extends Relationship {
 	/**
 	 * The UI Object for the "from" portion of the relationship, if the from UI is enabled
 	 *
-	 * @var \TenUp\P2P\UI\PostToPost
+	 * @var \TenUp\ContentConnect\UI\PostToPost
 	 */
 	public $from_ui;
 
 	/**
 	 * The UI Object for the "to" portion of the relationship, if the to UI is enabled
 	 *
-	 * @var \TenUp\P2P\UI\PostToPost
+	 * @var \TenUp\ContentConnect\UI\PostToPost
 	 */
 	public $to_ui;
 
@@ -52,7 +52,7 @@ class PostToPost extends Relationship {
 
 	public function setup() {
 		if ( $this->enable_from_ui === true ) {
-			$this->from_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->from, $this->from_labels, $this->from_sortable );
+			$this->from_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->from, $this->from_labels, $this->from_sortable );
 			$this->from_ui->setup();
 		}
 
@@ -65,7 +65,7 @@ class PostToPost extends Relationship {
 		 */
 		if ( ! ( $this->from_sortable === true && $this->enable_from_ui === true ) ) {
 			if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-				$this->to_ui = new \TenUp\P2P\UI\PostToPost( $this, $this->to, $this->to_labels, false );
+				$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to, $this->to_labels, false );
 				$this->to_ui->setup();
 			}
 		}
@@ -80,7 +80,7 @@ class PostToPost extends Relationship {
 	 * @return array
 	 */
 	public function get_related_object_ids( $post_id ) {
-		/** @var \TenUp\P2P\Tables\PostToPost $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 		$db = $table->get_db();
 
@@ -109,7 +109,7 @@ class PostToPost extends Relationship {
 	 * @param $pid2
 	 */
 	public function add_relationship( $pid1, $pid2 ) {
-		/** @var \TenUp\P2P\Tables\PostToPost $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
@@ -123,7 +123,7 @@ class PostToPost extends Relationship {
 	}
 
 	public function delete_relationship( $pid1, $pid2 ) {
-		/** @var \TenUp\P2P\Tables\PostToPost $table */
+		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(

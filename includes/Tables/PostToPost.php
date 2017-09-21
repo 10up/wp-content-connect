@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\P2P\Tables;
+namespace TenUp\ContentConnect\Tables;
 
 class PostToPost extends BaseTable {
 

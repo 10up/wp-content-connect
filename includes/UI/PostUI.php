@@ -1,11 +1,11 @@
 <?php
 
-namespace TenUp\P2P\UI;
+namespace TenUp\ContentConnect\UI;
 
 abstract class PostUI {
 
 	/**
-	 * @var \TenUp\P2P\Relationships\Relationship
+	 * @var \TenUp\ContentConnect\Relationships\Relationship
 	 */
 	public $relationship;
 

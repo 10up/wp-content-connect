@@ -1,13 +1,13 @@
 <?php
 
-namespace TenUp\P2P;
+namespace TenUp\ContentConnect;
 
-use TenUp\P2P\API\Search;
-use TenUp\P2P\QueryIntegration\UserQueryIntegration;
-use TenUp\P2P\QueryIntegration\WPQueryIntegration;
-use TenUp\P2P\Tables\PostToPost;
-use TenUp\P2P\Tables\PostToUser;
-use TenUp\P2P\UI\MetaBox;
+use TenUp\ContentConnect\API\Search;
+use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
+use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
+use TenUp\ContentConnect\Tables\PostToPost;
+use TenUp\ContentConnect\Tables\PostToUser;
+use TenUp\ContentConnect\UI\MetaBox;
 
 class Plugin {
 
@@ -105,7 +105,7 @@ class Plugin {
 	}
 
 	public function wp_init() {
-		do_action( 'tenup-p2p-init', $this->registry );
+		do_action( 'tenup-content-connect-init', $this->registry );
 	}
 
 	public function register_tables() {

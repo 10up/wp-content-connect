@@ -1,16 +1,16 @@
 <?php
 
-namespace TenUp\P2P\API;
+namespace TenUp\ContentConnect\API;
 
 class Search {
 
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'register_endpoint' ) );
-		add_filter( 'tenup_p2p_localize_data', array( $this, 'localize_endpoints' ) );
+		add_filter( 'tenup_content_connect_localize_data', array( $this, 'localize_endpoints' ) );
 	}
 
 	public function register_endpoint() {
-		register_rest_route( 'p2p/v1', '/search', array(
+		register_rest_route( 'content-connect/v1', '/search', array(
 			'methods' => 'POST',
 			'callback' => array( $this, 'process_search' ),
 			'permission_callback' => array( $this, 'check_permission' ),
@@ -18,8 +18,8 @@ class Search {
 	}
 
 	public function localize_endpoints( $data ) {
-		$data['endpoints']['search'] = get_rest_url( get_current_blog_id(), 'p2p/v1/search' );
-		$data['nonces']['search'] = wp_create_nonce( 'p2p-search' );
+		$data['endpoints']['search'] = get_rest_url( get_current_blog_id(), 'content-connect/v1/search' );
+		$data['nonces']['search'] = wp_create_nonce( 'content-connect-search' );
 
 		return $data;
 	}
@@ -39,7 +39,7 @@ class Search {
 		$nonce = $request->get_param( 'nonce' );
 
 		// If the user got the nonce, they were on the proper edit page
-		if ( ! wp_verify_nonce( $nonce, 'p2p-search' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'content-connect-search' ) ) {
 			return false;
 		}
 

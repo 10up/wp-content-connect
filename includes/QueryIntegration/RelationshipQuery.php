@@ -1,10 +1,10 @@
 <?php
 
-namespace TenUp\P2P\QueryIntegration;
+namespace TenUp\ContentConnect\QueryIntegration;
 
-use TenUp\P2P\Plugin;
-use TenUp\P2P\Relationships\PostToPost;
-use TenUp\P2P\Relationships\PostToUser;
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Relationships\PostToPost;
+use TenUp\ContentConnect\Relationships\PostToUser;
 
 class RelationshipQuery{
 

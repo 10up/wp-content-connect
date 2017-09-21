@@ -1,14 +1,14 @@
 <?php
 
-namespace TenUp\P2P\Tests\QueryIntegration;
+namespace TenUp\ContentConnect\Tests\QueryIntegration;
 
-use TenUp\P2P\Plugin;
-use TenUp\P2P\Registry;
-use TenUp\P2P\Relationships\PostToPost;
-use TenUp\P2P\Relationships\PostToUser;
-use TenUp\P2P\Tests\P2PTestCase;
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Registry;
+use TenUp\ContentConnect\Relationships\PostToPost;
+use TenUp\ContentConnect\Relationships\PostToUser;
+use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
-class User_Query_IntegrationTest extends P2PTestCase {
+class User_Query_IntegrationTest extends ContentConnectTestCase {
 
 	public function setUp() {
 		global $wpdb;

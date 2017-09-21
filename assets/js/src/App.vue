@@ -1,5 +1,5 @@
 <template>
-	<div class="Post To Post vtab-frame">
+	<div class="tenup-content-connect vtab-frame">
 		<div class="vtab-left" v-if="relationships.length > 1">
 			<div class="vtab-frame-menu">
 				<div class="vtab-menu">
@@ -39,14 +39,14 @@
 		</div>
 		<br>
 		<div>
-			<input type="hidden" v-model="saveData" name="tenup-p2p-relationships">
+			<input type="hidden" v-model="saveData" name="tenup-content-connect-relationships">
 		</div>
 
 	</div>
 </template>
 
 <style lang="sass">
-	#tenup-p2p-relationships .inside {
+	#tenup-content-connect-relationships .inside {
 		margin: 0;
 		padding: 0;
 	}
@@ -206,9 +206,9 @@
 	module.exports = {
 		data: function() {
 			return Object.assign({}, {
-				"activeRelationship": P2PData.relationships[0],
+				"activeRelationship": window.ContentConnectData.relationships[0],
 				"searchResults": [],
-			}, window.P2PData);
+			}, window.ContentConnectData);
 		},
 		components: {
 			PickerList: PickerList,

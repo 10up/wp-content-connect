@@ -1,9 +1,9 @@
 <?php
 
-namespace TenUp\P2P\QueryIntegration;
+namespace TenUp\ContentConnect\QueryIntegration;
 
-use TenUp\P2P\Plugin;
-use TenUp\P2P\Tables\PostToUser;
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Tables\PostToUser;
 
 class UserRelationshipQuery {
 
