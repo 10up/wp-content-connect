@@ -100,6 +100,12 @@ class Plugin {
 
 		$this->search = new Search();
 		$this->search->setup();
+
+		add_action( 'init', array( $this, 'wp_init' ), 100 );
+	}
+
+	public function wp_init() {
+		do_action( 'tenup-p2p-init', $this->registry );
 	}
 
 	public function register_tables() {
