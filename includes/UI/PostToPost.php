@@ -29,7 +29,6 @@ class PostToPost extends PostUI {
 
 		if ( $this->sortable ) {
 			$args['orderby'] = 'relationship';
-			$args['order'] = 'ASC';
 		}
 
 		$query = new \WP_Query( $args );

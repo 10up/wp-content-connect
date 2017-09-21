@@ -66,6 +66,8 @@ class WPQueryIntegration {
 			return $orderby;
 		}
 
+		// @Todo not supported for user -> post variant
+
 		/*
 		 * We're doing this CASE and FIELD method, in case we switched from a non-sortable relationship to a
 		 * sortable relationship. In that case, the meta value would be empty. If we did post__in and order by

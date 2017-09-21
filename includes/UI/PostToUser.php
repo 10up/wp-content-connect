@@ -23,12 +23,11 @@ class PostToUser extends PostUI {
 			)
 		);
 
-		$query = new \WP_User_Query( $args );
-
 		if ( $this->sortable ) {
 			$args['orderby'] = 'relationship';
-			$args['order'] = 'ASC';
 		}
+
+		$query = new \WP_User_Query( $args );
 
 		$users = $query->get_results();
 		if ( ! empty( $users ) ) {
