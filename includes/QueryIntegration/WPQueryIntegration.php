@@ -2,6 +2,9 @@
 
 namespace TenUp\ContentConnect\QueryIntegration;
 
+use TenUp\ContentConnect\Relationships\PostToPost;
+use TenUp\ContentConnect\Relationships\PostToUser;
+
 class WPQueryIntegration {
 
 	public function setup() {
@@ -44,8 +47,6 @@ class WPQueryIntegration {
 	}
 
 	public function posts_orderby( $orderby, $query ) {
-		global $wpdb;
-
 		if ( ! isset( $query->relationship_query ) || empty( $query->relationship_query->where ) ) {
 			return $orderby;
 		}
@@ -75,22 +76,16 @@ class WPQueryIntegration {
 			return $orderby;
 		}
 
-		/*
-		 * We're doing this CASE and FIELD method, in case we switched from a non-sortable relationship to a
-		 * sortable relationship. In that case, the meta value would be empty. If we did post__in and order by
-		 * post__in, we'd end up with no results, even though we could have a relationship in the relation table
-		 *
-		 * Using this method, we can order by any values we do have in meta, and THEN for any remaining relationships
-		 * in the relation table, we order by the original order by value that was on the WP_Query
-		 */
 		$segment = $query->relationship_query->segments[0];
 		$relationship = $query->relationship_query->get_relationship_for_segment( $segment );
 
-		$ids = $relationship->get_sort_data( $segment['related_to_post'] );
-
-		$query_safe_ids = implode( ', ', array_map( 'intval', (array) $ids ) );
-
-		$orderby = "CASE WHEN {$wpdb->posts}.ID IN ( {$query_safe_ids} ) then 0 ELSE 1 END, FIELD( {$wpdb->posts}.ID, {$query_safe_ids} ) ASC, " . $orderby;
+		// the order = 0 part puts any zero values (defaults) last to account for cases when they were adding from the
+		// other side of the relationship
+		if ( $relationship instanceof PostToPost ) {
+			$orderby = "p2p1.order = 0, p2p1.order ASC";
+		} else if ( $relationship instanceof  PostToUser ) {
+			$orderby = "p2u1.order = 0, p2u1.order ASC";
+		}
 
 		return $orderby;
 	}

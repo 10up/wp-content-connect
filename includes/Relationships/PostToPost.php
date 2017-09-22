@@ -97,6 +97,10 @@ class PostToPost extends Relationship {
 	 * ESPECIALLY when joining the same post type to itself. To work around this, we just store both combinations of
 	 * the relationship. Adds a tiny bit of data to the DB, but greatly simplifies queries to find related posts
 	 *
+	 * Coincidentally, this also allows us to store directional sort order information
+	 *
+	 * `order` corresponds to the order of id2, when viewed from id1
+	 *
 	 * @param $pid1
 	 * @param $pid2
 	 */
@@ -128,16 +132,47 @@ class PostToPost extends Relationship {
 		);
 	}
 
-	public function get_sort_meta_key() {
-		return "p2p_{$this->from}_{$this->to}_{$this->name}-sort-data";
-	}
-
+	/**
+	 * Updates all the rows with order information.
+	 *
+	 * This function ONLY modifies ONE direction of the query:
+	 *      - id2 is the post we're ordering on (we're on this edit screen)
+	 *      - id1 is the post being ordered
+	 * The inverse is managed from the other end of the relationship
+	 *
+	 * @param $object_id
+	 * @param $ordered_ids
+	 */
 	public function save_sort_data( $object_id, $ordered_ids ) {
-		update_post_meta( $object_id, $this->get_sort_meta_key(), array_map( 'intval', $ordered_ids ) );
-	}
+		if ( empty( $ordered_ids ) ) {
+			return;
+		}
 
-	public function get_sort_data( $object_id ) {
-		return get_post_meta( $object_id, $this->get_sort_meta_key(), true );
+		$order = 0;
+
+		$data = array();
+
+		foreach( $ordered_ids as $id ) {
+			$order++;
+
+			$data[] = array(
+				'id1' => $id,
+				'id2' => $object_id,
+				'name' => $this->name,
+				'order' => $order
+			);
+		}
+		
+		$fields = array(
+			'id1' => '%d',
+			'id2' => '%d',
+			'name' => '%s',
+			'order' => '%d',
+		);
+
+		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
+		$table = Plugin::instance()->get_table( 'p2p' );
+		$table->replace_bulk( $fields, $data );
 	}
 
 }

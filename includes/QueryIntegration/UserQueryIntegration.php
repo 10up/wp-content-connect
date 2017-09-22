@@ -2,6 +2,8 @@
 
 namespace TenUp\ContentConnect\QueryIntegration;
 
+use TenUp\ContentConnect\Relationships\PostToUser;
+
 class UserQueryIntegration {
 
 	public function setup() {
@@ -32,8 +34,6 @@ class UserQueryIntegration {
 	}
 
 	public function sortable_orderby( $query, $relationship_query ) {
-		global $wpdb;
-
 		/*
 		 * If orderby is anything other than relationship (array, etc) we don't allow it.
 		 * Trying to allow multiple order by statements would likely end in confusing results
@@ -61,11 +61,10 @@ class UserQueryIntegration {
 		$segment = $relationship_query->segments[0];
 		$relationship = $relationship_query->get_relationship_for_segment( $segment );
 
-		$ids = $relationship->get_sort_data( $segment['related_to_post'] );
-
-		$query_safe_ids = implode( ', ', array_map( 'intval', $ids ) );
-
-		$query->query_orderby = "ORDER BY CASE WHEN {$wpdb->users}.ID IN ( {$query_safe_ids} ) then 0 ELSE 1 END, FIELD( {$wpdb->users}.ID, {$query_safe_ids} ) ASC, " . str_ireplace( 'order by', '', $query->query_orderby );
+		if ( $relationship instanceof PostToUser ) {
+			// Puts 0 last, since these are just defaults
+			$query->query_orderby = "ORDER BY p2u1.user_order = 0, p2u1.user_order";
+		}
 	}
 
 }

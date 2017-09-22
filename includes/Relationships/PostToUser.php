@@ -118,16 +118,36 @@ class PostToUser extends Relationship {
 		);
 	}
 
-	public function get_sort_meta_key() {
-		return "p2u_{$this->from}_{$this->to}_{$this->name}-sort-data";
-	}
-
 	public function save_sort_data( $object_id, $ordered_ids ) {
-		update_post_meta( $object_id, $this->get_sort_meta_key(), array_map( 'intval', $ordered_ids ) );
-	}
+		if ( empty( $ordered_ids ) ) {
+			return;
+		}
 
-	public function get_sort_data( $object_id ) {
-		return get_post_meta( $object_id, $this->get_sort_meta_key(), true );
+		$order = 0;
+
+		$data = array();
+
+		foreach( $ordered_ids as $id ) {
+			$order++;
+
+			$data[] = array(
+				'post_id' => $object_id,
+				'user_id' => $id,
+				'name' => $this->name,
+				'user_order' => $order
+			);
+		}
+
+		$fields = array(
+			'post_id' => '%d',
+			'user_id' => '%d',
+			'name' => '%s',
+			'user_order' => '%d',
+		);
+
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
+		$table = Plugin::instance()->get_table( 'p2u' );
+		$table->replace_bulk( $fields, $data );
 	}
 
 }
