@@ -15,7 +15,10 @@
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
             "TenUp\\ContentConnect\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "content-connect.php"
+        ]
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7"
