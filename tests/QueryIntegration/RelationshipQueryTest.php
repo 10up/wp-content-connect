@@ -54,12 +54,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 	public function test_top_level_segments_are_reformatted_into_nested_arrays_correctly() {
 		$query = new RelationshipQuery( array(
 			'related_to_post' => '25',
-			'type' => 'basic',
+			'name' => 'basic',
 		) );
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'type' => 'basic',
+				'name' => 'basic',
 			)
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -67,12 +67,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			'related_to_user' => '1',
-			'type' => 'owner',
+			'name' => 'owner',
 		) );
 		$expected = array(
 			array(
 				'related_to_user' => '1',
-				'type' => 'owner',
+				'name' => 'owner',
 			)
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -81,20 +81,20 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		// Test top level keys AND segments in arrays
 		$query = new RelationshipQuery( array(
 			'related_to_post' => '25',
-			'type' => 'complex',
+			'name' => 'complex',
 			array(
 				'related_to_post' => '50',
-				'type' => 'basic',
+				'name' => 'basic',
 			),
 		) );
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'type' => 'complex',
+				'name' => 'complex',
 			),
 			array(
 				'related_to_post' => '50',
-				'type' => 'basic',
+				'name' => 'basic',
 			),
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -104,7 +104,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array() ) );
-		$this->assertFalse( $query->is_valid_segment( array( 'type' => 'basic' ) ) );
+		$this->assertFalse( $query->is_valid_segment( array( 'name' => 'basic' ) ) );
 		$this->assertFalse( $query->is_valid_segment( array( 'related_to_post' ) ) );
 		$this->assertFalse( $query->is_valid_segment( array( 'related_to_user' ) ) );
 	}
@@ -113,12 +113,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertTrue( $query->is_valid_segment( array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 45,
 		) ) );
 
 		$this->assertTrue( $query->is_valid_segment( array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_user' => 1,
 		) ) );
 	}
@@ -127,7 +127,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 45,
 			'related_to_user' => 2,
 		) ) );
@@ -138,14 +138,14 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertFalse( $query->has_valid_segments() );
 
 		$query = new RelationshipQuery( array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 25,
 		));
 		$this->assertTrue( $query->has_valid_segments() );
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'complex',
+				'name' => 'complex',
 				'related_to_post' => 25,
 			)
 		) );
@@ -154,7 +154,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$query = new RelationshipQuery( array(
 			array(
 				'related_to_user' => 2,
-				'type' => 'owner',
+				'name' => 'owner',
 			)
 		) );
 		$this->assertTrue( $query->has_valid_segments() );
@@ -163,7 +163,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 	public function test_generate_where_clause() {
 		// Should return nothing, since the relationship isn't defined yet
 		$query = new RelationshipQuery(array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 1,
 		));
 		$expected = '';
@@ -171,7 +171,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		// Should also return nothing, since also not defined
 		$query = new RelationshipQuery(array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_user' => 2,
 		));
 		$expected = '';
@@ -191,40 +191,40 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 
 		$query = new RelationshipQuery( array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 1
 		) );
-		$expected = " and ((p2p1.id2 = 1 and p2p1.type = 'basic'))";
+		$expected = " and ((p2p1.id2 = 1 and p2p1.name = 'basic'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 3,
 			),
 			'relation' => 'OR',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') OR (p2p1.id2 = 3 and p2p1.type = 'basic'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') OR (p2p1.id2 = 3 and p2p1.name = 'basic'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'complex',
+				'name' => 'complex',
 				'related_to_post' => 4,
 			),
 			'relation' => 'AND',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') AND (p2p2.id2 = 4 and p2p2.type = 'complex'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') AND (p2p2.id2 = 4 and p2p2.name = 'complex'))";
 		$this->assertEquals( $expected, $query->where );
 
 
@@ -233,77 +233,77 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			'relation' => 'AND',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') AND (p2u2.user_id = 4 and p2u2.type = 'owner'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') AND (p2u2.user_id = 4 and p2u2.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			'relation' => 'OR',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') OR (p2u1.user_id = 4 and p2u1.type = 'owner'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') OR (p2u1.user_id = 4 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 1,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'OR',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') OR (p2u1.user_id = 4 and p2u1.type = 'owner') OR (p2p1.id2 = 1 and p2p1.type = 'basic') OR (p2u1.user_id = 3 and p2u1.type = 'owner'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') OR (p2u1.user_id = 4 and p2u1.name = 'owner') OR (p2p1.id2 = 1 and p2p1.name = 'basic') OR (p2u1.user_id = 3 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 1,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'AND',
 		) );
-		$expected = " and ((p2p1.id2 = 2 and p2p1.type = 'basic') AND (p2u2.user_id = 4 and p2u2.type = 'owner') AND (p2p3.id2 = 1 and p2p3.type = 'basic') AND (p2u4.user_id = 3 and p2u4.type = 'owner'))";
+		$expected = " and ((p2p1.id2 = 2 and p2p1.name = 'basic') AND (p2u2.user_id = 4 and p2u2.name = 'owner') AND (p2p3.id2 = 1 and p2p3.name = 'basic') AND (p2u4.user_id = 3 and p2u4.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 	}
 
@@ -312,7 +312,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		// Should return nothing, since the relationship isn't defined yet
 		$query = new RelationshipQuery(array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 1,
 		));
 		$expected = '';
@@ -320,7 +320,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		// Should also return nothing, since also not defined
 		$query = new RelationshipQuery(array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_user' => 2,
 		));
 		$expected = '';
@@ -334,7 +334,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 
 		$query = new RelationshipQuery( array(
-			'type' => 'basic',
+			'name' => 'basic',
 			'related_to_post' => 1
 		) );
 		$expected = " left join {$wpdb->prefix}post_to_post as p2p1 on {$wpdb->posts}.ID = p2p1.id1";
@@ -343,11 +343,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 3,
 			),
 			'relation' => 'OR',
@@ -358,11 +358,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'complex',
+				'name' => 'complex',
 				'related_to_post' => 4,
 			),
 			'relation' => 'AND',
@@ -373,11 +373,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'AND',
@@ -388,11 +388,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'OR',
@@ -406,11 +406,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			'relation' => 'AND',
@@ -421,11 +421,11 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			'relation' => 'OR',
@@ -436,19 +436,19 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 1,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'OR',
@@ -459,19 +459,19 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new RelationshipQuery( array(
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 2,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 4,
 			),
 			array(
-				'type' => 'basic',
+				'name' => 'basic',
 				'related_to_post' => 1,
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_user' => 3,
 			),
 			'relation' => 'AND',

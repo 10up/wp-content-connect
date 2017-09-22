@@ -53,9 +53,9 @@ class ContentConnectTestCase extends \PHPUnit_Framework_TestCase {
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post;" );
 
-		// post to post "basic" type
+		// post to post "basic" name
 		$ppb = new PostToPost( 'post', 'post', 'basic' );
-		// post to post "complex" type
+		// post to post "complex" name
 		$ppc = new PostToPost( 'post', 'post', 'complex' );
 		$pcb = new PostToPost( 'post', 'car', 'basic' );
 		$pcc = new PostToPost( 'post', 'car', 'complex' );
@@ -79,7 +79,7 @@ class ContentConnectTestCase extends \PHPUnit_Framework_TestCase {
 		$ctb->add_relationship( 11, 21 );
 		$ctc->add_relationship( 13, 23 );
 
-		// for pagination tests, we'll use "page1" and "page2" types to make sure we have different types
+		// for pagination tests, we'll use "page1" and "page2" names to make sure we have different names
 		$p1 = new PostToPost( 'post', 'post', 'page1' );
 		$p2 = new PostToPost( 'post', 'post', 'page2' );
 

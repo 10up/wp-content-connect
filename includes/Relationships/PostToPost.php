@@ -34,7 +34,7 @@ class PostToPost extends Relationship {
 	 */
 	public $to_ui;
 
-	public function __construct( $from, $to, $type, $args = array() ) {
+	public function __construct( $from, $to, $name, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
 			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
 		}
@@ -45,9 +45,9 @@ class PostToPost extends Relationship {
 
 		$this->from = $from;
 		$this->to = $to;
-		$this->id = strtolower( get_class( $this ) ) . "-{$type}-{$from}-{$to}";
+		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-{$to}";
 		
-		parent::__construct( $type, $args );
+		parent::__construct( $name, $args );
 	}
 
 	public function setup() {
@@ -85,7 +85,7 @@ class PostToPost extends Relationship {
 		}
 		$where_post_type = $post_type === $this->from ? $this->to : $this->from;
 
-		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p2p.type = %s and p.post_type = %s", $post_id, $this->type, $where_post_type );
+		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $where_post_type );
 
 		$objects = $db->get_results( $query );
 
@@ -105,11 +105,11 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'type' => $this->type ),
+			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 		$table->replace(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'type' => $this->type ),
+			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 	}
@@ -119,17 +119,17 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'type' => $this->type ),
+			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 		$table->delete(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'type' => $this->type ),
+			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 	}
 
 	public function get_sort_meta_key() {
-		return "p2p_{$this->from}_{$this->to}_{$this->type}-sort-data";
+		return "p2p_{$this->from}_{$this->to}_{$this->name}-sort-data";
 	}
 
 	public function save_sort_data( $object_id, $ordered_ids ) {

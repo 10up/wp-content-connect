@@ -22,7 +22,7 @@ class PostToPost extends PostUI {
 		$args = array (
 			'post_type' => $other_post_type,
 			'relationship_query' => array(
-				'type' => $this->relationship->type,
+				'name' => $this->relationship->name,
 				'related_to_post' => $post->ID,
 			),
 		);
@@ -50,8 +50,8 @@ class PostToPost extends PostUI {
 			'reltype' => 'post-to-post',
 			'object_type' => 'post', // The object type we'll be querying for in searches on the front end
 			'post_type' => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship)
-			'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->type}", // @todo should probably get this from the registry
-			'type' => $this->relationship->type,
+			'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->name}", // @todo should probably get this from the registry
+			'name' => $this->relationship->name,
 			'labels' => $this->labels,
 			'sortable' => $this->sortable,
 			'selected' => $final_posts,

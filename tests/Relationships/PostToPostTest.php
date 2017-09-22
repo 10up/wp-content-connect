@@ -37,12 +37,12 @@ class PostToPostTest extends ContentConnectTestCase {
 		$p2p = new PostToPost( 'post', 'post', 'basic' );
 
 		// Make sure we don't already have this in the DB
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 
 		$p2p->add_relationship( '1', '2' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 	}
 
 	public function test_adding_duplicates() {
@@ -52,14 +52,14 @@ class PostToPostTest extends ContentConnectTestCase {
 		// Making sure we don't add duplicates
 		$p2p->add_relationship( '1', '2' );
 		$p2p->add_relationship( '1', '2' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 
 		// Making sure that order doesn't matter / duplicates
 		$p2p->add_relationship( 2, 1 );
 
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 	}
 
 	public function test_delete_relationship() {
@@ -68,12 +68,12 @@ class PostToPostTest extends ContentConnectTestCase {
 
 		// Make sure we're in a known state of having a relationship in the DB
 		$p2p->add_relationship( '1', '2' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 
 		$p2p->delete_relationship( 1, 2 );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 	}
 
 	public function test_delete_flipped_order() {
@@ -82,12 +82,12 @@ class PostToPostTest extends ContentConnectTestCase {
 
 		// Make sure we're in a known state of having a relationship in the DB
 		$p2p->add_relationship( '1', '2' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 
 		$p2p->delete_relationship( 2, 1 );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and type='basic'") );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and type='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='1' and id2='2' and name='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='2' and id2='1' and name='basic'") );
 	}
 
 	public function test_delete_only_deletes_correct_records() {
@@ -112,20 +112,20 @@ class PostToPostTest extends ContentConnectTestCase {
 		}
 
 		foreach( $pairs as $pair ) {
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and type='basic'") );
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and type='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and name='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and name='basic'") );
 		}
 
 		$pp->delete_relationship( 1, 10 );
 
 		foreach( $keep_pairs as $pair ) {
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and type='basic'") );
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and type='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and name='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and name='basic'") );
 		}
 
 		foreach( $delete_pairs as $pair ) {
-			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and type='basic'") );
-			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and type='basic'") );
+			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[0]}' and id2='{$pair[1]}' and name='basic'") );
+			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_post where id1='{$pair[1]}' and id2='{$pair[0]}' and name='basic'") );
 		}
 	}
 
@@ -194,8 +194,8 @@ class PostToPostTest extends ContentConnectTestCase {
 		$this->add_post_relations();
 
 		// Add a really high ID (1000) to the relationships table that shouldn't exist in our valid test data
-		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1', 'id2' => '1000', 'type' => 'basic' ) );
-		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1000', 'id2' => '1', 'type' => 'basic' ) );
+		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1', 'id2' => '1000', 'name' => 'basic' ) );
+		$wpdb->insert( "{$wpdb->prefix}post_to_post", array( 'id1' => '1000', 'id2' => '1', 'name' => 'basic' ) );
 
 		// Make sure post ID 1000 doesn't exist (sanity check)
 		$this->assertNull( get_post( 1000 ) );

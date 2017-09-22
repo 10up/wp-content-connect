@@ -5,11 +5,11 @@ namespace TenUp\ContentConnect\Relationships;
 abstract class Relationship {
 
 	/**
-	 * Relationship Type. Used to enable multiple relationships between the same combinations of objects.
+	 * Relationship Name. Used to enable multiple relationships between the same combinations of objects.
 	 *
 	 * @var string
 	 */
-	public $type;
+	public $name;
 
 	/**
 	 * Unique ID string for the relationship
@@ -62,22 +62,22 @@ abstract class Relationship {
 	 */
 	public $to_sortable;
 
-	public function __construct( $type, $args = array() ) {
-		$this->type = $type;
+	public function __construct( $name, $args = array() ) {
+		$this->name = $name;
 
 		$defaults = array(
 			'from' => array(
 				'enable_ui' => true,
 				'sortable' => false,
 				'labels' => array(
-					'name' => $type,
+					'name' => $name,
 				),
 			),
 			'to' => array(
 				'enable_ui' => false,
 				'sortable' => false,
 				'labels' => array(
-					'name' => $type,
+					'name' => $name,
 				)
 			),
 		);

@@ -44,7 +44,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_post' => '20',
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -87,7 +87,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 			'paged' => 1,
 			'relationship_query' => array(
 				array(
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -100,7 +100,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->get_results() );
 	}
 
-	public function test_that_nothing_happens_without_relationship_type() {
+	public function test_that_nothing_happens_without_relationship_name() {
 		$this->define_relationships();
 
 		$args = array(
@@ -148,7 +148,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_post' => 1,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -178,11 +178,11 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_post' => 2,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 				array(
 					'related_to_post' => 5,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 				'relation' => 'OR',
 			),

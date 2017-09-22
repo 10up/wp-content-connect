@@ -5,7 +5,7 @@ namespace TenUp\ContentConnect\Tables;
 class PostToPost extends BaseTable {
 
 	function get_schema_version() {
-		return '0.1.3';
+		return '0.1.7';
 	}
 
 	function get_table_name() {
@@ -18,8 +18,9 @@ class PostToPost extends BaseTable {
 		$sql = "CREATE TABLE `{$table_name}` ( 
 			`id1` bigint(20) unsigned NOT NULL, 
 			`id2` bigint(20) unsigned NOT NULL, 
-			`type` varchar(20) NOT NULL, 
-			PRIMARY KEY (`id1`,`id2`,`type`) 
+			`name` varchar(20) NOT NULL, 
+			`order` int(11) NOT NULL default 0,
+			PRIMARY KEY  (`id1`,`id2`,`name`) 
 		);";
 
 		return $sql;
