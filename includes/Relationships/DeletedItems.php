@@ -8,6 +8,7 @@ class DeletedItems {
 
 	public function setup() {
 		add_action( 'deleted_post', array( $this, 'deleted_post' ) );
+		add_action( 'deleted_user', array( $this, 'deleted_user' ) );
 	}
 
 	/**
@@ -33,6 +34,21 @@ class DeletedItems {
 
 		$p2u_table->delete(
 			array( 'post_id' => $post_id ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Fires immediately after a user is deleted from wp_users (single site) or removed from the site (multisite)
+	 *
+	 * @param $user_id
+	 */
+	public function deleted_user( $user_id ) {
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $p2p_table */
+		$p2u_table = Plugin::instance()->get_table( 'p2u' );
+
+		$p2u_table->delete(
+			array( 'user_id' => $user_id ),
 			array( '%d' )
 		);
 	}

@@ -29,10 +29,7 @@ class DeletedItemsTest extends ContentConnectTestCase {
 	public function test_deleted_posts_are_removed_from_post_to_post_table() {
 		global $wpdb;
 
-		$registry = Plugin::instance()->get_registry();
-
-		/** @var PostToPost $relationship */
-		$relationship = $registry->define_post_to_post( 'car', 'tire', 'test' );
+		$relationship = new PostToPost( 'car', 'tire', 'test' );
 
 		// 11 (car) to 21 (tire)
 		$this->assertEquals( 0, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=11;" ) );
@@ -67,10 +64,7 @@ class DeletedItemsTest extends ContentConnectTestCase {
 	public function test_deleted_posts_are_removed_from_post_to_user_table() {
 		global $wpdb;
 
-		$registry = Plugin::instance()->get_registry();
-
-		/** @var PostToUser $relationship */
-		$relationship = $registry->define_post_to_user( 'car', 'test' );
+		$relationship = new PostToUser( 'car', 'test' );
 
 		// 11 (car) to 1 (user)
 		$this->assertEquals( 0, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=11;" ) );
@@ -84,6 +78,25 @@ class DeletedItemsTest extends ContentConnectTestCase {
 
 		wp_delete_post( 11 );
 		$this->assertEquals( 0, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=11;" ) );
+	}
+
+	/*
+	 * Direct DB queries, because get_related_*_id functions are smart enough to not return the IDs (because of the join)
+	 * even if the record still exists in the join table
+	 */
+	public function test_deleted_users_are_removed_from_post_to_user_table() {
+		global $wpdb;
+
+		$relationship = new PostToUser( 'car', 'test' );
+
+		// 11 (car) to 1 (user)
+		$this->assertEquals( 0, $wpdb->get_var( "select count(user_id) from {$wpdb->prefix}post_to_user where user_id=1;" ) );
+
+		$relationship->add_relationship( 11, 1 );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(user_id) from {$wpdb->prefix}post_to_user where user_id=1;" ) );
+
+		wp_delete_user( 1 );
+		$this->assertEquals( 0, $wpdb->get_var( "select count(user_id) from {$wpdb->prefix}post_to_user where user_id=1;" ) );
 	}
 
 }
