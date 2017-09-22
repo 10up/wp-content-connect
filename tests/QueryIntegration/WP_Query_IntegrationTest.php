@@ -395,4 +395,9 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2, 4, 5 ), $query->posts );
 	}
 
+	public function test_orderby_relationship_does_nothing_with_no_ids() {
+		// When we have no order stored on the post, we have an empty array, so we should not alter the orderby,
+		// since it will result in nothign happening, and will be needlessly complex
+	}
+
 }

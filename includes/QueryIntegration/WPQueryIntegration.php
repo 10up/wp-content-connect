@@ -88,7 +88,7 @@ class WPQueryIntegration {
 
 		$ids = $relationship->get_sort_data( $segment['related_to_post'] );
 
-		$query_safe_ids = implode( ', ', array_map( 'intval', $ids ) );
+		$query_safe_ids = implode( ', ', array_map( 'intval', (array) $ids ) );
 
 		$orderby = "CASE WHEN {$wpdb->posts}.ID IN ( {$query_safe_ids} ) then 0 ELSE 1 END, FIELD( {$wpdb->posts}.ID, {$query_safe_ids} ) ASC, " . $orderby;
 
