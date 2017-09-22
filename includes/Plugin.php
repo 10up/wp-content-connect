@@ -5,6 +5,7 @@ namespace TenUp\ContentConnect;
 use TenUp\ContentConnect\API\Search;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
+use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\MetaBox;
@@ -57,6 +58,11 @@ class Plugin {
 	 */
 	public $search;
 
+	/**
+	 * @var DeletedItems
+	 */
+	public $deleted_items;
+
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -100,6 +106,9 @@ class Plugin {
 
 		$this->search = new Search();
 		$this->search->setup();
+
+		$this->deleted_items = new DeletedItems();
+		$this->deleted_items->setup();
 
 		add_action( 'init', array( $this, 'wp_init' ), 100 );
 	}
