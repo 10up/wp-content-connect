@@ -34,6 +34,10 @@ Args expects options for the `from` and `to` sides of the relationship as top le
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
+#### Return Value
+
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToPost` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+
 Example:
 
 ```php
@@ -55,7 +59,7 @@ function my_define_relationships( $registry ) {
         ),
     );
 
-    $registry->define_post_to_post( 'car', 'tire', 'car-tires', $args );    
+    $relationship = $registry->define_post_to_post( 'car', 'tire', 'car-tires', $args );    
 }
 add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 
@@ -80,6 +84,10 @@ Args expects options for the `from` (post type) side of the relationship as a to
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
+#### Return Value
+
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToUser` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+
 Example:
 
 ```php
@@ -94,7 +102,7 @@ function my_define_relationships( $registry ) {
         ),
     )
     
-    $registry->define_post_to_user( 'post', 'related', $args );   
+    $relationship = $registry->define_post_to_user( 'post', 'related', $args );   
 }
 add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 ```
