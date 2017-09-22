@@ -20,15 +20,15 @@ class PostToUser extends Relationship {
 	 */
 	public $from_ui;
 
-	public function __construct( $post_type, $type, $args = array() ) {
+	public function __construct( $post_type, $name, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
 			throw new \Exception( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" );
 		}
 
 		$this->post_type = $post_type;
-		$this->id = strtolower( get_class( $this ) ) . "-{$type}-{$post_type}-user";
+		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$post_type}-user";
 		
-		parent::__construct( $type, $args );
+		parent::__construct( $name, $args );
 	}
 
 	public function setup() {
@@ -52,7 +52,7 @@ class PostToUser extends Relationship {
 
 		$table_name = esc_sql( $table->get_table_name() );
 
-		$query = $db->prepare( "SELECT p2u.post_id from {$table_name} as p2u inner join {$db->posts} as p on p.ID = p2u.post_id where p2u.user_id=%d and p2u.type=%s and p.post_type=%s", $user_id, $this->type, $this->post_type );
+		$query = $db->prepare( "SELECT p2u.post_id from {$table_name} as p2u inner join {$db->posts} as p on p.ID = p2u.post_id where p2u.user_id=%d and p2u.name=%s and p.post_type=%s", $user_id, $this->name, $this->post_type );
 
 		$objects = $db->get_results( $query );
 
@@ -79,7 +79,7 @@ class PostToUser extends Relationship {
 
 		$table_name = esc_sql( $table->get_table_name() );
 
-		$query = $db->prepare( "SELECT p2u.user_id from {$table_name} as p2u where p2u.post_id=%d and p2u.type=%s", $post_id, $this->type );
+		$query = $db->prepare( "SELECT p2u.user_id from {$table_name} as p2u where p2u.post_id=%d and p2u.name=%s", $post_id, $this->name );
 
 		$objects = $db->get_results( $query );
 
@@ -97,7 +97,7 @@ class PostToUser extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2u' );
 
 		$table->replace(
-			array( 'post_id' => $post_id, 'user_id' => $user_id, 'type' => $this->type ),
+			array( 'post_id' => $post_id, 'user_id' => $user_id, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 	}
@@ -113,13 +113,13 @@ class PostToUser extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2u' );
 
 		$table->delete(
-			array( 'post_id' => $post_id, 'user_id' => $user_id, 'type' => $this->type ),
+			array( 'post_id' => $post_id, 'user_id' => $user_id, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
 	}
 
 	public function get_sort_meta_key() {
-		return "p2u_{$this->from}_{$this->to}_{$this->type}-sort-data";
+		return "p2u_{$this->from}_{$this->to}_{$this->name}-sort-data";
 	}
 
 	public function save_sort_data( $object_id, $ordered_ids ) {

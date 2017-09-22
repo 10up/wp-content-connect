@@ -36,10 +36,10 @@ class PostToUserTest extends ContentConnectTestCase {
 		$p2u = new PostToUser( 'post', 'basic' );
 
 		// Make sure we don't already have this in the DB
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and type='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and name='basic'") );
 
 		$p2u->add_relationship( 2, 1 );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and name='basic'") );
 	}
 
 	public function test_adding_duplicates() {
@@ -49,7 +49,7 @@ class PostToUserTest extends ContentConnectTestCase {
 		// Making sure we don't add duplicates
 		$p2u->add_relationship( '2', '1' );
 		$p2u->add_relationship( '2', '1' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and name='basic'") );
 	}
 
 	public function test_delete_relationship() {
@@ -58,10 +58,10 @@ class PostToUserTest extends ContentConnectTestCase {
 
 		// Make sure we're in a known state of having a relationship in the DB
 		$p2u->add_relationship( '2', '1' );
-		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and type='basic'") );
+		$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and name='basic'") );
 
 		$p2u->delete_relationship( 2, 1 );
-		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and type='basic'") );
+		$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='2' and user_id='1' and name='basic'") );
 	}
 
 	public function test_delete_only_deletes_correct_records() {
@@ -86,7 +86,7 @@ class PostToUserTest extends ContentConnectTestCase {
 		}
 
 		foreach( $pairs as $pair ) {
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and type='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and name='basic'") );
 		}
 
 		foreach( $delete_pairs as $delete_pair ) {
@@ -94,11 +94,11 @@ class PostToUserTest extends ContentConnectTestCase {
 		}
 
 		foreach( $keep_pairs as $pair ) {
-			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and type='basic'") );
+			$this->assertEquals( 1, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and name='basic'") );
 		}
 
 		foreach( $delete_pairs as $pair ) {
-			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and type='basic'") );
+			$this->assertEquals( 0, $wpdb->query( "select * from {$wpdb->prefix}post_to_user where post_id='{$pair[0]}' and user_id='{$pair[1]}' and name='basic'") );
 		}
 	}
 

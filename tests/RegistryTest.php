@@ -104,7 +104,7 @@ class RegistryTest extends ContentConnectTestCase {
 		$this->assertSame( $pc, $registry->get_post_to_user_relationship( 'post', 'contrib' ) );
 	}
 
-	public function test_retreival_of_unique_types_on_same_cpt() {
+	public function test_retreival_of_unique_relationship_names_on_same_cpt() {
 		$registry = new Registry();
 
 		$pp1 = $registry->define_post_to_post( 'post', 'post', 'type1' );

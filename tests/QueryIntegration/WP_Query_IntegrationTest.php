@@ -49,7 +49,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_post' => '20',
-					'type' => 'page1',
+					'name' => 'page1',
 				),
 			),
 		);
@@ -72,7 +72,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_user' => '2',
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -117,7 +117,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'paged' => 1,
 			'relationship_query' => array(
 				array(
-					'type' => 'page1',
+					'name' => 'page1',
 				),
 			),
 		);
@@ -142,7 +142,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'paged' => 1,
 			'relationship_query' => array(
 				array(
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -155,7 +155,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_that_nothing_happens_without_relationship_type() {
+	public function test_that_nothing_happens_without_relationship_name() {
 		$this->define_relationships();
 
 		$args = array(
@@ -216,7 +216,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_post' => '31',
-					'type' => 'page1',
+					'name' => 'page1',
 				),
 			),
 
@@ -238,13 +238,13 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 45, 49 ), $query->posts );
 
-		// Different type, so should come back empty
+		// Different name, so should come back empty
 		$args['relationship_query'][0]['related_to_post'] = 33;
 		$args['paged'] = 1;
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array(), $query->posts );
 
-		$args['relationship_query'][0]['type'] = 'page2';
+		$args['relationship_query'][0]['name'] = 'page2';
 		$query = new \WP_Query( $args );
 		$this->assertEquals( array( 38, 42 ), $query->posts );
 
@@ -271,11 +271,11 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relation' => 'OR',
 			array(
 				'related_to_post' => 1,
-				'type' => 'basic',
+				'name' => 'basic',
 			),
 			array(
 				'related_to_post' => 1,
-				'type' => 'complex'
+				'name' => 'complex'
 			)
 		);
 		$query = new \WP_Query( $args );
@@ -318,7 +318,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_user' => 2,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 			),
 		);
@@ -345,11 +345,11 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_user' => 2,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 				array(
 					'related_to_user' => 3,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 				'relation' => 'OR',
 			),
@@ -377,11 +377,11 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 			'relationship_query' => array(
 				array(
 					'related_to_user' => 2,
-					'type' => 'owner',
+					'name' => 'owner',
 				),
 				array(
 					'related_to_post' => 3,
-					'type' => 'basic',
+					'name' => 'basic',
 				),
 				'relation' => 'AND',
 			),

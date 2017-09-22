@@ -54,12 +54,12 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 	public function test_top_level_segments_are_reformatted_into_nested_arrays_correctly() {
 		$query = new UserRelationshipQuery( array(
 			'related_to_post' => '25',
-			'type' => 'owner',
+			'name' => 'owner',
 		) );
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'type' => 'owner',
+				'name' => 'owner',
 			)
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -68,20 +68,20 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		// Test top level keys AND segments in arrays
 		$query = new UserRelationshipQuery( array(
 			'related_to_post' => '25',
-			'type' => 'owner',
+			'name' => 'owner',
 			array(
 				'related_to_post' => '50',
-				'type' => 'contrib',
+				'name' => 'contrib',
 			),
 		) );
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'type' => 'owner',
+				'name' => 'owner',
 			),
 			array(
 				'related_to_post' => '50',
-				'type' => 'contrib',
+				'name' => 'contrib',
 			),
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -91,7 +91,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$query = new UserRelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array() ) );
-		$this->assertFalse( $query->is_valid_segment( array( 'type' => 'owner' ) ) );
+		$this->assertFalse( $query->is_valid_segment( array( 'name' => 'owner' ) ) );
 		$this->assertFalse( $query->is_valid_segment( array( 'related_to_post' ) ) );
 	}
 
@@ -99,7 +99,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$query = new UserRelationshipQuery( array() );
 
 		$this->assertTrue( $query->is_valid_segment( array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 45,
 		) ) );
 	}
@@ -109,14 +109,14 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertFalse( $query->has_valid_segments() );
 
 		$query = new UserRelationshipQuery( array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 25,
 		));
 		$this->assertTrue( $query->has_valid_segments() );
 
 		$query = new UserRelationshipQuery( array(
 			array(
-				'type' => 'contrib',
+				'name' => 'contrib',
 				'related_to_post' => 25,
 			)
 		) );
@@ -126,7 +126,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 	public function test_generate_where_clause() {
 		// Should return nothing, since the relationship isn't defined yet
 		$query = new UserRelationshipQuery(array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 1,
 		));
 		$expected = '';
@@ -145,40 +145,40 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 
 		$query = new UserRelationshipQuery( array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 1
 		) );
-		$expected = " and ((p2u1.post_id = 1 and p2u1.type = 'owner'))";
+		$expected = " and ((p2u1.post_id = 1 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new UserRelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 3,
 			),
 			'relation' => 'OR',
 		) );
-		$expected = " and ((p2u1.post_id = 2 and p2u1.type = 'owner') OR (p2u1.post_id = 3 and p2u1.type = 'owner'))";
+		$expected = " and ((p2u1.post_id = 2 and p2u1.name = 'owner') OR (p2u1.post_id = 3 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
 
 		$query = new UserRelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'contrib',
+				'name' => 'contrib',
 				'related_to_post' => 4,
 			),
 			'relation' => 'AND',
 		) );
-		$expected = " and ((p2u1.post_id = 2 and p2u1.type = 'owner') AND (p2u2.post_id = 4 and p2u2.type = 'contrib'))";
+		$expected = " and ((p2u1.post_id = 2 and p2u1.name = 'owner') AND (p2u2.post_id = 4 and p2u2.name = 'contrib'))";
 		$this->assertEquals( $expected, $query->where );
 	}
 
@@ -187,7 +187,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 		// Should return nothing, since the relationship isn't defined yet
 		$query = new UserRelationshipQuery(array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 1,
 		));
 		$expected = '';
@@ -200,7 +200,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 
 		$query = new UserRelationshipQuery( array(
-			'type' => 'owner',
+			'name' => 'owner',
 			'related_to_post' => 1
 		) );
 		$expected = " left join {$wpdb->prefix}post_to_user as p2u1 on {$wpdb->users}.ID = p2u1.user_id";
@@ -209,11 +209,11 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new UserRelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 3,
 			),
 			'relation' => 'OR',
@@ -224,11 +224,11 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 
 		$query = new UserRelationshipQuery( array(
 			array(
-				'type' => 'owner',
+				'name' => 'owner',
 				'related_to_post' => 2
 			),
 			array(
-				'type' => 'contrib',
+				'name' => 'contrib',
 				'related_to_post' => 4,
 			),
 			'relation' => 'AND',

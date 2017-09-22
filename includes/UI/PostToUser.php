@@ -18,7 +18,7 @@ class PostToUser extends PostUI {
 
 		$args = array(
 			'relationship_query' => array(
-				'type' => $this->relationship->type,
+				'name' => $this->relationship->name,
 				'related_to_post' => $post->ID,
 			)
 		);
@@ -44,8 +44,8 @@ class PostToUser extends PostUI {
 		$data[] = array(
 			'reltype' => 'post-to-user',
 			'object_type' => 'user', // The object type we'll be querying for in searches on the front end
-			'relid' => "{$this->relationship->post_type}_user_{$this->relationship->type}", // @todo should probably get this from the registry
-			'type' => $this->relationship->type,
+			'relid' => "{$this->relationship->post_type}_user_{$this->relationship->name}", // @todo should probably get this from the registry
+			'name' => $this->relationship->name,
 			'labels' => $this->labels,
 			'sortable' => $this->sortable,
 			'selected' => $final_users,

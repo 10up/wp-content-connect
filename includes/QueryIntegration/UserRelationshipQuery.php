@@ -3,7 +3,6 @@
 namespace TenUp\ContentConnect\QueryIntegration;
 
 use TenUp\ContentConnect\Plugin;
-use TenUp\ContentConnect\Tables\PostToUser;
 
 class UserRelationshipQuery {
 
@@ -79,7 +78,7 @@ class UserRelationshipQuery {
 		// Check for any top level keys that should be moved into a nested segment
 		$valid_keys = array(
 			'related_to_post',
-			'type',
+			'name',
 		);
 		$new_segment = array();
 		foreach( $valid_keys as $key ) {
@@ -104,7 +103,7 @@ class UserRelationshipQuery {
 	/**
 	 * Determines if the segment is valid or not.
 	 *
-	 * A valid segment requires both a 'type' property AND one of the following additional properties:
+	 * A valid segment requires both a 'name' property AND one of the following additional properties:
 	 *  - related_to_post
 	 *
 	 * @param $segment
@@ -112,7 +111,7 @@ class UserRelationshipQuery {
 	 * @return bool
 	 */
 	public function is_valid_segment( $segment ) {
-		if ( isset( $segment['related_to_post'] ) && isset( $segment['type'] ) ) {
+		if ( isset( $segment['related_to_post'] ) && isset( $segment['name'] ) ) {
 			return true;
 		}
 
@@ -150,7 +149,7 @@ class UserRelationshipQuery {
 		foreach( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
-				$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.post_id = %d and p2u{$wherecount}.type = %s)", $segment['related_to_post'], $segment['type'] );
+				$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.post_id = %d and p2u{$wherecount}.name = %s)", $segment['related_to_post'], $segment['name'] );
 			}
 
 			// Only increment counter no "AND" relations, when we are joining a table for each segment
@@ -214,7 +213,7 @@ class UserRelationshipQuery {
 			return false;
 		}
 		
-		$relationship = $registry->get_post_to_user_relationship( $related_to_post->post_type, $segment['type'] );
+		$relationship = $registry->get_post_to_user_relationship( $related_to_post->post_type, $segment['name'] );
 
 		return $relationship;
 	}

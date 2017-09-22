@@ -90,7 +90,7 @@ class RelationshipQuery{
 		$valid_keys = array(
 			'related_to_post',
 			'related_to_user',
-			'type',
+			'name',
 		);
 		$new_segment = array();
 		foreach( $valid_keys as $key ) {
@@ -115,7 +115,7 @@ class RelationshipQuery{
 	/**
 	 * Determines if the segment is valid or not.
 	 *
-	 * A valid segment requires both a 'type' property AND one of the following additional properties:
+	 * A valid segment requires both a 'name' property AND one of the following additional properties:
 	 *  - related_to_post
 	 *  - related_to_user
 	 *
@@ -129,7 +129,7 @@ class RelationshipQuery{
 			return false;
 		}
 
-		if ( ( isset( $segment['related_to_post'] ) || isset( $segment['related_to_user'] ) ) && isset( $segment['type'] ) ) {
+		if ( ( isset( $segment['related_to_post'] ) || isset( $segment['related_to_user'] ) ) && isset( $segment['name'] ) ) {
 			return true;
 		}
 
@@ -168,9 +168,9 @@ class RelationshipQuery{
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
 				if ( $relationship instanceof PostToPost ) {
-					$where_parts[] = $wpdb->prepare( "(p2p{$wherecount}.id2 = %d and p2p{$wherecount}.type = %s)", $segment['related_to_post'], $segment['type'] );
+					$where_parts[] = $wpdb->prepare( "(p2p{$wherecount}.id2 = %d and p2p{$wherecount}.name = %s)", $segment['related_to_post'], $segment['name'] );
 				} else if ( $relationship instanceof PostToUser ) {
-					$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.user_id = %d and p2u{$wherecount}.type = %s)", $segment['related_to_user'], $segment['type'] );
+					$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.user_id = %d and p2u{$wherecount}.name = %s)", $segment['related_to_user'], $segment['name'] );
 				}
 
 				// Only increment counter no "AND" relations, when we are joining a table for each segment
@@ -245,7 +245,7 @@ class RelationshipQuery{
 				return false;
 			}
 
-			$relationship = $registry->get_post_to_post_relationship( $this->post_type, $related_to_post->post_type, $segment['type'] );
+			$relationship = $registry->get_post_to_post_relationship( $this->post_type, $related_to_post->post_type, $segment['name'] );
 		} else {
 			$related_to_user = get_user_by( 'id', $segment['related_to_user'] );
 
@@ -253,7 +253,7 @@ class RelationshipQuery{
 				return false;
 			}
 
-			$relationship = $registry->get_post_to_user_relationship( $this->post_type, $segment['type'] );
+			$relationship = $registry->get_post_to_user_relationship( $this->post_type, $segment['name'] );
 		}
 
 		return $relationship;
