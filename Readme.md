@@ -2,6 +2,14 @@
 
 WordPress library that enables direct relationships for posts to posts and posts to users.
 
+## Usage
+
+1. `composer install --no-dev`
+
+1. `yarn install`
+
+1. include with composer, install as a plugin and activate, or load the main `content-connect.php` file
+
 ## Defining Relationships
 Relationships can be defined once any post types they utilize are defined by hooking into the `tenup-content-connect-init` action. This action is fired on the WordPress `init` action, at prority 100, so any post types must be registered prior to this. Currently supported relationships are post-to-post and post-to-user. Additionally, when registering a relationship, you must specify a `type`. Type enables multiple distinct relationships between the same object types. For instance, you could have a post-to-user relationship for post type `post` with a type of `researchers` to indicate that any user in the "researcher" relationship is a researcher for the post and have another post-to-user relationship defined for post type `post` with a type of `backer` to indicate that any user in the "backer" relationship contributes fincially to the post.
 
