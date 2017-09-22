@@ -20,7 +20,7 @@ class PostToUser extends BaseTable {
 			`user_id` bigint(20) unsigned NOT NULL, 
 			`name` varchar(20) NOT NULL,
 			`user_order` int(11) NOT NULL default 0,
-			PRIMARY KEY  (`post_id`,`user_id`,`name`)
+			UNIQUE KEY  (`post_id`,`user_id`,`name`)
 		);";
 
 		return $sql;
