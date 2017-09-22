@@ -55,19 +55,27 @@ abstract class Relationship {
 	 */
 	public $from_sortable;
 
+	/**
+	 * Is the "to" UI for this sortable
+	 *
+	 * @var bool
+	 */
+	public $to_sortable;
+
 	public function __construct( $type, $args = array() ) {
 		$this->type = $type;
 
 		$defaults = array(
-			'from_ui' => array(
-				'enabled' => true,
+			'from' => array(
+				'enable_ui' => true,
 				'sortable' => false,
 				'labels' => array(
 					'name' => $type,
 				),
 			),
-			'to_ui' => array(
-				'enabled' => false,
+			'to' => array(
+				'enable_ui' => false,
+				'sortable' => false,
 				'labels' => array(
 					'name' => $type,
 				)
@@ -76,12 +84,13 @@ abstract class Relationship {
 
 		$args = array_replace_recursive( $defaults, $args );
 
-		$this->enable_from_ui = $args['from_ui']['enabled'];
-		$this->from_sortable = $args['from_ui']['sortable'];
-		$this->from_labels = $args['from_ui']['labels'];
+		$this->enable_from_ui = $args['from']['enable_ui'];
+		$this->from_sortable = $args['from']['sortable'];
+		$this->from_labels = $args['from']['labels'];
 
-		$this->enable_to_ui = $args['to_ui']['enabled'];
-		$this->to_labels = $args['to_ui']['labels'];
+		$this->enable_to_ui = $args['to']['enable_ui'];
+		$this->to_sortable = $args['to']['sortable'];
+		$this->to_labels = $args['to']['labels'];
 	}
 
 	abstract function setup();
