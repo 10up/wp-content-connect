@@ -2,6 +2,7 @@
 
 namespace TenUp\ContentConnect\Tests\Relationships;
 
+use TenUp\ContentConnect\Plugin;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
@@ -205,5 +206,43 @@ class PostToPostTest extends ContentConnectTestCase {
 		$related = $ppb->get_related_object_ids( 1 );
 		$this->assertEquals( array( 2, 3 ), $related );
 	}
+
+	public function test_sort_data_is_saved() {
+		global $wpdb;
+
+		$this->add_post_relations();
+
+		$rel = new PostToPost( 'post', 'post', 'basic' );
+		$rel->save_sort_data( 1, array( 2, 3 ) );
+
+		$this->assertEquals( 1, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=2;" ) );
+		$this->assertEquals( 2, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=3;" ) );
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, true ) );
+
+		$rel->save_sort_data( 1, array( 3, 2 ) );
+
+		$this->assertEquals( 2, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=2;" ) );
+		$this->assertEquals( 1, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=3;" ) );
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
+		$this->assertEquals( array( 3, 2 ), $rel->get_related_object_ids( 1, true ) );
+	}
+
+	public function test_relationship_ids_are_returned_in_order() {
+		$this->add_post_relations();
+
+		$rel = new PostToPost( 'post', 'post', 'basic' );
+		$rel->save_sort_data( 1, array( 2, 3 ) );
+
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, true ) );
+
+		$rel->save_sort_data( 1, array( 3, 2 ) );
+
+		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
+		$this->assertEquals( array( 3, 2 ), $rel->get_related_object_ids( 1, true ) );
+	}
+
+
 
 }

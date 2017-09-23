@@ -71,7 +71,7 @@ class PostToPost extends Relationship {
 	 *
 	 * @return array
 	 */
-	public function get_related_object_ids( $post_id ) {
+	public function get_related_object_ids( $post_id, $order_by_relationship = false ) {
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 		$db = $table->get_db();
@@ -85,7 +85,10 @@ class PostToPost extends Relationship {
 		}
 		$where_post_type = $post_type === $this->from ? $this->to : $this->from;
 
-		$query = $db->prepare( "SELECT p2p.id2 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id2 = p.ID WHERE p2p.id1 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $where_post_type );
+		$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $where_post_type );
+		if ( $order_by_relationship ) {
+			$query .= " ORDER BY p2p.order = 0, p2p.order ASC";
+		}
 
 		$objects = $db->get_results( $query );
 

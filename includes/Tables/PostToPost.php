@@ -20,7 +20,7 @@ class PostToPost extends BaseTable {
 			`id2` bigint(20) unsigned NOT NULL, 
 			`name` varchar(20) NOT NULL, 
 			`order` int(11) NOT NULL default 0,
-			UNIQUE KEY  (`id1`,`id2`,`name`) 
+			UNIQUE KEY post_post_name (`id1`,`id2`,`name`) 
 		);";
 
 		return $sql;
