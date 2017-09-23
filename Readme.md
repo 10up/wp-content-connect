@@ -11,9 +11,9 @@ WordPress library that enables direct relationships for posts to posts and posts
 1. include with composer, install as a plugin and activate, or load the main `content-connect.php` file
 
 ## Defining Relationships
-Relationships can be defined once any post types they utilize are defined by hooking into the `tenup-content-connect-init` action. This action is fired on the WordPress `init` action, at prority 100, so any post types must be registered prior to this. Currently supported relationships are post-to-post and post-to-user. Additionally, when registering a relationship, you must specify a `type`. Type enables multiple distinct relationships between the same object types. For instance, you could have a post-to-user relationship for post type `post` with a type of `researchers` to indicate that any user in the "researcher" relationship is a researcher for the post and have another post-to-user relationship defined for post type `post` with a type of `backer` to indicate that any user in the "backer" relationship contributes fincially to the post.
+Relationships can be defined once any post types they utilize are defined by hooking into the `tenup-content-connect-init` action. This action is fired on the WordPress `init` action, at prority 100, so any post types must be registered prior to this. Currently supported relationships are post-to-post and post-to-user. Additionally, when registering a relationship, you must specify a `name`. Name enables multiple distinct relationships between the same object types. For instance, you could have a post-to-user relationship for post type `post` with a type of `researchers` to indicate that any user in the "researcher" relationship is a researcher for the post and have another post-to-user relationship defined for post type `post` with a name of `backer` to indicate that any user in the "backer" relationship contributes financially to the post.
 
-### `define_post_to_post( $from, $to, $type, $args = array() )`
+### `define_post_to_post( $from, $to, $name, $args = array() )`
 This method defines a post to post relationship between two post types, `$from` and `$to`.
 
 #### Parameters:
@@ -22,7 +22,7 @@ This method defines a post to post relationship between two post types, `$from` 
 
 `$to` (String) Second post type in the relationship
 
-`$type` (String) Unique name for this relationship, used to distinguish between multiple relationships between the same post types
+`$name` (String) Unique name for this relationship, used to distinguish between multiple relationships between the same post types
 
 `$args` (Array) Array of options for the relationship
 
@@ -65,14 +65,14 @@ add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 
 ```
 
-### `define_post_to_user( $post_type, $type $args = array() )`
+### `define_post_to_user( $post_type, $name $args = array() )`
 This method defines a post to user relationship between the supplied post type and users.
 
 #### Parameters:
 
 `$post_type` (String) The post type to be related to users
 
-`$type` (String) Unique name for this relationship, used to distinguish between multiple relationships between users and the same post type
+`$name` (String) Unique name for this relationship, used to distinguish between multiple relationships between users and the same post type
 
 `$args` (Array) Array of options for the relationship
 
@@ -120,7 +120,7 @@ Since you can manage this relationship from both post types in the relationship,
 
 Querying for relationships is enabled via a new `relationship_query` parameter for `WP_Query`. The format for `relationship_query` is very similar to `tax_query`.
 
-A valid relationship query segment **requires** `type` and either `related_to_post` OR `related_to_user`. As many relationship segments as necessary can be combined to create a specific set of results, and can be combined using an `AND` or `OR` relation.
+A valid relationship query segment **requires** `name` and either `related_to_post` OR `related_to_user`. As many relationship segments as necessary can be combined to create a specific set of results, and can be combined using an `AND` or `OR` relation.
 
 #### Top Level Args:
 
@@ -128,7 +128,7 @@ A valid relationship query segment **requires** `type` and either `related_to_po
 
 #### Segment Args:
 
-- `type` (String) The unique type for the relationship you are querying. Should match a `type` from registering relationships.
+- `name` (String) The unique name for the relationship you are querying. Should match a `name` from registering relationships.
 - `related_to_post` (Int) Find items in the relationship related to this post ID. Cannot be used in the same segment as `related_to_user`.
 - `related_to_user` (Int) Find items in the relationship related to this user ID. Cannot be used in the same segment as `related_to_post`.
 
@@ -141,11 +141,11 @@ $query = new WP_Query( array(
         'relation' => 'AND', // AND is default
         array(
             'related_to_post' => 25,
-            'type' => 'related',
+            'name' => 'related',
         ),
         array(
             'related_to_user' => 5,
-            'type' => 'researcher',
+            'name' => 'researcher',
         )
     ),
 ) );
@@ -167,7 +167,7 @@ For example, this is fine:
 'relationship_query' => array(
     array(
         'related_to_post' => 25,
-        'type' => 'related',
+        'name' => 'related',
     ),
 ),
 'orderby' => 'relationship',
@@ -178,11 +178,11 @@ while this will not work (orderby will be ignored):
 'relationship_query' => array(
     array(
         'related_to_post' => 25,
-        'type' => 'related',
+        'name' => 'related',
     ),
     array(
 		'related_to_post' => 15,
-		'type' => 'related',
+		'name' => 'related',
 	),
 ),
 'orderby' => 'relationship',
