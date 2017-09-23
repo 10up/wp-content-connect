@@ -3,6 +3,8 @@
 namespace TenUp\ContentConnect\Tests\QueryIntegration;
 
 use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\QueryIntegration\RelationshipQuery;
+use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
@@ -395,9 +397,77 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2, 4, 5 ), $query->posts );
 	}
 
-	public function test_orderby_relationship_does_nothing_with_no_ids() {
-		// When we have no order stored on the post, we have an empty array, so we should not alter the orderby,
-		// since it will result in nothign happening, and will be needlessly complex
+	public function test_orderby_only_works_with_one_segment() {
+		$this->define_relationships();
+
+		$query = new \stdClass();
+
+		$query->query = array(
+			'orderby' => 'relationship',
+		);
+
+		$query->relationship_query = new RelationshipQuery( array(
+			array(
+				'related_to_post' => 1,
+				'name' => 'basic',
+			),
+		) );
+
+		// The other function does nothing without a where
+		$query->relationship_query->where = 'WHERE';
+
+		$orderby = 'default';
+
+		$integration = new WPQueryIntegration();
+
+		$this->assertEquals( 'p2p1.order = 0, p2p1.order ASC', $integration->posts_orderby( $orderby, $query ) );
+
+
+		$query->relationship_query = new RelationshipQuery( array(
+			array(
+				'related_to_post' => 1,
+				'name' => 'basic',
+			),
+			array(
+				'related_to_post' => 2,
+				'name' => 'basic',
+			)
+		) );
+
+		// The other function does nothing without a where
+		$query->relationship_query->where = 'WHERE';
+
+		$this->assertEquals( 'default', $integration->posts_orderby( $orderby, $query ) );
+	}
+
+	public function test_post_to_post_sorting_queries() {
+		$this->add_post_relations();
+		$this->define_relationships();
+
+		$p2p = new PostToPost( 'post', 'post', 'page1' );
+		$p2p->save_sort_data( 31, array( 40, 48, 44, 36 ) );
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'relationship',
+			'posts_per_page' => 2,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_post' => '31',
+					'name' => 'page1',
+				),
+			),
+
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 40, 48 ), $query->posts );
+
+		$args['paged'] = 2;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 44, 36 ), $query->posts );
 	}
 
 }
