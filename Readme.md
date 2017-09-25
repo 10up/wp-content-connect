@@ -111,7 +111,7 @@ add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 
 
 ### Sortable Relationships
-Relationships can optionally support sortable related items. Sorting data is stored on the post object, not on the relationship. This means that you can store an order on both sides of any given relationship independent of one another with both UIs enabled. For example, if you have cars and tires, you may have a car that has 5 related tires, and if you wanted to sort the tires, you do so from the car page. You could then go to one of the related tires, and order all of the cars it is related to separately.
+Relationships can optionally support sortable related items. Order can be stored independently for both sides of a relationship. For example, if you have cars and tires, you may have a car that has 5 related tires, and if you wanted to sort the tires, you do so from the car page. You could then go to one of the related tires, and order all of the cars it is related to separately.
 
 Since you can manage this relationship from both post types in the relationship, if you added a tire from the car page, and you had relationship data previously stored on the tire, the NEW car in the relationship will still show up in query results, at the very end (after all of your other pre-ordered data).
 
@@ -151,7 +151,7 @@ $query = new WP_Query( array(
 ) );
 ```
 
-Currently, querying for multiple post types in WP_Query will not work. When using relationship queries, make sure to only have one `post_type` value in WP_Query.
+Currently, querying for multiple post types in WP_Query may not work as expected. When using relationship queries, make sure to only have one `post_type` value in WP_Query.
 
 #### Order By
 
@@ -187,4 +187,7 @@ while this will not work (orderby will be ignored):
 ),
 'orderby' => 'relationship',
 ```
+
+## Manually Managing Relationships
+
 
