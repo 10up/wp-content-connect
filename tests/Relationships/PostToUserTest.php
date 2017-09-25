@@ -168,14 +168,14 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->add_user_relations();
 
 		$rel = new PostToUser( 'post', 'owner' );
-		$rel->save_sort_data( 1, array( 2, 3, 4 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 2, 3, 4 ) );
 
 		$this->assertEquals( 1, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=2;" ) );
 		$this->assertEquals( 2, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=3;" ) );
 		$this->assertEquals( 3, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=4;" ) );
 
 		$rel = new PostToUser( 'post', 'owner' );
-		$rel->save_sort_data( 1, array( 4, 2, 3 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 4, 2, 3 ) );
 
 		$this->assertEquals( 1, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=4;" ) );
 		$this->assertEquals( 2, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=2;" ) );
@@ -186,12 +186,12 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->add_user_relations();
 
 		$rel = new PostToUser( 'post', 'owner' );
-		$rel->save_sort_data( 1, array( 1, 2, 3, 4 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 1, 2, 3, 4 ) );
 
 		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
 		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, true ) );
 
-		$rel->save_sort_data( 1, array( 3, 2, 1, 4 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 3, 2, 1, 4 ) );
 
 		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
 		$this->assertEquals( array( 3, 2, 1, 4 ), $rel->get_related_user_ids( 1, true ) );
@@ -201,12 +201,12 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->add_user_relations();
 
 		$rel = new PostToUser( 'post', 'owner' );
-		$rel->save_sort_data( 1, array( 2, 3, 4 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 2, 3, 4 ) );
 
 		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
 		$this->assertEquals( array( 2, 3, 4, 1 ), $rel->get_related_user_ids( 1, true ) );
 
-		$rel->save_sort_data( 1, array( 3, 2, 4 ) );
+		$rel->save_post_to_user_sort_data( 1, array( 3, 2, 4 ) );
 
 		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
 		$this->assertEquals( array( 3, 2, 4, 1 ), $rel->get_related_user_ids( 1, true ) );

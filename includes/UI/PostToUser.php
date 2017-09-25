@@ -70,7 +70,7 @@ class PostToUser extends PostUI {
 		}
 
 		if ( $this->sortable ) {
-			$this->relationship->save_sort_data( $post_id, $relationship_data['add_items'] );
+			$this->relationship->save_post_to_user_sort_data( $post_id, $relationship_data['add_items'] );
 		}
 	}
 

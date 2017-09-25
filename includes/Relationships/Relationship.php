@@ -95,6 +95,4 @@ abstract class Relationship {
 
 	abstract function setup();
 
-	abstract function save_sort_data( $object_id, $ordered_ids );
-
 }

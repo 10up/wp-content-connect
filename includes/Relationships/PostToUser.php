@@ -121,8 +121,14 @@ class PostToUser extends Relationship {
 		);
 	}
 
-	public function save_sort_data( $object_id, $ordered_ids ) {
-		if ( empty( $ordered_ids ) ) {
+	/**
+	 * Saves the order of users for a particular post
+	 *
+	 * @param $object_id
+	 * @param $ordered_user_ids
+	 */
+	public function save_post_to_user_sort_data( $object_id, $ordered_user_ids ) {
+		if ( empty( $ordered_user_ids ) ) {
 			return;
 		}
 
@@ -130,7 +136,7 @@ class PostToUser extends Relationship {
 
 		$data = array();
 
-		foreach( $ordered_ids as $id ) {
+		foreach( $ordered_user_ids as $id ) {
 			$order++;
 
 			$data[] = array(

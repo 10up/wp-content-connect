@@ -243,7 +243,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->add_small_relationship_set();
 
 		$rel = new PostToUser( 'post', 'owner' );
-		$rel->save_sort_data( 5, array( 2, 3 ) );
+		$rel->save_post_to_user_sort_data( 5, array( 2, 3 ) );
 
 		$args = array(
 			'fields' => 'ids',
@@ -261,7 +261,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$query = new \WP_User_Query( $args );
 		$this->assertEquals( array( 2, 3 ), $query->get_results() );
 
-		$rel->save_sort_data( 5, array( 3, 2 ) );
+		$rel->save_post_to_user_sort_data( 5, array( 3, 2 ) );
 		$query = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 2 ), $query->get_results() );
 	}
