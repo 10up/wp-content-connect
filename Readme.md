@@ -190,4 +190,64 @@ while this will not work (orderby will be ignored):
 
 ## Manually Managing Relationships
 
+If you choose to not use the built in UIs for relationships, you'll need to manually update relationships. **DO NOT** try and work directly with the database tables. Instead, work with the following API methods. The underlying implementations may need to change from time to time, but the following methods should continue to function if the underlying implementations need to change.
 
+These methods are available on the relationship objects returned when defining the relationship. Make sure to call these methods on the specific relationship object you are defining a relationship for, as these methods are specific to the relationship context (they are aware of the `name` of the relationship, as well as the post types in the relationship).
+
+### `PostToPost->add_relationship( $pid1, $pid2 )`
+This method adds a relationship between one post and another, in a post to post relationship. When calling this method, the order of IDs passed is not important.
+
+#### Parameters:
+
+`$pid1` (Int) The ID of the first post in the relationship
+
+`$pid2` (Int) The ID of the second post in the relationship
+
+#### Example:
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->add_relationship( 1, 2 ); // Adds a relationship between post ID 1 and post ID 2
+```
+
+### `PostToPost->delete_relationship( $pid1, $pid2 )`
+This methods deletes a relationship between one post and another, in a post to post relationship. When calling this method, the order of IDs passed is not important. 
+
+#### Parameters:
+
+`$pid1` (Int) The ID of the first post in the relationship. Does **not** need to be in the same order as the relationship was added.
+
+`$pid2` (Int) The ID of the second post in the relationship. Does **not** need to be in the same order as the relationship was added.
+
+#### Example:
+```php
+// $relationship is the return value from ->define_post_to_post()
+// Note that the example above added these in the reverse order, but the relationship is still deleted
+$relationship->delete_relationship( 2, 1 ); // Deletes the relationship between post ID 1 and post ID 2. 
+```
+
+### `PostToPost->save_sort_data( $object_id, $ordered_ids )`
+For a relationship with sorting enabled, this saves the order of the posts for a single direction of the relationship.
+
+#### Parameters:
+
+`$object_id` (Int) The Post ID that we are ordering from. If we were ordering 5 tires for a single car, this would be the car ID.
+
+`$ordered_ids` (Array) An array of Post IDs, in the order they should be sorted. If we were ordering 5 tires for a single car, this is the ordered tire IDs.
+
+#### Example:
+
+Car ID 5 has five related tires, that should be ordered 7, 6, 3, 8, 2
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->save_sort_data( 5, array( 7, 6, 3, 8, 2 ) );
+```
+
+### `PostToUser->add_relationship( $post_id, $user_id )`
+
+### `PostToUser->delete_relationship( $post_id, $user_id )` 
+
+### `PostToUser->save_post_to_user_sort_data( $object_id, $ordered_user_ids )`
+
+### `PostTo_user->save_user_to_post_sort_data( $user_id, $ordered_post_ids )` 
