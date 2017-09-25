@@ -217,15 +217,11 @@ class PostToPostTest extends ContentConnectTestCase {
 
 		$this->assertEquals( 1, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=2;" ) );
 		$this->assertEquals( 2, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=3;" ) );
-		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
-		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, true ) );
 
 		$rel->save_sort_data( 1, array( 3, 2 ) );
 
 		$this->assertEquals( 2, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=2;" ) );
 		$this->assertEquals( 1, $wpdb->get_var( "select `order` from {$wpdb->prefix}post_to_post where id2=1 and name='basic' and id1=3;" ) );
-		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
-		$this->assertEquals( array( 3, 2 ), $rel->get_related_object_ids( 1, true ) );
 	}
 
 	public function test_relationship_ids_are_returned_in_order() {
@@ -241,6 +237,10 @@ class PostToPostTest extends ContentConnectTestCase {
 
 		$this->assertEquals( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
 		$this->assertEquals( array( 3, 2 ), $rel->get_related_object_ids( 1, true ) );
+	}
+
+	public function test_relationships_added_with_no_order_go_to_end() {
+
 	}
 
 

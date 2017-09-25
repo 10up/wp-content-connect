@@ -3,8 +3,9 @@
 namespace TenUp\ContentConnect\Tests\QueryIntegration;
 
 use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
+use TenUp\ContentConnect\QueryIntegration\UserRelationshipQuery;
 use TenUp\ContentConnect\Registry;
-use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
@@ -194,6 +195,75 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$args['relationship_query']['relation'] = 'AND';
 		$query = new \WP_User_Query( $args );
 		$this->assertEquals( array( 2 ), $query->get_results() );
+	}
+
+	public function test_orderby_only_works_with_one_segment() {
+		$this->define_relationships();
+
+		$query = new \stdClass();
+
+		$query->query_vars = array(
+			'orderby' => 'relationship',
+		);
+
+		$relationship_query = new UserRelationshipQuery( array(
+			array(
+				'related_to_post' => 1,
+				'name' => 'owner',
+			),
+		) );
+
+		$query->query_orderby = 'default';
+
+		$integration = new UserQueryIntegration();
+		$integration->sortable_orderby( $query, $relationship_query );
+
+		$this->assertEquals( 'ORDER BY p2u1.user_order = 0, p2u1.user_order ASC', $query->query_orderby );
+
+
+		$relationship_query = new UserRelationshipQuery( array(
+			array(
+				'related_to_post' => 1,
+				'name' => 'owner',
+			),
+			array(
+				'related_to_post' => 2,
+				'name' => 'owner',
+			)
+		) );
+
+		$query->query_orderby = 'default';
+
+		$integration->sortable_orderby( $query, $relationship_query );
+		$this->assertEquals( 'default', $query->query_orderby );
+	}
+
+	public function test_post_to_user_sorting_queries() {
+		$this->define_relationships();
+		$this->add_small_relationship_set();
+
+		$rel = new PostToUser( 'post', 'owner' );
+		$rel->save_sort_data( 5, array( 2, 3 ) );
+
+		$args = array(
+			'fields' => 'ids',
+			'orderby' => 'relationship',
+			'number' => 10,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_post' => 5,
+					'name' => 'owner',
+				),
+			),
+		);
+
+		$query = new \WP_User_Query( $args );
+		$this->assertEquals( array( 2, 3 ), $query->get_results() );
+
+		$rel->save_sort_data( 5, array( 3, 2 ) );
+		$query = new \WP_User_Query( $args );
+		$this->assertEquals( array( 3, 2 ), $query->get_results() );
 	}
 
 }

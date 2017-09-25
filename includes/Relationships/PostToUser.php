@@ -66,7 +66,7 @@ class PostToUser extends Relationship {
 	 *
 	 * @return array
 	 */
-	public function get_related_user_ids( $post_id ) {
+	public function get_related_user_ids( $post_id, $order_by_relationship = false ) {
 		// Ensure the post ID provided is valid for this relationship
 		$post = get_post( $post_id );
 		if ( $post->post_type !== $this->post_type ) {
@@ -80,6 +80,9 @@ class PostToUser extends Relationship {
 		$table_name = esc_sql( $table->get_table_name() );
 
 		$query = $db->prepare( "SELECT p2u.user_id from {$table_name} as p2u where p2u.post_id=%d and p2u.name=%s", $post_id, $this->name );
+		if ( $order_by_relationship ) {
+			$query .= "order by p2u.user_order = 0, p2u.user_order ASC";
+		}
 
 		$objects = $db->get_results( $query );
 

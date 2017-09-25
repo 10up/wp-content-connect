@@ -162,4 +162,34 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 11, 12, 13, 14, 15 ), $carcontrib->get_related_post_ids( 3 ) );
 	}
 
+	public function test_sort_data_is_saved() {
+		global $wpdb;
+
+		$this->add_user_relations();
+
+		$rel = new PostToUser( 'post', 'owner' );
+		$rel->save_sort_data( 1, array( 2, 3, 4 ) );
+
+		$this->assertEquals( 1, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=2;" ) );
+		$this->assertEquals( 2, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=3;" ) );
+		$this->assertEquals( 3, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=4;" ) );
+
+		$rel = new PostToUser( 'post', 'owner' );
+		$rel->save_sort_data( 1, array( 4, 2, 3 ) );
+
+		$this->assertEquals( 1, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=4;" ) );
+		$this->assertEquals( 2, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=2;" ) );
+		$this->assertEquals( 3, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where post_id=1 and name='owner' and user_id=3;" ) );
+	}
+
+	public function test_relationship_ids_are_returned_in_order() {
+		$this->add_user_relations();
+
+
+	}
+
+	public function test_relationships_added_with_no_order_go_to_end() {
+
+	}
+
 }

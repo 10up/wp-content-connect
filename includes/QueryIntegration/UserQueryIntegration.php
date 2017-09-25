@@ -63,7 +63,7 @@ class UserQueryIntegration {
 
 		if ( $relationship instanceof PostToUser ) {
 			// Puts 0 last, since these are just defaults
-			$query->query_orderby = "ORDER BY p2u1.user_order = 0, p2u1.user_order";
+			$query->query_orderby = "ORDER BY p2u1.user_order = 0, p2u1.user_order ASC";
 		}
 	}
 
