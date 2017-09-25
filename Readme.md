@@ -245,9 +245,69 @@ $relationship->save_sort_data( 5, array( 7, 6, 3, 8, 2 ) );
 ```
 
 ### `PostToUser->add_relationship( $post_id, $user_id )`
+This method adds a relationship between a post and a user, in a post to user relationship. 
+
+#### Parameters:
+
+`$post_id` (Int) The ID of the post in the relationship
+
+`$user_id` (Int) The ID of the user in the relationship
+
+#### Example:
+
+```php
+// $relationship is the return value from ->define_post_to_user()
+$relationship->add_relationship( 1, 5 ); // Adds a relationship between post 1 and user 5
+```
 
 ### `PostToUser->delete_relationship( $post_id, $user_id )` 
+This method deletes a relationship between a post and a user, in a post to user relationship.
+
+#### Parameters:
+
+`$post_id` (Int) The ID of the post in the relationship
+
+`$user_id` (Int) The ID of the user in the relationship
+
+#### Example:
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->delete_relationship( 1, 5 ); // Deletes the relationship between post 1 and user 5
+```
 
 ### `PostToUser->save_post_to_user_sort_data( $object_id, $ordered_user_ids )`
+For a relationship with sorting enabled, this saves the order of users for a particular post
+
+#### Parameters:
+
+`$object_id` (Int) The ID of the post to store the order of users for
+
+`$ordered_user_ids` (Array) Array of User IDs, in the order they should be sorted.
+
+#### Example:
+
+Post ID has 5 users that need to be stored in the following order: 2, 4, 1, 6, 3
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->save_post_to_user_sort_data( 5, array( 2, 4, 1, 6, 3 ) );
+```
 
 ### `PostTo_user->save_user_to_post_sort_data( $user_id, $ordered_post_ids )` 
+For a relationship with sorting enabled, this saves the order of posts for a particular user
+
+#### Parameters:
+
+`$user_id` (Int) The ID of the user to store the order of posts for
+
+`$ordered_post_ids` (Array) Array of Post IDs, in the order they should be sorted
+
+#### Example:
+
+User ID 1 has 5 posts that need to be stored in the following order: 4, 2, 7, 9, 8
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->save_user_to_post_sort_data( 1, array( 4, 2, 7, 9, 8 ) );
+```
