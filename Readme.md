@@ -294,7 +294,7 @@ Post ID has 5 users that need to be stored in the following order: 2, 4, 1, 6, 3
 $relationship->save_post_to_user_sort_data( 5, array( 2, 4, 1, 6, 3 ) );
 ```
 
-### `PostTo_user->save_user_to_post_sort_data( $user_id, $ordered_post_ids )` 
+### `PostToUser->save_user_to_post_sort_data( $user_id, $ordered_post_ids )` 
 For a relationship with sorting enabled, this saves the order of posts for a particular user
 
 #### Parameters:
