@@ -185,11 +185,31 @@ class PostToUserTest extends ContentConnectTestCase {
 	public function test_relationship_ids_are_returned_in_order() {
 		$this->add_user_relations();
 
+		$rel = new PostToUser( 'post', 'owner' );
+		$rel->save_sort_data( 1, array( 1, 2, 3, 4 ) );
 
+		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
+		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, true ) );
+
+		$rel->save_sort_data( 1, array( 3, 2, 1, 4 ) );
+
+		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
+		$this->assertEquals( array( 3, 2, 1, 4 ), $rel->get_related_user_ids( 1, true ) );
 	}
 
 	public function test_relationships_added_with_no_order_go_to_end() {
+		$this->add_user_relations();
 
+		$rel = new PostToUser( 'post', 'owner' );
+		$rel->save_sort_data( 1, array( 2, 3, 4 ) );
+
+		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
+		$this->assertEquals( array( 2, 3, 4, 1 ), $rel->get_related_user_ids( 1, true ) );
+
+		$rel->save_sort_data( 1, array( 3, 2, 4 ) );
+
+		$this->assertEquals( array( 1, 2, 3, 4 ), $rel->get_related_user_ids( 1, false ) );
+		$this->assertEquals( array( 3, 2, 4, 1 ), $rel->get_related_user_ids( 1, true ) );
 	}
 
 }

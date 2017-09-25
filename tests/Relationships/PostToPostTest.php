@@ -240,7 +240,19 @@ class PostToPostTest extends ContentConnectTestCase {
 	}
 
 	public function test_relationships_added_with_no_order_go_to_end() {
+		// post to post "basic" name
+		$rel = new PostToPost( 'post', 'post', 'basic' );
 
+		$rel->add_relationship( 1, 2 );
+		$rel->add_relationship( 1, 3 );
+		$rel->add_relationship( 1, 4 );
+		$rel->add_relationship( 1, 5 );
+		$rel->add_relationship( 1, 6 );
+
+		$rel->save_sort_data( 1, array( 2, 3, 4, 6 ) );
+
+		$this->assertEquals( array( 2, 3, 4, 5, 6 ), $rel->get_related_object_ids( 1, false ) );
+		$this->assertEquals( array( 2, 3, 4, 6, 5 ), $rel->get_related_object_ids( 1, true ) );
 	}
 
 
