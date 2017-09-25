@@ -45,7 +45,7 @@ class PostToUser extends Relationship {
 	 *
 	 * @return array
 	 */
-	public function get_related_post_ids( $user_id ) {
+	public function get_related_post_ids( $user_id, $order_by_relationship = false ) {
 		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 		$db = $table->get_db();
@@ -53,6 +53,9 @@ class PostToUser extends Relationship {
 		$table_name = esc_sql( $table->get_table_name() );
 
 		$query = $db->prepare( "SELECT p2u.post_id from {$table_name} as p2u inner join {$db->posts} as p on p.ID = p2u.post_id where p2u.user_id=%d and p2u.name=%s and p.post_type=%s", $user_id, $this->name, $this->post_type );
+		if ( $order_by_relationship ) {
+			$query .= "order by p2u.post_order = 0, p2u.post_order ASC";
+		}
 
 		$objects = $db->get_results( $query );
 
@@ -136,14 +139,14 @@ class PostToUser extends Relationship {
 
 		$data = array();
 
-		foreach( $ordered_user_ids as $id ) {
+		foreach ( $ordered_user_ids as $id ) {
 			$order++;
 
 			$data[] = array(
 				'post_id' => $object_id,
 				'user_id' => $id,
 				'name' => $this->name,
-				'user_order' => $order
+				'user_order' => $order,
 			);
 		}
 
@@ -152,6 +155,46 @@ class PostToUser extends Relationship {
 			'user_id' => '%d',
 			'name' => '%s',
 			'user_order' => '%d',
+		);
+
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
+		$table = Plugin::instance()->get_table( 'p2u' );
+		$table->replace_bulk( $fields, $data );
+	}
+
+	/**
+	 * Saves the order of posts for a particular user.
+	 *
+	 * Currently no UI for this, but supporting this on the API level for consistency on all sides of the relationship
+	 *
+	 * @param $user_id
+	 * @param $ordered_post_ids
+	 */
+	public function save_user_to_post_sort_data( $user_id, $ordered_post_ids ) {
+		if ( empty( $ordered_post_ids ) ) {
+			return;
+		}
+
+		$order = 0;
+
+		$data = array();
+
+		foreach ( $ordered_post_ids as $id ) {
+			$order++;
+
+			$data[] = array(
+				'post_id' => $id,
+				'user_id' => $user_id,
+				'name' => $this->name,
+				'post_order' => $order,
+			);
+		}
+
+		$fields = array(
+			'post_id' => '%d',
+			'user_id' => '%d',
+			'name' => '%s',
+			'post_order' => '%d',
 		);
 
 		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */

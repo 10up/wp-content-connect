@@ -67,15 +67,6 @@ class WPQueryIntegration {
 			return $orderby;
 		}
 
-		/*
-		 * Since we don't have a UI for anything on user screens, its not possible to order there
-		 * Therefore, if we are finding things related by a user ID, we ignore this param, since it would do nothing
-		 * and just over complicate the query
-		 */
-		if ( isset( $query->relationship_query->segments[0]['related_to_user'] ) ) {
-			return $orderby;
-		}
-
 		$segment = $query->relationship_query->segments[0];
 		$relationship = $query->relationship_query->get_relationship_for_segment( $segment );
 
@@ -84,7 +75,7 @@ class WPQueryIntegration {
 		if ( $relationship instanceof PostToPost ) {
 			$orderby = "p2p1.order = 0, p2p1.order ASC";
 		} else if ( $relationship instanceof  PostToUser ) {
-			$orderby = "p2u1.order = 0, p2u1.order ASC";
+			$orderby = "p2u1.post_order = 0, p2u1.post_order ASC";
 		}
 
 		return $orderby;
