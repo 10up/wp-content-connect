@@ -470,4 +470,34 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 44, 36 ), $query->posts );
 	}
 
+	public function test_post_to_user_sorting_queries() {
+		$this->add_post_relations();
+		$this->define_relationships();
+
+		$p2u = new PostToUser( 'post', 'owner' );
+		$p2u->save_user_to_post_sort_data( 1, array( 2, 4, 1, 3, 5 ) );
+
+		$args = array(
+			'post_type' => 'post',
+			'fields' => 'ids',
+			'orderby' => 'relationship',
+			'posts_per_page' => 2,
+			'paged' => 1,
+			'relationship_query' => array(
+				array(
+					'related_to_user' => '1',
+					'name' => 'owner',
+				),
+			),
+
+		);
+
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 2, 4 ), $query->posts );
+
+		$args['paged'] = 2;
+		$query = new \WP_Query( $args );
+		$this->assertEquals( array( 1, 3 ), $query->posts );
+	}
+
 }
