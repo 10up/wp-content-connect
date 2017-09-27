@@ -127,7 +127,7 @@ class PostToUser extends Relationship {
 	/**
 	 * Replaces users related to a post with the provided set of user ids.
 	 *
-	 * Any users related to the post that are not provided in $user_ids will be deleted
+	 * Any users related to the post that are not provided in $user_ids will no longer be related
 	 *
 	 * @param $post_id
 	 * @param $user_ids
@@ -135,16 +135,40 @@ class PostToUser extends Relationship {
 	public function replace_post_to_user_relationships( $post_id, $user_ids ) {
 		$current_ids = $this->get_related_user_ids( $post_id );
 
-		$delete_ids = array_diff( $current_ids, $user_ids );
-		$add_ids = array_diff( $user_ids, $current_ids );
+		$delete_user_ids = array_diff( $current_ids, $user_ids );
+		$add_user_ids = array_diff( $user_ids, $current_ids );
 
 		// @todo add bulk methods!
-		foreach( $delete_ids as $delete ) {
-			$this->delete_relationship( $post_id, $delete );
+		foreach( $delete_user_ids as $delete_user_id ) {
+			$this->delete_relationship( $post_id, $delete_user_id );
 		}
 
-		foreach( $add_ids as $add ) {
-			$this->add_relationship( $post_id, $add );
+		foreach( $add_user_ids as $add_user_id ) {
+			$this->add_relationship( $post_id, $add_user_id );
+		}
+	}
+
+	/**
+	 * Replaces posts relasted to a user with the provided post ids.
+	 *
+	 * Any posts related to the user that are not provided in $post_ids will no longer be related
+	 *
+	 * @param $user_id
+	 * @param $post_ids
+	 */
+	public function replace_user_to_post_relationships( $user_id, $post_ids ) {
+		$current_ids = $this->get_related_post_ids( $user_id );
+
+		$delete_post_ids = array_diff( $current_ids, $post_ids );
+		$add_post_ids = array_diff( $post_ids, $current_ids );
+
+		// @todo add bulk methods
+		foreach ( $delete_post_ids as $delete_post_id ) {
+			$this->delete_relationship( $delete_post_id, $user_id );
+		}
+
+		foreach( $add_post_ids as $add_post_id ) {
+			$this->add_relationship( $add_post_id, $user_id );
 		}
 	}
 
