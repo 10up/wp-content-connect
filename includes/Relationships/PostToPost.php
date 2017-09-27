@@ -138,7 +138,7 @@ class PostToPost extends Relationship {
 	/**
 	 * Replaces existing relationships for the post with this set.
 	 *
-	 * Any relationship that is present in the database but not in $related_ids will be deleted
+	 * Any relationship that is present in the database but not in $related_ids will no longer be related
 	 *
 	 * @param $post_id
 	 * @param $related_ids
