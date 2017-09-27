@@ -125,6 +125,30 @@ class PostToUser extends Relationship {
 	}
 
 	/**
+	 * Replaces users related to a post with the provided set of user ids.
+	 *
+	 * Any users related to the post that are not provided in $user_ids will be deleted
+	 *
+	 * @param $post_id
+	 * @param $user_ids
+	 */
+	public function replace_post_to_user_relationships( $post_id, $user_ids ) {
+		$current_ids = $this->get_related_user_ids( $post_id );
+
+		$delete_ids = array_diff( $current_ids, $user_ids );
+		$add_ids = array_diff( $user_ids, $current_ids );
+
+		// @todo add bulk methods!
+		foreach( $delete_ids as $delete ) {
+			$this->delete_relationship( $post_id, $delete );
+		}
+
+		foreach( $add_ids as $add ) {
+			$this->add_relationship( $post_id, $add );
+		}
+	}
+
+	/**
 	 * Saves the order of users for a particular post
 	 *
 	 * @param $object_id
