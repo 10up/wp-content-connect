@@ -255,6 +255,33 @@ class PostToPostTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 2, 3, 4, 6, 5 ), $rel->get_related_object_ids( 1, true ) );
 	}
 
+	public function test_replace_relationships() {
+		global $wpdb;
+
+		$rel = new PostToPost( 'post', 'post', 'basic' );
+
+		$this->assertEquals( 0, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and `name`='basic';") );
+
+		// Add some known relationships, and make sure they get written to DB
+		$rel->add_relationship( 1, 2 );
+		$rel->add_relationship( 1, 3 );
+		$rel->add_relationship( 1, 4 );
+		$rel->add_relationship( 1, 5 );
+
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=2 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=3 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=4 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=5 and `name`='basic';") );
+
+		// Should remove 2 and 5 and add 6
+		$rel->replace_relationships( 1, array( 3, 4, 6 ) );
+		$this->assertEquals( 0, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=2 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=3 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=4 and `name`='basic';") );
+		$this->assertEquals( 0, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=5 and `name`='basic';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=6 and `name`='basic';") );
+	}
+
 
 
 }
