@@ -262,6 +262,24 @@ This methods deletes a relationship between one post and another, in a post to p
 $relationship->delete_relationship( 2, 1 ); // Deletes the relationship between post ID 1 and post ID 2. 
 ```
 
+### `PostToPost->replace_relationships( $post_id, $related_ids )`
+Replaces existing relationships for the post to post relationship. Any relationship that is present in the database but not in $related_ids will no longer be related.
+
+#### Parameters:
+
+`$post_id` (Int) The ID of the post we are replacing relationships from.
+
+`$related_ids` (Array) An array of Post IDs of items related to $post_id
+
+#### Example:
+
+Post ID 5 is related to posts 2, 3, 6, 7, 8
+
+```php
+// $relationship is the return value from ->define_post_to_post()
+$relationship->replace_relationships( 5, array( 2, 3, 6, 7, 8 ) );
+```
+
 ### `PostToPost->save_sort_data( $object_id, $ordered_ids )`
 For a relationship with sorting enabled, this saves the order of the posts for a single direction of the relationship.
 
@@ -310,6 +328,42 @@ This method deletes a relationship between a post and a user, in a post to user 
 ```php
 // $relationship is the return value from ->define_post_to_post()
 $relationship->delete_relationship( 1, 5 ); // Deletes the relationship between post 1 and user 5
+```
+
+### `PostToUser->replace_post_to_user_relationships( $post_id, $user_ids )`
+Replaces users related to a post with the provided set of user ids. Any users related to the post that are not provided in $user_ids will no longer be related.
+
+#### Parameters:
+
+`$post_id` (Int) The ID of the post we are replacing relationships from.
+
+`$user_ids` (Array) An array of User IDs related to $post_id
+
+#### Example:
+
+Post ID 5 is related to users 3, 4, 5
+
+```php
+// $relationship is the return value from ->define_post_to_user()
+$relationship->replace_post_to_user_relationships( 5, array( 3, 4, 5 ) );
+```
+
+### `PostToUser->replace_user_to_post_relationships( $user_id, $post_ids )`
+Replaces posts related to a user with the provided set of post ids. Any posts related to the user that are not provided in $post_ids will no longer be related.
+
+#### Parameters:
+
+`$user_id` (Int) The User ID we are replacing relationships from.
+
+`$post_ids` (Array) An array of Post IDs related to $user_id
+
+#### Example:
+
+User 2 is related to posts 6, 7, 8
+
+```php
+// $relationship is the return value from ->define_post_to_user()
+$relationship->replace_user_to_post_relationships( 2, array( 6, 7, 8 ) );
 ```
 
 ### `PostToUser->save_post_to_user_sort_data( $object_id, $ordered_user_ids )`
