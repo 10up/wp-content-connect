@@ -55,19 +55,7 @@ class PostToUser extends PostUI {
 	}
 
 	public function handle_save( $relationship_data, $post_id ) {
-		$current_ids = $this->relationship->get_related_user_ids( $post_id );
-
-		$delete_ids = array_diff( $current_ids, $relationship_data['add_items'] );
-		$add_ids = array_diff( $relationship_data['add_items'], $current_ids );
-
-		// @todo add bulk methods!
-		foreach( $delete_ids as $delete ) {
-			$this->relationship->delete_relationship( $post_id, $delete );
-		}
-
-		foreach( $add_ids as $add ) {
-			$this->relationship->add_relationship( $post_id, $add );
-		}
+		$this->relationship->replace_post_to_user_relationships( $post_id, $relationship_data['add_items'] );
 
 		if ( $this->sortable ) {
 			$this->relationship->save_post_to_user_sort_data( $post_id, $relationship_data['add_items'] );
