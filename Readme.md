@@ -190,6 +190,46 @@ If you choose to not use the built in UIs for relationships, you'll need to manu
 
 These methods are available on the relationship objects returned when defining the relationship. Make sure to call these methods on the specific relationship object you are defining a relationship for, as these methods are specific to the relationship context (they are aware of the `name` of the relationship, as well as the post types in the relationship).
 
+If you don't already have a relationship object, you can get one from the registry using either `Registry->get_post_to_post_relationship()` or `Registry->get_post_to_user_relationship()`.
+
+### `Registry->get_post_to_post_relationship( $cpt1, $cpt2, $name )`
+Returns the relationship object between the two post types with the provided name.
+
+#### Parameters:
+
+`$cpt1` (String) The first post type in the relationship 
+ 
+`$cpt2` (String) The second post type in the relationship
+
+`$name` (String) The name of the relationship, as passed to define_post_to_post_relationship
+
+#### Example:
+
+```php
+$registry = \TenUp\ContentConnect\Plugin::instance()->get_registry();
+
+// Gets the car to tire relationship defined in the example above
+$relationship = $registry->get_post_to_post_relationship( 'car', 'tire', 'car-tires' );
+```
+
+### `Registry->get_post_to_user_relationship( $post_type, $name )`
+Returns the relationship object between the post types and users with the provided name.
+
+#### Parameters:
+
+`$post_type` (String) The post type in the post to user relationship 
+
+`$name` (String) The name of the relationship, as passed to define_post_to_user_relationship
+
+#### Example:
+
+```php
+$registry = \TenUp\ContentConnect\Plugin::instance()->get_registry();
+
+// Gets the post to user relationship defined in the example above
+$relationship = $registry->get_post_to_user_relationship( 'post', 'related' );
+```
+
 ### `PostToPost->add_relationship( $pid1, $pid2 )`
 This method adds a relationship between one post and another, in a post to post relationship. When calling this method, the order of IDs passed is not important.
 
