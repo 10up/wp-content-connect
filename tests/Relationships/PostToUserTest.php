@@ -277,4 +277,31 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->assertEquals( 2, $wpdb->get_var( "select `user_order` from {$wpdb->prefix}post_to_user where user_id=1 and name='owner' and post_id=3;" ) );
 	}
 
+	public function test_replace_post_to_user_relationships() {
+		global $wpdb;
+
+		$rel = new PostToUser( 'post', 'owner' );
+
+		$this->assertEquals( 0, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and `name`='owner';") );
+
+		// Add some known relationships, and make sure they get written to DB
+		$rel->add_relationship( 1, 2 );
+		$rel->add_relationship( 1, 3 );
+		$rel->add_relationship( 1, 4 );
+		$rel->add_relationship( 1, 5 );
+
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=2 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=3 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=4 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=5 and `name`='owner';") );
+
+		// Should remove 2 and 5 and add 6
+		$rel->replace_post_to_user_relationships( 1, array( 3, 4, 6 ) );
+		$this->assertEquals( 0, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=2 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=3 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=4 and `name`='owner';") );
+		$this->assertEquals( 0, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=5 and `name`='owner';") );
+		$this->assertEquals( 1, $wpdb->get_var( "select count(post_id) from {$wpdb->prefix}post_to_user where post_id=1 and user_id=6 and `name`='owner';") );
+	}
+
 }
