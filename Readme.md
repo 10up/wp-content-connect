@@ -4,10 +4,6 @@ WordPress library that enables direct relationships for posts to posts and posts
 
 ## Usage
 
-1. `composer install --no-dev`
-
-1. `yarn install`
-
 1. include with composer, install as a plugin and activate, or load the main `content-connect.php` file
 
 ## Defining Relationships
