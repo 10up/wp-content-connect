@@ -136,6 +136,30 @@ class PostToPost extends Relationship {
 	}
 
 	/**
+	 * Replaces existing relationships for the post with this set.
+	 *
+	 * Any relationship that is present in the database but not in $related_ids will be deleted
+	 *
+	 * @param $post_id
+	 * @param $related_ids
+	 */
+	public function replace_relationships( $post_id, $related_ids ) {
+		$current_ids = $this->get_related_object_ids( $post_id );
+
+		$delete_ids = array_diff( $current_ids, $related_ids );
+		$add_ids = array_diff( $related_ids, $current_ids );
+
+		// @todo add bulk methods!
+		foreach( $delete_ids as $delete ) {
+			$this->delete_relationship( $post_id, $delete );
+		}
+
+		foreach( $add_ids as $add ) {
+			$this->add_relationship( $post_id, $add );
+		}
+	}
+
+	/**
 	 * Updates all the rows with order information.
 	 *
 	 * This function ONLY modifies ONE direction of the query:
