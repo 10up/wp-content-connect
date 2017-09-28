@@ -1,9 +1,7 @@
 <?php
 
-namespace TenUp\ContentConnect\Tests;
+namespace TenUp\ContentConnect\Tests\Integration;
 
-use TenUp\ContentConnect\Plugin;
-use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 

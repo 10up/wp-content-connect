@@ -1,13 +1,13 @@
 <?php
 
-namespace TenUp\ContentConnect\Tests\QueryIntegration;
+namespace TenUp\ContentConnect\Tests\Integration\QueryIntegration;
 
 use TenUp\ContentConnect\Plugin;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\UserRelationshipQuery;
 use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToUser;
-use TenUp\ContentConnect\Tests\ContentConnectTestCase;
+use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class User_Query_IntegrationTest extends ContentConnectTestCase {
 

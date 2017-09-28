@@ -1,11 +1,10 @@
 <?php
 
-namespace TenUp\ContentConnect\Tests\Relationships;
+namespace TenUp\ContentConnect\Tests\Integration\Relationships;
 
-use TenUp\ContentConnect\Plugin;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
-use TenUp\ContentConnect\Tests\ContentConnectTestCase;
+use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class DeletedItemsTest extends ContentConnectTestCase {
 

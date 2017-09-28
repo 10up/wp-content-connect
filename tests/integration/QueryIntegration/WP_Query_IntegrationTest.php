@@ -1,6 +1,6 @@
 <?php
 
-namespace TenUp\ContentConnect\Tests\QueryIntegration;
+namespace TenUp\ContentConnect\Tests\Integration\QueryIntegration;
 
 use TenUp\ContentConnect\Plugin;
 use TenUp\ContentConnect\QueryIntegration\RelationshipQuery;
@@ -8,7 +8,7 @@ use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
-use TenUp\ContentConnect\Tests\ContentConnectTestCase;
+use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class WP_Query_IntegrationTest extends ContentConnectTestCase {
 
