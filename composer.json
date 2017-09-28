@@ -14,7 +14,8 @@
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
-            "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration"
+            "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration",
+            "TenUp\\ContentConnect\\Tests\\Unit\\": "tests/unit"
         }
     },
     "require-dev": {
