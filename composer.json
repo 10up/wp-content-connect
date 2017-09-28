@@ -14,7 +14,7 @@
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
-            "TenUp\\ContentConnect\\Tests\\": "tests"
+            "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration"
         },
         "files": [
             "content-connect.php"
