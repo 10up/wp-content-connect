@@ -149,7 +149,6 @@ class PostToPost extends Relationship {
 		$delete_ids = array_diff( $current_ids, $related_ids );
 		$add_ids = array_diff( $related_ids, $current_ids );
 
-		// @todo add bulk methods!
 		foreach( $delete_ids as $delete ) {
 			$this->delete_relationship( $post_id, $delete );
 		}

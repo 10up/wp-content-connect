@@ -93,14 +93,29 @@ abstract class BaseTable {
 		$db->replace( $this->get_table_name(), $data, $format );
 	}
 
+
 	/**
 	 * Bulk replaces records in the database
-	 *
-	 * @todo make this an actual bulk insert query
 	 *
 	 *       INSERT into `table` (id,fruit)
 	 *			VALUES (1,'apple'), (2,'orange'), (3,'peach')
 	 *			ON DUPLICATE KEY UPDATE fruit = VALUES(fruit);
+	 *
+	 * $columns = array(
+	 *      'col1' => '%s',
+	 *      'col2' => '%d',
+	 * );
+	 *
+	 * $rows = array(
+	 *      array(
+	 *          'col1' => 'string',
+	 *          'col2' => 1
+	 *      ),
+	 *      array(
+	 *          'col1' => 'another string',
+	 *          'col2' => 2
+	 *      ),
+	 * );
 	 */
 	public function replace_bulk( $columns, $rows ) {
 		$db = $this->get_db();
