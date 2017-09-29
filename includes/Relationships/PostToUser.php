@@ -138,7 +138,6 @@ class PostToUser extends Relationship {
 		$delete_user_ids = array_diff( $current_ids, $user_ids );
 		$add_user_ids = array_diff( $user_ids, $current_ids );
 
-		// @todo add bulk methods!
 		foreach( $delete_user_ids as $delete_user_id ) {
 			$this->delete_relationship( $post_id, $delete_user_id );
 		}
@@ -162,7 +161,6 @@ class PostToUser extends Relationship {
 		$delete_post_ids = array_diff( $current_ids, $post_ids );
 		$add_post_ids = array_diff( $post_ids, $current_ids );
 
-		// @todo add bulk methods
 		foreach ( $delete_post_ids as $delete_post_id ) {
 			$this->delete_relationship( $delete_post_id, $user_id );
 		}
