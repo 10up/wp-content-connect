@@ -5,13 +5,23 @@ namespace TenUp\ContentConnect\Tables;
 class PostToPost extends BaseTable {
 
 	function get_schema_version() {
-		return '0.1.7';
+		return '0.1.9';
 	}
 
 	function get_table_name() {
 		return $this->generate_table_name( 'post_to_post');
 	}
 
+	/**
+	 * Defines the post_to_post table schema
+	 *
+	 * Indexes:
+	 *  id1_id2_name - Used to ensure no duplicates are created
+	 *  id2_name - Used for WP_Query "related_to_post" and get_related_object_ids() WITHOUT order by relationship
+	 *  id2_name_order - Used for WP_Query "related_to_post" and get_related_object_ids() WITH order by relationship
+	 *
+	 * @return string
+	 */
 	function get_schema() {
 		$table_name = $this->get_table_name();
 
@@ -20,7 +30,9 @@ class PostToPost extends BaseTable {
 			`id2` bigint(20) unsigned NOT NULL, 
 			`name` varchar(20) NOT NULL, 
 			`order` int(11) NOT NULL default 0,
-			UNIQUE KEY post_post_name (`id1`,`id2`,`name`) 
+			UNIQUE KEY id1_id2_name (`id1`,`id2`,`name`), 
+			KEY id2_name (`id2`,`name`),
+			KEY id2_name_order (`id2`,`name`,`order`)
 		);";
 
 		return $sql;
