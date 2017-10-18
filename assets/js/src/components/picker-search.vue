@@ -14,6 +14,10 @@
 				<span class="content-connect-selected-item-name">{{ result.name }}</span>
 				<span class="add-item content-connect-add-button" v-on:click.prevent.stop="add(result)">add</span>
 			</li>
+			<li class="content-connect-picker-search-searching" v-if="searching">
+				<span class="spinner is-active"></span>
+				Searching...
+			</li>
 		</ul>
 	</div>
 </template>
@@ -36,7 +40,8 @@
 		margin-right: 0.5em;
 	}
 
-	.content-connect-picker-search-item {
+	.content-connect-picker-search-item,
+	.content-connect-picker-search-searching {
 		width: 100%;
 		position: relative;
 		padding: 1em 1em 1em 0.5em;
@@ -44,6 +49,11 @@
 
 	.content-connect-picker-search-item:nth-child(odd) {
 		background-color: #f9f9f9;
+	}
+
+	.content-connect-picker-search-searching .spinner {
+		float: left;
+		margin-top: 0;
 	}
 
 	.content-connect-add-button {
@@ -63,7 +73,8 @@
 <script>
 	export default {
 		props: {
-			results: {}
+			results: {},
+			searching: false,
 		},
 		data: function() {
 			return {

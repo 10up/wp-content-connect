@@ -30,7 +30,8 @@
 						<picker-search
 								v-on:add-item="addSearchItem"
 								v-on:search="search"
-								:results="searchResults"></picker-search>
+								:results="searchResults"
+								:searching="searching"></picker-search>
 					</div>
 				</div>
 
@@ -45,7 +46,7 @@
 	</div>
 </template>
 
-<style lang="sass">
+<style lang="scss">
 	#tenup-content-connect-relationships .inside {
 		margin: 0;
 		padding: 0;
@@ -208,6 +209,7 @@
 			return Object.assign({}, {
 				"activeRelationship": window.ContentConnectData.relationships[0],
 				"searchResults": [],
+				"searching": false
 			}, window.ContentConnectData);
 		},
 		components: {
@@ -250,6 +252,9 @@
 				this.searchResults = [];
 			},
 			search( searchText ) {
+				this.searching = true;
+				this.searchResults = [];
+
 				this.$http.post( this.endpoints.search, {
 					"nonce": this.nonces.search,
 					"object_type": this.activeRelationship.object_type,
@@ -259,7 +264,7 @@
 					// success
 					var i, result;
 
-					this.searchResults = [];
+					this.searching = false;
 
 					// Don't add already selected IDs
 					for ( i = 0; i < response.body.length; i++ ) {
@@ -270,6 +275,7 @@
 						}
 					}
 				}, response => {
+					this.searching = false;
 					// @todo handle error response
 				});
 			},
