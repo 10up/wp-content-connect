@@ -152,7 +152,7 @@ SQL;
 		$column_names = array_map( function( $value ){
 			return "`{$value}`";
 		}, $column_names );
-		return '( ' . implode( ',', $column_names ) . ' )';
+		return '( ' . implode( ',', array_map( 'esc_sql', $column_names ) ) . ' )';
 	}
 
 	function get_column_updates_query( &$columns ) {
