@@ -175,6 +175,10 @@ SQL;
 		$values = array();
 
 		foreach( $rows as $data ) {
+			/*
+			 * $types is an array of values such as %d and %s, used in vsprintf to make sure data is correct format.
+			 * Values are escaped for SQL via the array_map( 'esc_sql', $data ) in the same line
+			 */
 			$values[] = "\n\t('" . vsprintf( implode( "', '", $types ), array_map( 'esc_sql', $data ) ) . "')";
 		}
 
