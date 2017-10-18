@@ -45,6 +45,10 @@ class MetaBox {
 			return false;
 		}
 
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return false;
+		}
+
 		$registry = Plugin::instance()->get_registry();
 
 		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
