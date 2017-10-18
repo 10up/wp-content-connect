@@ -32,7 +32,8 @@
 								v-on:search="search"
 								:results="searchResults"
 								:searching="searching"
-								:didsearch="didSearch"></picker-search>
+								:didsearch="didSearch"
+								:searcherror="searchErrorMessage"></picker-search>
 					</div>
 				</div>
 
@@ -211,7 +212,7 @@
 				"activeRelationship": window.ContentConnectData.relationships[0],
 				"searchResults": [],
 				"searching": false,
-				"didSearch": false // Have we searched at all
+				"searchErrorMessage": ""
 			}, window.ContentConnectData);
 		},
 		components: {
@@ -255,6 +256,7 @@
 			},
 			search( searchText ) {
 				this.searching = true;
+				this.searchErrorMessage = '';
 				this.searchResults = [];
 
 				this.$http.post( this.endpoints.search, {
@@ -269,6 +271,10 @@
 					this.searching = false;
 					this.didSearch = true;
 
+					// In case multiple were running at the same time
+					this.searchResults = [];
+					this.searchErrorMessage = '';
+
 					// Don't add already selected IDs
 					for ( i = 0; i < response.body.length; i++ ) {
 						result = response.body[ i ];
@@ -277,11 +283,15 @@
 							this.searchResults.push( result );
 						}
 					}
+
+					if ( this.searchResults.length === 0 ) {
+						this.searchErrorMessage = "Your search returned no results";
+					}
 				}, response => {
 					this.searching = false;
 					this.didSearch = true;
 
-					// @todo handle error response
+					this.searchErrorMessage = "An error occurred. Please try your search again";
 				});
 			},
 			// Checks if the ID is already present in the list of items

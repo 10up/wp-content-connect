@@ -15,11 +15,13 @@
 				<span class="add-item content-connect-add-button" v-on:click.prevent.stop="add(result)">add</span>
 			</li>
 			<li class="content-connect-picker-search-item searching" v-if="searching">
-				<span class="spinner is-active"></span>
-				Searching...
+				<p>
+					<span class="spinner is-active"></span>
+					Searching...
+				</p>
 			</li>
-			<li class="content-connect-picker-search-item no-results" v-if="! searching && didsearch && results.length === 0">
-				Your search returned no results
+			<li class="content-connect-picker-search-item error" v-if="! searching && searcherror.length > 0">
+				<p class="error">{{ searcherror }}</p>
 			</li>
 		</ul>
 	</div>
@@ -53,7 +55,7 @@
 		background-color: #f9f9f9;
 	}
 
-	.content-connect-picker-search-searching .spinner {
+	.content-connect-picker-search-item.searching .spinner {
 		float: left;
 		margin-top: 0;
 	}
@@ -77,7 +79,7 @@
 		props: {
 			results: {},
 			searching: false,
-			didsearch: false,
+			searcherror: ""
 		},
 		data: function() {
 			return {
