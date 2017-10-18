@@ -31,7 +31,8 @@
 								v-on:add-item="addSearchItem"
 								v-on:search="search"
 								:results="searchResults"
-								:searching="searching"></picker-search>
+								:searching="searching"
+								:didsearch="didSearch"></picker-search>
 					</div>
 				</div>
 
@@ -209,7 +210,8 @@
 			return Object.assign({}, {
 				"activeRelationship": window.ContentConnectData.relationships[0],
 				"searchResults": [],
-				"searching": false
+				"searching": false,
+				"didSearch": false // Have we searched at all
 			}, window.ContentConnectData);
 		},
 		components: {
@@ -265,6 +267,7 @@
 					var i, result;
 
 					this.searching = false;
+					this.didSearch = true;
 
 					// Don't add already selected IDs
 					for ( i = 0; i < response.body.length; i++ ) {
@@ -276,6 +279,8 @@
 					}
 				}, response => {
 					this.searching = false;
+					this.didSearch = true;
+
 					// @todo handle error response
 				});
 			},
