@@ -85,7 +85,7 @@ class Search {
 
 	public function search_users( $search_text ) {
 		$query = new \WP_User_Query( array(
-			'search' => $search_text,
+			'search' => "*{$search_text}*",
 		) );
 
 		$results = array();
