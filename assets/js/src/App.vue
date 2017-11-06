@@ -112,6 +112,7 @@
 		line-height: 18px;
 		font-size: 14px;
 		text-decoration: none;
+		cursor: pointer;
 
 		&:hover {
 			color: #0073aa;
