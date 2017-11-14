@@ -55,7 +55,7 @@ class WPQueryIntegration {
 		 * If orderby is anything other than relationship (array, etc) we don't allow it.
 		 * Trying to allow multiple order by statements would likely end in confusing results
 		 */
-		if ( $query->query['orderby'] !== 'relationship' ) {
+		if ( ! isset( $query->query['orderby'] ) || $query->query['orderby'] !== 'relationship' ) {
 			return $orderby;
 		}
 

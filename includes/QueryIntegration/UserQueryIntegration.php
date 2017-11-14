@@ -38,7 +38,7 @@ class UserQueryIntegration {
 		 * If orderby is anything other than relationship (array, etc) we don't allow it.
 		 * Trying to allow multiple order by statements would likely end in confusing results
 		 */
-		if ( $query->query_vars['orderby'] !== 'relationship' ) {
+		if ( ! isset( $query->query_vars['orderby'] ) || $query->query_vars['orderby'] !== 'relationship' ) {
 			return;
 		}
 
