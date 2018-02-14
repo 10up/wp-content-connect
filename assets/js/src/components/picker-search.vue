@@ -24,6 +24,11 @@
 				<p class="error">{{ searcherror }}</p>
 			</li>
 		</ul>
+
+		<div class="content-connect-picker-pagination" v-if="! searching && ( morePages || prevPages )">
+			<button class="prev-page" v-if="prevPages" v-on:click.prevent.stop="prevPage()">Previous Page</button>
+			<button class="next-page" v-if="morePages" v-on:click.prevent.stop="nextPage()">Next Page</button>
+		</div>
 	</div>
 </template>
 
@@ -79,7 +84,9 @@
 		props: {
 			results: {},
 			searching: false,
-			searcherror: ""
+			searcherror: "",
+			prevPages: false,
+			morePages: false
 		},
 		data: function() {
 			return {
@@ -92,6 +99,12 @@
 			},
 			add( item ) {
 				this.$emit( 'add-item', item );
+			},
+			nextPage() {
+				this.$emit( 'next-page' );
+			},
+			prevPage() {
+				this.$emit( 'prev-page' );
 			}
 		}
 	}
