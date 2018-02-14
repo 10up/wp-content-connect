@@ -70,29 +70,41 @@ class Search {
 
 		$search_text = sanitize_text_field( $request->get_param( 'search' ) );
 
-		// @todo pagination
+		$paged = intval( $request->get_param( 'paged' ) );
+
 		switch( $object_type ) {
 			case 'user':
-				$results = $this->search_users( $search_text );
+				$results = $this->search_users( $search_text, array( 'paged' => $paged ) );
 				break;
 			case 'post':
-				$results = $this->search_posts( $search_text, $post_type );
+				$results = $this->search_posts( $search_text, $post_type, array( 'paged' => $paged ) );
 				break;
 		}
 
 		return $results;
 	}
 
-	public function search_users( $search_text ) {
+	public function search_users( $search_text, $args = array() ) {
+		$defaults = array(
+			'paged' => 1,
+		);
+		$args = wp_parse_args( $args, $defaults );
+
 		$query = new \WP_User_Query( array(
 			'search' => "*{$search_text}*",
+			'paged' => $args['paged'],
 		) );
 
-		$results = array();
+		// @todo pagination args
+		$results = array(
+			'prev_pages' => false,
+			'more_pages' => false,
+			'data' => array(),
+		);
 
 		// Normalize Formatting
 		foreach( $query->get_results() as $user ) {
-			$results[] = array(
+			$results['data'][] = array(
 				'ID' => $user->ID,
 				'name' => $user->display_name,
 			);
@@ -101,20 +113,31 @@ class Search {
 		return $results;
 	}
 
-	public function search_posts( $search_text, $post_type ) {
+	public function search_posts( $search_text, $post_type, $args = array() ) {
+		$defaults = array(
+			'paged' => 1,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
 		$query = new \WP_Query( array(
 			'post_type' => $post_type,
 			's' => $search_text,
+			'paged' => $args['paged'],
 		) );
 
-		$results = array();
+		$results = array(
+			'prev_pages' => ( $args['paged'] > 1 ),
+			'more_pages' => ( $args['paged'] < $query->max_num_pages ),
+			'data' => array(),
+		);
 
 		// Normalize Formatting
 		if ( $query->have_posts() ) {
 			while( $query->have_posts() ) {
 				$post = $query->next_post();
 
-				$results[] = array(
+				$results['data'][] = array(
 					'ID' => $post->ID,
 					'name' => $post->post_title,
 				);
