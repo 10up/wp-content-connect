@@ -12,7 +12,8 @@
 		<ul class="content-connect-picker-search-list">
 			<li v-for="result in results" class="content-connect-picker-search-item result">
 				<span class="content-connect-selected-item-name">{{ result.name }}</span>
-				<span class="add-item content-connect-add-button" v-on:click.prevent.stop="add(result)">add</span>
+				<span v-if="!result.added" class="add-item content-connect-add-button" v-on:click.prevent.stop="add(result)">add</span>
+				<span v-if="result.added" class="add-item content-connect-already-added" >Added</span>
 			</li>
 			<li class="content-connect-picker-search-item searching" v-if="searching">
 				<p>
@@ -69,12 +70,21 @@
 		margin-top: 0;
 	}
 
+	.content-connect-already-added,
 	.content-connect-add-button {
-		color: #0073aa;
 		display: inline-block;
 		float: right;
 		position: relative;
+	}
+
+	.content-connect-add-button {
+		color: #0073aa;
 		cursor: pointer;
+	}
+
+	.content-connect-already-added {
+		color: #aaa;
+		font-style: italic;
 	}
 
 	.content-connect-add-button:hover {

@@ -323,8 +323,11 @@
 						result = response.body.data[ i ];
 
 						if ( this.isSelected( result.ID ) === false ) {
-							this.searchResults.push( result );
+							result.added = false;
+						} else {
+							result.added = true;
 						}
+						this.searchResults.push( result );
 					}
 
 					if ( this.searchResults.length === 0 ) {
@@ -352,12 +355,20 @@
 			addSearchItem( item ) {
 				this.activeRelationship.selected.push( item );
 				var index = this.searchResults.indexOf( item );
-				this.searchResults.splice( index, 1 );
+				this.searchResults[ index ].added = true;
 			},
 			reorderItems( items ) {
 				this.activeRelationship.selected = items;
 			},
 			deleteItem( item ) {
+				// In case the removed is also in search results, update the "added" indicator
+				for ( let i in this.searchResults ) {
+					if ( this.searchResults[ i ].id === item.id ) {
+						this.searchResults[ i ].added = false;
+						break;
+					}
+				}
+
 				var index = this.activeRelationship.selected.indexOf( item );
 				this.activeRelationship.selected.splice( index, 1 );
 			}
