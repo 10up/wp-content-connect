@@ -30,10 +30,14 @@
 						<picker-search
 								v-on:add-item="addSearchItem"
 								v-on:search="search"
+								v-on:next-page="nextPage"
+								v-on:prev-page="prevPage"
 								:results="searchResults"
 								:searching="searching"
 								:didsearch="didSearch"
-								:searcherror="searchErrorMessage"></picker-search>
+								:searcherror="searchErrorMessage"
+								:prevPages="prevPages"
+								:morePages="morePages"></picker-search>
 					</div>
 				</div>
 
@@ -213,7 +217,11 @@
 				"activeRelationship": window.ContentConnectData.relationships[0],
 				"searchResults": [],
 				"searching": false,
-				"searchErrorMessage": ""
+				"searchErrorMessage": "",
+				"searchText": "",
+				"prevPages": false,
+				"morePages": false,
+				"currentPage": 1
 			}, window.ContentConnectData);
 		},
 		components: {
@@ -256,6 +264,36 @@
 				this.searchResults = [];
 			},
 			search( searchText ) {
+				this.prevPages = false;
+				this.morePages = false;
+				this.curentPage = 1;
+				this.searchText = searchText;
+
+				this.sendSearchRequest();
+			},
+			prevPage() {
+				if ( this.prevPages !== true ) {
+					return;
+				}
+
+				if ( this.currentPage <= 1 ) {
+					this.prevPages = false;
+					return;
+				}
+
+				this.currentPage--;
+				this.sendSearchRequest();
+			},
+			nextPage() {
+				if ( this.morePages !== true ) {
+					return;
+				}
+
+				this.currentPage++;
+
+				this.sendSearchRequest();
+			},
+			sendSearchRequest() {
 				this.searching = true;
 				this.searchErrorMessage = '';
 				this.searchResults = [];
@@ -264,7 +302,8 @@
 					"nonce": this.nonces.search,
 					"object_type": this.activeRelationship.object_type,
 					"post_type": this.activeRelationship.post_type,
-					"search": searchText
+					"search": this.searchText,
+					"paged": this.currentPage
 				} ).then( response => {
 					// success
 					var i, result;
@@ -276,13 +315,19 @@
 					this.searchResults = [];
 					this.searchErrorMessage = '';
 
+					this.prevPages = response.body.prev_pages;
+					this.morePages = response.body.more_pages;
+
 					// Don't add already selected IDs
-					for ( i = 0; i < response.body.length; i++ ) {
-						result = response.body[ i ];
+					for ( i = 0; i < response.body.data.length; i++ ) {
+						result = response.body.data[ i ];
 
 						if ( this.isSelected( result.ID ) === false ) {
-							this.searchResults.push( result );
+							result.added = false;
+						} else {
+							result.added = true;
 						}
+						this.searchResults.push( result );
 					}
 
 					if ( this.searchResults.length === 0 ) {
@@ -310,12 +355,20 @@
 			addSearchItem( item ) {
 				this.activeRelationship.selected.push( item );
 				var index = this.searchResults.indexOf( item );
-				this.searchResults.splice( index, 1 );
+				this.searchResults[ index ].added = true;
 			},
 			reorderItems( items ) {
 				this.activeRelationship.selected = items;
 			},
 			deleteItem( item ) {
+				// In case the removed is also in search results, update the "added" indicator
+				for ( let i in this.searchResults ) {
+					if ( this.searchResults[ i ].id === item.id ) {
+						this.searchResults[ i ].added = false;
+						break;
+					}
+				}
+
 				var index = this.activeRelationship.selected.indexOf( item );
 				this.activeRelationship.selected.splice( index, 1 );
 			}
