@@ -187,7 +187,7 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("/* line 52, stdin */\n#tenup-content-connect-relationships .inside {\n  margin: 0;\n  padding: 0; }\n\n/* Basically mimics the style of the vertical tab interface in the media modal */\n/* line 58, stdin */\n.vtab-frame {\n  display: flex;\n  flex-flow: row wrap;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif;\n  font-size: 12px; }\n  /* line 64, stdin */\n  .vtab-frame a {\n    border-bottom: none;\n    color: #0073aa; }\n\n/* line 70, stdin */\n.vtab-left {\n  flex: 0 200px; }\n\n/* line 74, stdin */\n.vtab-right {\n  flex: 1 calc(100% - 232px);\n  padding: 0 16px; }\n\n/* line 79, stdin */\n.vtab-frame-menu {\n  height: 100%; }\n\n/* line 83, stdin */\n.vtab-menu {\n  margin: 0;\n  padding: 10px 0;\n  border-right-width: 1px;\n  border-right-style: solid;\n  border-right-color: #ccc;\n  background: #f3f3f3;\n  height: calc(100% - 20px); }\n  /* line 92, stdin */\n  .vtab-menu .separator {\n    height: 0;\n    margin: 12px 20px;\n    padding: 0;\n    border-top: 1px solid #ddd; }\n  /* line 99, stdin */\n  .vtab-menu .active,\n  .vtab-menu .active:hover {\n    color: #23282d;\n    font-weight: 600; }\n\n/* line 106, stdin */\n.vtab-menu > a {\n  display: block;\n  position: relative;\n  padding: 8px 20px;\n  margin: 0;\n  color: #0073aa;\n  line-height: 18px;\n  font-size: 14px;\n  text-decoration: none;\n  cursor: pointer; }\n  /* line 117, stdin */\n  .vtab-menu > a:hover {\n    color: #0073aa;\n    background: rgba(0, 0, 0, 0.04); }\n\n/* line 123, stdin */\n.vtab-frame-title {\n  height: 50px;\n  display: flex;\n  align-items: center; }\n  /* line 128, stdin */\n  .vtab-frame-title i {\n    margin-right: 0.5em; }\n  /* line 132, stdin */\n  .vtab-frame-title h1 {\n    padding: 0;\n    font-size: 22px;\n    line-height: 50px;\n    margin: 0; }\n\n/* line 140, stdin */\n.vtab-frame-content {\n  background: #fff;\n  bottom: 61px; }\n\n/* line 149, stdin */\n.vtab-frame-toolbar {\n  border-top: 1px solid #ddd;\n  height: 60px; }\n\n/* line 154, stdin */\n.vtab-grid-list {\n  display: flex;\n  flex-wrap: wrap; }\n\n/* line 159, stdin */\n.vtab-grid-list-item {\n  margin: 10px;\n  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 0, 0, 0.1);\n  background: #eee;\n  cursor: pointer;\n  text-align: center;\n  width: 150px;\n  height: 150px;\n  position: relative; }\n\n/* line 170, stdin */\n.vtab-grid-list-item-icon {\n  height: 120px;\n  font-size: 64px;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n  /* line 177, stdin */\n  .vtab-grid-list-item-icon .dashicons {\n    font-size: inherit;\n    height: auto;\n    width: auto;\n    max-width: 80%;\n    max-height: 80%; }\n\n/* line 186, stdin */\n.vtab-grid-list-item-title {\n  box-sizing: border-box;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  margin: 0;\n  line-height: 1.2;\n  padding: 8px;\n  overflow: hidden;\n  max-height: 100%;\n  word-wrap: break-word;\n  text-align: center;\n  font-weight: bold;\n  background: rgba(255, 255, 255, 0.8);\n  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }")
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("/* line 56, stdin */\n#tenup-content-connect-relationships .inside {\n  margin: 0;\n  padding: 0; }\n\n/* Basically mimics the style of the vertical tab interface in the media modal */\n/* line 62, stdin */\n.vtab-frame {\n  display: flex;\n  flex-flow: row wrap;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif;\n  font-size: 12px; }\n  /* line 68, stdin */\n  .vtab-frame a {\n    border-bottom: none;\n    color: #0073aa; }\n\n/* line 74, stdin */\n.vtab-left {\n  flex: 0 200px; }\n\n/* line 78, stdin */\n.vtab-right {\n  flex: 1 calc(100% - 232px);\n  padding: 0 16px; }\n\n/* line 83, stdin */\n.vtab-frame-menu {\n  height: 100%; }\n\n/* line 87, stdin */\n.vtab-menu {\n  margin: 0;\n  padding: 10px 0;\n  border-right-width: 1px;\n  border-right-style: solid;\n  border-right-color: #ccc;\n  background: #f3f3f3;\n  height: calc(100% - 20px); }\n  /* line 96, stdin */\n  .vtab-menu .separator {\n    height: 0;\n    margin: 12px 20px;\n    padding: 0;\n    border-top: 1px solid #ddd; }\n  /* line 103, stdin */\n  .vtab-menu .active,\n  .vtab-menu .active:hover {\n    color: #23282d;\n    font-weight: 600; }\n\n/* line 110, stdin */\n.vtab-menu > a {\n  display: block;\n  position: relative;\n  padding: 8px 20px;\n  margin: 0;\n  color: #0073aa;\n  line-height: 18px;\n  font-size: 14px;\n  text-decoration: none;\n  cursor: pointer; }\n  /* line 121, stdin */\n  .vtab-menu > a:hover {\n    color: #0073aa;\n    background: rgba(0, 0, 0, 0.04); }\n\n/* line 127, stdin */\n.vtab-frame-title {\n  height: 50px;\n  display: flex;\n  align-items: center; }\n  /* line 132, stdin */\n  .vtab-frame-title i {\n    margin-right: 0.5em; }\n  /* line 136, stdin */\n  .vtab-frame-title h1 {\n    padding: 0;\n    font-size: 22px;\n    line-height: 50px;\n    margin: 0; }\n\n/* line 144, stdin */\n.vtab-frame-content {\n  background: #fff;\n  bottom: 61px; }\n\n/* line 153, stdin */\n.vtab-frame-toolbar {\n  border-top: 1px solid #ddd;\n  height: 60px; }\n\n/* line 158, stdin */\n.vtab-grid-list {\n  display: flex;\n  flex-wrap: wrap; }\n\n/* line 163, stdin */\n.vtab-grid-list-item {\n  margin: 10px;\n  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 0, 0, 0.1);\n  background: #eee;\n  cursor: pointer;\n  text-align: center;\n  width: 150px;\n  height: 150px;\n  position: relative; }\n\n/* line 174, stdin */\n.vtab-grid-list-item-icon {\n  height: 120px;\n  font-size: 64px;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n  /* line 181, stdin */\n  .vtab-grid-list-item-icon .dashicons {\n    font-size: inherit;\n    height: auto;\n    width: auto;\n    max-width: 80%;\n    max-height: 80%; }\n\n/* line 190, stdin */\n.vtab-grid-list-item-title {\n  box-sizing: border-box;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  margin: 0;\n  line-height: 1.2;\n  padding: 8px;\n  overflow: hidden;\n  max-height: 100%;\n  word-wrap: break-word;\n  text-align: center;\n  font-weight: bold;\n  background: rgba(255, 255, 255, 0.8);\n  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }")
 ;(function(){
 'use strict';
 
@@ -210,7 +210,11 @@ module.exports = {
 			"activeRelationship": window.ContentConnectData.relationships[0],
 			"searchResults": [],
 			"searching": false,
-			"searchErrorMessage": ""
+			"searchErrorMessage": "",
+			"searchText": "",
+			"prevPages": false,
+			"morePages": false,
+			"currentPage": 1
 		}, window.ContentConnectData);
 	},
 	components: {
@@ -253,6 +257,36 @@ module.exports = {
 			this.searchResults = [];
 		},
 		search: function search(searchText) {
+			this.prevPages = false;
+			this.morePages = false;
+			this.curentPage = 1;
+			this.searchText = searchText;
+
+			this.sendSearchRequest();
+		},
+		prevPage: function prevPage() {
+			if (this.prevPages !== true) {
+				return;
+			}
+
+			if (this.currentPage <= 1) {
+				this.prevPages = false;
+				return;
+			}
+
+			this.currentPage--;
+			this.sendSearchRequest();
+		},
+		nextPage: function nextPage() {
+			if (this.morePages !== true) {
+				return;
+			}
+
+			this.currentPage++;
+
+			this.sendSearchRequest();
+		},
+		sendSearchRequest: function sendSearchRequest() {
 			var _this = this;
 
 			this.searching = true;
@@ -263,7 +297,8 @@ module.exports = {
 				"nonce": this.nonces.search,
 				"object_type": this.activeRelationship.object_type,
 				"post_type": this.activeRelationship.post_type,
-				"search": searchText
+				"search": this.searchText,
+				"paged": this.currentPage
 			}).then(function (response) {
 				var i, result;
 
@@ -273,12 +308,18 @@ module.exports = {
 				_this.searchResults = [];
 				_this.searchErrorMessage = '';
 
-				for (i = 0; i < response.body.length; i++) {
-					result = response.body[i];
+				_this.prevPages = response.body.prev_pages;
+				_this.morePages = response.body.more_pages;
+
+				for (i = 0; i < response.body.data.length; i++) {
+					result = response.body.data[i];
 
 					if (_this.isSelected(result.ID) === false) {
-						_this.searchResults.push(result);
+						result.added = false;
+					} else {
+						result.added = true;
 					}
+					_this.searchResults.push(result);
 				}
 
 				if (_this.searchResults.length === 0) {
@@ -305,12 +346,19 @@ module.exports = {
 		addSearchItem: function addSearchItem(item) {
 			this.activeRelationship.selected.push(item);
 			var index = this.searchResults.indexOf(item);
-			this.searchResults.splice(index, 1);
+			this.searchResults[index].added = true;
 		},
 		reorderItems: function reorderItems(items) {
 			this.activeRelationship.selected = items;
 		},
 		deleteItem: function deleteItem(item) {
+			for (var i in this.searchResults) {
+				if (this.searchResults[i].id === item.id) {
+					this.searchResults[i].added = false;
+					break;
+				}
+			}
+
 			var index = this.activeRelationship.selected.indexOf(item);
 			this.activeRelationship.selected.splice(index, 1);
 		}
@@ -320,7 +368,7 @@ module.exports = {
 if (module.exports.__esModule) module.exports = module.exports.default
 var __vue__options__ = (typeof module.exports === "function"? module.exports.options: module.exports)
 if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
-__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tenup-content-connect vtab-frame"},[(_vm.relationships.length > 1)?_c('div',{staticClass:"vtab-left"},[_c('div',{staticClass:"vtab-frame-menu"},[_c('div',{staticClass:"vtab-menu"},[(_vm.relationships.length)?_vm._l((_vm.relationships),function(relationship){return _c('a',{staticClass:"vtab-menu-item",class:_vm.activeMenuItem(relationship),on:{"click":function($event){$event.preventDefault();_vm.setActiveRelationship(relationship)}}},[_vm._v("\n\t\t\t\t\t\t"+_vm._s(relationship.labels.name)+"\n\t\t\t\t\t")])}):_vm._e()],2)])]):_vm._e(),_vm._v(" "),_c('div',{staticClass:"vtab-right"},[(_vm.activeRelationship)?[_c('div',{staticClass:"vtab-frame-title"},[_c('h1',[_vm._v(_vm._s(_vm.activeRelationship.labels.name))])]),_vm._v(" "),_c('div',{staticClass:"vtab-frame-content"},[_c('div',{staticClass:"vtab-content-area"},[_c('picker-list',{attrs:{"sortable":_vm.activeRelationship.sortable,"items":_vm.activeRelationship.selected},on:{"reorder-items":_vm.reorderItems,"delete-item":_vm.deleteItem}}),_vm._v(" "),_c('picker-search',{attrs:{"results":_vm.searchResults,"searching":_vm.searching,"didsearch":_vm.didSearch,"searcherror":_vm.searchErrorMessage},on:{"add-item":_vm.addSearchItem,"search":_vm.search}})],1)])]:_vm._e()],2),_vm._v(" "),_c('br'),_vm._v(" "),_c('div',[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.saveData),expression:"saveData"}],attrs:{"type":"hidden","name":"tenup-content-connect-relationships"},domProps:{"value":(_vm.saveData)},on:{"input":function($event){if($event.target.composing){ return; }_vm.saveData=$event.target.value}}})])])}
+__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tenup-content-connect vtab-frame"},[(_vm.relationships.length > 1)?_c('div',{staticClass:"vtab-left"},[_c('div',{staticClass:"vtab-frame-menu"},[_c('div',{staticClass:"vtab-menu"},[(_vm.relationships.length)?_vm._l((_vm.relationships),function(relationship){return _c('a',{staticClass:"vtab-menu-item",class:_vm.activeMenuItem(relationship),on:{"click":function($event){$event.preventDefault();_vm.setActiveRelationship(relationship)}}},[_vm._v("\n\t\t\t\t\t\t"+_vm._s(relationship.labels.name)+"\n\t\t\t\t\t")])}):_vm._e()],2)])]):_vm._e(),_vm._v(" "),_c('div',{staticClass:"vtab-right"},[(_vm.activeRelationship)?[_c('div',{staticClass:"vtab-frame-title"},[_c('h1',[_vm._v(_vm._s(_vm.activeRelationship.labels.name))])]),_vm._v(" "),_c('div',{staticClass:"vtab-frame-content"},[_c('div',{staticClass:"vtab-content-area"},[_c('picker-list',{attrs:{"sortable":_vm.activeRelationship.sortable,"items":_vm.activeRelationship.selected},on:{"reorder-items":_vm.reorderItems,"delete-item":_vm.deleteItem}}),_vm._v(" "),_c('picker-search',{attrs:{"results":_vm.searchResults,"searching":_vm.searching,"didsearch":_vm.didSearch,"searcherror":_vm.searchErrorMessage,"prevPages":_vm.prevPages,"morePages":_vm.morePages},on:{"add-item":_vm.addSearchItem,"search":_vm.search,"next-page":_vm.nextPage,"prev-page":_vm.prevPage}})],1)])]:_vm._e()],2),_vm._v(" "),_c('br'),_vm._v(" "),_c('div',[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.saveData),expression:"saveData"}],attrs:{"type":"hidden","name":"tenup-content-connect-relationships"},domProps:{"value":(_vm.saveData)},on:{"input":function($event){if($event.target.composing){ return; }_vm.saveData=$event.target.value}}})])])}
 __vue__options__.staticRenderFns = []
 if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -330,7 +378,7 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!module.hot.data) {
     hotAPI.createRecord("data-v-449f0e82", __vue__options__)
   } else {
-    hotAPI.reload("data-v-449f0e82", __vue__options__)
+    hotAPI.rerender("data-v-449f0e82", __vue__options__)
   }
 })()}
 },{"./components/picker-list.vue":4,"./components/picker-search.vue":5,"babel-runtime/core-js/json/stringify":7,"babel-runtime/core-js/object/assign":8,"vue":49,"vue-hot-reload-api":47,"vueify/lib/insert-css":51}],4:[function(require,module,exports){
@@ -388,7 +436,7 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   }
 })()}
 },{"vue":49,"vue-hot-reload-api":47,"vuedraggable":50,"vueify/lib/insert-css":51}],5:[function(require,module,exports){
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-037c595d] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-search-input-label[data-v-037c595d] {\n\tdisplay: block;\n}\n\n.content-connect-picker-search-input-container form[data-v-037c595d] {\n\tdisplay: flex;\n}\n\n.content-connect-picker-search-input[data-v-037c595d] {\n\tflex: 1;\n\tmargin-right: 0.5em;\n}\n\n.content-connect-picker-search-item[data-v-037c595d] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-search-item.result[data-v-037c595d]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-search-item.searching .spinner[data-v-037c595d] {\n\tfloat: left;\n\tmargin-top: 0;\n}\n\n.content-connect-add-button[data-v-037c595d] {\n\tcolor: #0073aa;\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n\tcursor: pointer;\n}\n\n.content-connect-add-button[data-v-037c595d]:hover {\n\tcolor: #00a0d2;\n}")
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-037c595d] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-search-container[data-v-037c595d] {\n\tpadding-bottom: 20px;\n}\n\n.content-connect-picker-search-input-label[data-v-037c595d] {\n\tdisplay: block;\n}\n\n.content-connect-picker-search-input-container form[data-v-037c595d] {\n\tdisplay: flex;\n}\n\n.content-connect-picker-search-input[data-v-037c595d] {\n\tflex: 1;\n\tmargin-right: 0.5em;\n}\n\n.content-connect-picker-search-item[data-v-037c595d] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-search-item.result[data-v-037c595d]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-search-item.searching .spinner[data-v-037c595d] {\n\tfloat: left;\n\tmargin-top: 0;\n}\n\n.content-connect-already-added[data-v-037c595d],\n.content-connect-add-button[data-v-037c595d] {\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n}\n\n.content-connect-add-button[data-v-037c595d] {\n\tcolor: #0073aa;\n\tcursor: pointer;\n}\n\n.content-connect-already-added[data-v-037c595d] {\n\tcolor: #aaa;\n\tfont-style: italic;\n}\n\n.content-connect-add-button[data-v-037c595d]:hover {\n\tcolor: #00a0d2;\n}\n\n.content-connect-picker-pagination[data-v-037c595d] {\n\theight: 3em;\n\tborder-top: 1px solid #ddd;\n\tpadding-top: 20px;\n}\n\n.content-connect-picker-pagination a[data-v-037c595d] {\n\tcursor: pointer;\n}\n\n.content-connect-picker-pagination .next-page[data-v-037c595d] {\n\tfloat: right;\n}")
 ;(function(){
 'use strict';
 
@@ -399,7 +447,9 @@ exports.default = {
 	props: {
 		results: {},
 		searching: false,
-		searcherror: ""
+		searcherror: "",
+		prevPages: false,
+		morePages: false
 	},
 	data: function data() {
 		return {
@@ -412,6 +462,12 @@ exports.default = {
 		},
 		add: function add(item) {
 			this.$emit('add-item', item);
+		},
+		nextPage: function nextPage() {
+			this.$emit('next-page');
+		},
+		prevPage: function prevPage() {
+			this.$emit('prev-page');
 		}
 	}
 };
@@ -419,7 +475,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 var __vue__options__ = (typeof module.exports === "function"? module.exports.options: module.exports)
 if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
-__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"content-connect-picker-search-container"},[_c('label',{staticClass:"content-connect-picker-search-input-label",attrs:{"for":_vm._uid}},[_vm._v("Search")]),_vm._v(" "),_c('div',{staticClass:"content-connect-picker-search-input-container"},[_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.search($event)}}},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.searchtext),expression:"searchtext"}],staticClass:"content-connect-picker-search-input widefat",attrs:{"type":"text","id":_vm._uid},domProps:{"value":(_vm.searchtext)},on:{"input":function($event){if($event.target.composing){ return; }_vm.searchtext=$event.target.value}}}),_vm._v(" "),_c('button',{staticClass:"button",attrs:{"type":"submit"}},[_vm._v("Search")])])]),_vm._v(" "),_c('ul',{staticClass:"content-connect-picker-search-list"},[_vm._l((_vm.results),function(result){return _c('li',{staticClass:"content-connect-picker-search-item result"},[_c('span',{staticClass:"content-connect-selected-item-name"},[_vm._v(_vm._s(result.name))]),_vm._v(" "),_c('span',{staticClass:"add-item content-connect-add-button",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.add(result)}}},[_vm._v("add")])])}),_vm._v(" "),(_vm.searching)?_c('li',{staticClass:"content-connect-picker-search-item searching"},[_vm._m(0)]):_vm._e(),_vm._v(" "),(! _vm.searching && _vm.searcherror.length > 0)?_c('li',{staticClass:"content-connect-picker-search-item error"},[_c('p',{staticClass:"error"},[_vm._v(_vm._s(_vm.searcherror))])]):_vm._e()],2)])}
+__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"content-connect-picker-search-container"},[_c('label',{staticClass:"content-connect-picker-search-input-label",attrs:{"for":_vm._uid}},[_vm._v("Search")]),_vm._v(" "),_c('div',{staticClass:"content-connect-picker-search-input-container"},[_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.search($event)}}},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.searchtext),expression:"searchtext"}],staticClass:"content-connect-picker-search-input widefat",attrs:{"type":"text","id":_vm._uid},domProps:{"value":(_vm.searchtext)},on:{"input":function($event){if($event.target.composing){ return; }_vm.searchtext=$event.target.value}}}),_vm._v(" "),_c('button',{staticClass:"button",attrs:{"type":"submit"}},[_vm._v("Search")])])]),_vm._v(" "),_c('ul',{staticClass:"content-connect-picker-search-list"},[_vm._l((_vm.results),function(result){return _c('li',{staticClass:"content-connect-picker-search-item result"},[_c('span',{staticClass:"content-connect-selected-item-name"},[_vm._v(_vm._s(result.name))]),_vm._v(" "),(!result.added)?_c('span',{staticClass:"add-item content-connect-add-button",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.add(result)}}},[_vm._v("add")]):_vm._e(),_vm._v(" "),(result.added)?_c('span',{staticClass:"add-item content-connect-already-added"},[_vm._v("Added")]):_vm._e()])}),_vm._v(" "),(_vm.searching)?_c('li',{staticClass:"content-connect-picker-search-item searching"},[_vm._m(0)]):_vm._e(),_vm._v(" "),(! _vm.searching && _vm.searcherror.length > 0)?_c('li',{staticClass:"content-connect-picker-search-item error"},[_c('p',{staticClass:"error"},[_vm._v(_vm._s(_vm.searcherror))])]):_vm._e()],2),_vm._v(" "),(! _vm.searching && ( _vm.morePages || _vm.prevPages ))?_c('div',{staticClass:"content-connect-picker-pagination"},[(_vm.prevPages)?_c('a',{staticClass:"prev-page",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.prevPage()}}},[_vm._v("‹ Previous Page")]):_vm._e(),_vm._v(" "),(_vm.morePages)?_c('a',{staticClass:"next-page",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.nextPage()}}},[_vm._v("Next Page ›")]):_vm._e()]):_vm._e()])}
 __vue__options__.staticRenderFns = [function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('p',[_c('span',{staticClass:"spinner is-active"}),_vm._v("\n\t\t\t\tSearching...\n\t\t\t")])}]
 __vue__options__._scopeId = "data-v-037c595d"
 if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
@@ -430,7 +486,7 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!module.hot.data) {
     hotAPI.createRecord("data-v-037c595d", __vue__options__)
   } else {
-    hotAPI.reload("data-v-037c595d", __vue__options__)
+    hotAPI.rerender("data-v-037c595d", __vue__options__)
   }
 })()}
 },{"vue":49,"vue-hot-reload-api":47,"vueify/lib/insert-css":51}],6:[function(require,module,exports){
