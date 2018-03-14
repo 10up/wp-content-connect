@@ -12,7 +12,7 @@
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
   },
   "author": "Chris Marslender <chris.marslender@10up.com>",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
