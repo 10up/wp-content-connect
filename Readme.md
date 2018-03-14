@@ -1,5 +1,9 @@
 # WP Content Connect
 
+<p align="center">
+<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
+</p>
+
 WordPress library that enables direct relationships for posts to posts and posts to users.
 
 ## Usage
