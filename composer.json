@@ -2,7 +2,7 @@
     "name": "10up/wp-content-connect",
     "description": "Post to Post and Post to User Library for WordPress",
     "type": "wordpress-library",
-    "license": "MIT",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Chris Marslender",
