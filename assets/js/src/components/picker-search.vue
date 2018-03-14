@@ -26,8 +26,8 @@
 		</ul>
 
 		<div class="content-connect-picker-pagination" v-if="! searching && ( morePages || prevPages )">
-			<button class="prev-page" v-if="prevPages" v-on:click.prevent.stop="prevPage()">Previous Page</button>
-			<button class="next-page" v-if="morePages" v-on:click.prevent.stop="nextPage()">Next Page</button>
+			<a class="prev-page" v-if="prevPages" v-on:click.prevent.stop="prevPage()">‹ Previous Page</a>
+			<a class="next-page" v-if="morePages" v-on:click.prevent.stop="nextPage()">Next Page ›</a>
 		</div>
 	</div>
 </template>
@@ -35,6 +35,10 @@
 <style scoped>
 	* {
 		box-sizing: border-box;
+	}
+
+	.content-connect-picker-search-container {
+		padding-bottom: 20px;
 	}
 
 	.content-connect-picker-search-input-label {
@@ -75,6 +79,20 @@
 
 	.content-connect-add-button:hover {
 		color: #00a0d2;
+	}
+
+	.content-connect-picker-pagination {
+		height: 3em;
+		border-top: 1px solid #ddd;
+		padding-top: 20px;
+	}
+
+	.content-connect-picker-pagination a {
+		cursor: pointer;
+	}
+
+	.content-connect-picker-pagination .next-page {
+		float: right;
 	}
 
 </style>
