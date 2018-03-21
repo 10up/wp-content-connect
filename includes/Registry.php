@@ -27,6 +27,8 @@ class Registry {
 	 * @return string
 	 */
 	public function get_relationship_key( $from, $to, $name ) {
+		$to = implode( '.', (array) $to );
+
 		return "{$from}_{$to}_{$name}";
 	}
 
@@ -78,6 +80,7 @@ class Registry {
 		}
 
 		// Try the inverse
+		// @todo this wont work right with array as $cpt2
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $name );
 
 		$relationship = $this->get_post_to_post_relationship_by_key( $key );
