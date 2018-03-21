@@ -29,7 +29,7 @@ class PostToPostTest extends ContentConnectTestCase {
 		$p2p = new PostToPost( 'post', 'post', 'basic' );
 
 		$this->assertEquals( 'post', $p2p->from );
-		$this->assertEquals( 'post', $p2p->to );
+		$this->assertTrue( in_array( 'post',$p2p->to ) );
 	}
 
 	public function test_add_relationship() {

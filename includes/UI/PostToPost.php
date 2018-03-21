@@ -2,6 +2,8 @@
 
 namespace TenUp\ContentConnect\UI;
 
+use TenUp\ContentConnect\Plugin;
+
 class PostToPost extends PostUI {
 
 	public function setup() {
@@ -20,7 +22,7 @@ class PostToPost extends PostUI {
 		$final_posts = array();
 
 		$args = array (
-			'post_type' => $other_post_type,
+			'post_type' => (array) $other_post_type,
 			'relationship_query' => array(
 				'name' => $this->relationship->name,
 				'related_to_post' => $post->ID,
@@ -46,11 +48,13 @@ class PostToPost extends PostUI {
 
 		// @Todo add pagination
 
+		$registry = Plugin::instance()->get_registry();
+
 		$data[] = array(
 			'reltype' => 'post-to-post',
 			'object_type' => 'post', // The object type we'll be querying for in searches on the front end
 			'post_type' => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship)
-			'relid' => "{$this->relationship->from}_{$this->relationship->to}_{$this->relationship->name}", // @todo should probably get this from the registry
+			'relid' => $registry->get_relationship_key($this->relationship->from, $this->relationship->to, $this->relationship->name ),
 			'name' => $this->relationship->name,
 			'labels' => $this->labels,
 			'sortable' => $this->sortable,

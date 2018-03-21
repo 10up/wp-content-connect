@@ -60,10 +60,17 @@ class Search {
 			return array();
 		}
 
+		$final_post_types = array();
 		if ( $object_type === 'post' ) {
-			$post_type = $request->get_param( 'post_type' );
+			$post_types = $request->get_param( 'post_type' );
 
-			if ( ! post_type_exists( $post_type ) ) {
+			foreach( $post_types as $post_type ) {
+				if ( post_type_exists( $post_type ) ) {
+					$final_post_types[] = $post_type;
+				}
+			}
+
+			if ( empty( $final_post_types ) ) {
 				return array();
 			}
 		}
@@ -77,7 +84,7 @@ class Search {
 				$results = $this->search_users( $search_text, array( 'paged' => $paged ) );
 				break;
 			case 'post':
-				$results = $this->search_posts( $search_text, $post_type, array( 'paged' => $paged ) );
+				$results = $this->search_posts( $search_text, $final_post_types, array( 'paged' => $paged ) );
 				break;
 		}
 
@@ -113,7 +120,7 @@ class Search {
 		return $results;
 	}
 
-	public function search_posts( $search_text, $post_type, $args = array() ) {
+	public function search_posts( $search_text, $post_types, $args = array() ) {
 		$defaults = array(
 			'paged' => 1,
 		);
@@ -121,7 +128,7 @@ class Search {
 		$args = wp_parse_args( $args, $defaults );
 
 		$query = new \WP_Query( array(
-			'post_type' => $post_type,
+			'post_type' => $post_types,
 			's' => $search_text,
 			'paged' => $args['paged'],
 		) );

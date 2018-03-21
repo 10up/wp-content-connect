@@ -39,13 +39,16 @@ class PostToPost extends Relationship {
 			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
 		}
 
-		if ( ! post_type_exists( $to ) ) {
-			throw new \Exception( "Post Type {$to} does not exist. Post types must exist to create a relationship" );
+		$to = (array) $to;
+		foreach( $to as $to_post_type ) {
+			if ( ! post_type_exists( $to_post_type ) ) {
+				throw new \Exception( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" );
+			}
 		}
 
 		$this->from = $from;
 		$this->to = $to;
-		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-{$to}";
+		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
 		
 		parent::__construct( $name, $args );
 	}
@@ -58,8 +61,11 @@ class PostToPost extends Relationship {
 
 		// Make sure CPT is not the same as "from" so we don't get a duplicate, then register if enabled
 		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to, $this->to_labels, $this->to_sortable );
-			$this->to_ui->setup();
+			// Currently, only support a default UI when the "to" end is a single post type
+			if ( count( $this->to ) === 1 ) {
+				$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to[0], $this->to_labels, $this->to_sortable );
+				$this->to_ui->setup();
+			}
 		}
 
 	}
@@ -80,12 +86,20 @@ class PostToPost extends Relationship {
 
 		// Query either to or from, depending on the post type of the ID we're finding relationships for
 		$post_type = get_post_type( $post_id );
-		if ( $post_type != $this->from && $post_type != $this->to ) {
+		if ( $post_type != $this->from && ! in_array( $post_type, $this->to ) ) {
 			return array();
 		}
-		$where_post_type = $post_type === $this->from ? $this->to : $this->from;
 
-		$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $where_post_type );
+		if ( $post_type == $this->from ) {
+			$where_post_types = array_map( function( $value ) {
+				return "'" . esc_sql( $value ) . "'";
+			}, $this->to );
+			$where_post_types = implode( ', ', $where_post_types );
+			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type IN ({$where_post_types})", $post_id, $this->name );
+		} else {
+			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $this->from );
+		}
+
 		if ( $order_by_relationship ) {
 			$query .= " ORDER BY p2p.order = 0, p2p.order ASC";
 		}
