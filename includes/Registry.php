@@ -27,7 +27,9 @@ class Registry {
 	 * @return string
 	 */
 	public function get_relationship_key( $from, $to, $name ) {
-		$to = implode( '.', (array) $to );
+		$to = (array) $to;
+		sort( $to );
+		$to = implode( '.', $to );
 
 		return "{$from}_{$to}_{$name}";
 	}
@@ -79,8 +81,10 @@ class Registry {
 			return $relationship;
 		}
 
-		// Try the inverse
-		// @todo this wont work right with array as $cpt2
+		// Try the inverse, only if "cpt2" isn't an array
+		if ( is_array( $cpt2 ) ) {
+			return false;
+		}
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $name );
 
 		$relationship = $this->get_post_to_post_relationship_by_key( $key );
@@ -101,6 +105,7 @@ class Registry {
 	 */
 	public function define_post_to_post( $from, $to, $name, $args = array() ) {
 		if ( $this->post_to_post_relationship_exists( $from, $to, $name ) ) {
+			$to = implode( ', ', (array) $to );
 			throw new \Exception( "A relationship already exists between {$from} and {$to} with name {$name}" );
 		}
 
