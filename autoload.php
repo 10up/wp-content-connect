@@ -8,7 +8,10 @@ function wp_content_connect_autoloader() {
 
 		if ( file_exists( $composer_autoloader ) ) {
 			require_once $composer_autoloader;
-		} else spl_autoload_register( 'wp_content_connect_autoload' );
+		} else {
+			spl_autoload_register( 'wp_content_connect_autoload' );
+			require_once __DIR__ . '/includes/Helpers.php';
+		}
 
 		$loaded = true;
 	}
