@@ -16,7 +16,10 @@
             "TenUp\\ContentConnect\\": "includes",
             "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration",
             "TenUp\\ContentConnect\\Tests\\Unit\\": "tests/unit"
-        }
+        },
+        "files": [
+            "includes/Helpers.php"
+        ]
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",
