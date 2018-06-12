@@ -402,7 +402,7 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 
 		$query = new \stdClass();
 
-		$query->query = array(
+		$query->query_vars = array(
 			'orderby' => 'relationship',
 		);
 
