@@ -59,7 +59,7 @@ class RegistryTest extends ContentConnectTestCase {
 		$registry->define_post_to_post( 'car', 'post', 'basic' );
 	}
 
-	public function test_retreival_of_post_to_post_relationships() {
+	public function test_retrieval_of_post_to_post_relationships() {
 		$registry = new Registry();
 
 		// Add all the relationship types so we know we aren't just lucky in the return values
@@ -85,7 +85,7 @@ class RegistryTest extends ContentConnectTestCase {
 		$this->assertSame( $registry->get_post_to_post_relationship( 'post', 'car', 'basic' ), $registry->get_post_to_post_relationship( 'car', 'post', 'basic' ) );
 	}
 
-	public function test_retreival_of_post_to_user_relationships() {
+	public function test_retrieval_of_post_to_user_relationships() {
 		$registry = new Registry();
 
 		$po = $registry->define_post_to_user( 'post', 'owner' );
@@ -100,7 +100,7 @@ class RegistryTest extends ContentConnectTestCase {
 		$this->assertSame( $pc, $registry->get_post_to_user_relationship( 'post', 'contrib' ) );
 	}
 
-	public function test_retreival_of_unique_relationship_names_on_same_cpt() {
+	public function test_retrieval_of_unique_relationship_names_on_same_cpt() {
 		$registry = new Registry();
 
 		$pp1 = $registry->define_post_to_post( 'post', 'post', 'type1' );
@@ -108,6 +108,47 @@ class RegistryTest extends ContentConnectTestCase {
 
 		$this->assertSame( $pp1, $registry->get_post_to_post_relationship( 'post', 'post', 'type1' ) );
 		$this->assertSame( $pp2, $registry->get_post_to_post_relationship( 'post', 'post', 'type2' ) );
+	}
+
+	public function test_defining_without_array_is_same_as_with_array() {
+		$registry = new Registry();
+
+		$this->expectException( \Exception::class );
+
+		$registry->define_post_to_post( 'post', 'post', 'basic' );
+		$registry->define_post_to_post( 'post', ['post'], 'basic' );
+	}
+
+	public function test_defining_same_multi_to_is_not_allowed() {
+		$registry = new Registry();
+
+		$this->expectException( \Exception::class );
+
+		$registry->define_post_to_post( 'post', ['car', 'tire'], 'basic' );
+		$registry->define_post_to_post( 'post', ['car', 'tire'], 'basic' );
+	}
+
+	public function test_defining_multi_to_inverse_order_is_not_allowed() {
+		$registry = new Registry();
+
+		$this->expectException( \Exception::class );
+
+		$registry->define_post_to_post( 'post', ['car', 'tire'], 'basic' );
+		$registry->define_post_to_post( 'post', ['tire', 'car'], 'basic' );
+	}
+
+	public function test_retrieval_of_multi_post_type_relationships() {
+		$registry = new Registry();
+
+		$pct = $registry->define_post_to_post( 'post', [ 'car', 'tire' ], 'basic' );
+
+		$pct2 = new PostToPost( 'post', [ 'car', 'tire' ], 'basic' );
+
+		// Verify that two separate objects are NOT the same (sanity check)
+		$this->assertNotSame( $pct, $pct2 );
+
+		$this->assertSame( $pct, $registry->get_post_to_post_relationship( 'post', ['car', 'tire'], 'basic' ) );
+		$this->assertSame( $pct, $registry->get_post_to_post_relationship( 'post', ['tire', 'car'], 'basic' ) );
 	}
 
 }
