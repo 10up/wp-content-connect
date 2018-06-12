@@ -16,11 +16,11 @@ class WPQueryIntegration {
 	}
 
 	public function posts_where( $where, $query ) {
-		if ( isset( $query->query['relationship_query'] ) ) {
-			$post_type = isset( $query->query['post_type'] ) ? $query->query['post_type'] : '';
+		if ( isset( $query->query_vars['relationship_query'] ) ) {
+			$post_type = isset( $query->query_vars['post_type'] ) ? $query->query_vars['post_type'] : '';
 
 			// Adding to the query, so that we can fetch it from the other filter methods below and be dealing with the same data
-			$query->relationship_query = new RelationshipQuery( $query->query['relationship_query'], $post_type );
+			$query->relationship_query = new RelationshipQuery( $query->query_vars['relationship_query'], $post_type );
 
 			$where .= $query->relationship_query->where;
 		}
@@ -55,7 +55,7 @@ class WPQueryIntegration {
 		 * If orderby is anything other than relationship (array, etc) we don't allow it.
 		 * Trying to allow multiple order by statements would likely end in confusing results
 		 */
-		if ( ! isset( $query->query['orderby'] ) || $query->query['orderby'] !== 'relationship' ) {
+		if ( ! isset( $query->query_vars['orderby'] ) || $query->query_vars['orderby'] !== 'relationship' ) {
 			return $orderby;
 		}
 
