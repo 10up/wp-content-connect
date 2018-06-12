@@ -20,7 +20,7 @@ This method defines a post to post relationship between two post types, `$from` 
 
 `$from` (String) First post type in the relationship
 
-`$to` (String) Second post type in the relationship
+`$to` (String|Array) Second post type(s) in the relationship
 
 `$name` (String) Unique name for this relationship, used to distinguish between multiple relationships between the same post types
 
