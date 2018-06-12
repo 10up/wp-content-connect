@@ -35,6 +35,7 @@ abstract class PostUI {
 	 */
 	public function __construct( $relationship, $render_post_type, $labels, $sortable = false ) {
 		$this->relationship = $relationship;
+		// The post type we are rendering the UI on
 		$this->render_post_type = $render_post_type;
 		$this->labels = $labels;
 		$this->sortable = $sortable;
