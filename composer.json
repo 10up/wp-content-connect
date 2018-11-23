@@ -1,7 +1,7 @@
 {
     "name": "10up/wp-content-connect",
     "description": "Post to Post and Post to User Library for WordPress",
-    "type": "wordpress-library",
+    "type": "wordpress-plugin",
     "license": "GPL-3.0-or-later",
     "authors": [
         {
@@ -10,7 +10,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "composer/installers": "^1.2"
+    },
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
