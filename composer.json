@@ -10,7 +10,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "composer/installers": "^1.2"
+    },
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
