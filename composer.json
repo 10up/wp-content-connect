@@ -1,7 +1,7 @@
 {
     "name": "10up/wp-content-connect",
     "description": "Post to Post and Post to User Library for WordPress",
-    "type": "wordpress-library",
+    "type": "library",
     "license": "GPL-3.0-or-later",
     "authors": [
         {
