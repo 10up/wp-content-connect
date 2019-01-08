@@ -27,6 +27,10 @@ class Registry {
 	 * @return string
 	 */
 	public function get_relationship_key( $from, $to, $name ) {
+		$from = (array) $from;
+		sort( $from );
+		$from = implode( '.', $from );
+
 		$to = (array) $to;
 		sort( $to );
 		$to = implode( '.', $to );
