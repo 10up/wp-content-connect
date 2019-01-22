@@ -21,7 +21,7 @@ class PostToPost extends PostUI {
 
 		$final_posts = array();
 
-		$args = array (
+		$args = array(
 			'post_type' => (array) $other_post_type,
 			'relationship_query' => array(
 				'name' => $this->relationship->name,
@@ -36,13 +36,15 @@ class PostToPost extends PostUI {
 		$query = new \WP_Query( $args );
 
 		if ( $query->have_posts() ) {
-			while( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
 				$post = $query->next_post();
 
-				$final_posts[] = array(
+				$final_post = array(
 					'ID' => $post->ID,
 					'name' => $post->post_title,
 				);
+
+				$final_posts[] = apply_filters( 'tenup_content_connect_final_post', $final_post, $this->relationship );
 			}
 		}
 
