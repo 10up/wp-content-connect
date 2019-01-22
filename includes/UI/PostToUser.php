@@ -22,7 +22,7 @@ class PostToUser extends PostUI {
 			'relationship_query' => array(
 				'name' => $this->relationship->name,
 				'related_to_post' => $post->ID,
-			)
+			),
 		);
 
 		if ( $this->sortable ) {
@@ -33,11 +33,14 @@ class PostToUser extends PostUI {
 
 		$users = $query->get_results();
 		if ( ! empty( $users ) ) {
-			foreach( $users as $user ) {
-				$final_users[] = array(
+			foreach ( $users as $user ) {
+
+				$final_user = array(
 					'ID' => $user->ID,
 					'name' => $user->display_name,
 				);
+
+				$final_users[] = apply_filters( 'tenup_content_connect_final_user', $final_user, $this->relationship );
 			}
 		}
 
