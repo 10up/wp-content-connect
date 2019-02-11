@@ -64,7 +64,7 @@ class Search {
 		if ( $object_type === 'post' ) {
 			$post_types = $request->get_param( 'post_type' );
 
-			foreach( $post_types as $post_type ) {
+			foreach( (array) $post_types as $post_type ) {
 				if ( post_type_exists( $post_type ) ) {
 					$final_post_types[] = $post_type;
 				}
