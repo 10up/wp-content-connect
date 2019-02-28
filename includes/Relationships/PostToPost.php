@@ -133,6 +133,8 @@ class PostToPost extends Relationship {
 			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
+
+		do_action( 'tenup-content-connect-add-relationship', $pid1, $pid2, $this->name );
 	}
 
 	public function delete_relationship( $pid1, $pid2 ) {
@@ -147,6 +149,8 @@ class PostToPost extends Relationship {
 			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
+
+		do_action( 'tenup-content-connect-delete-relationship', $pid1, $pid2, $this->name );
 	}
 
 	/**
@@ -170,6 +174,8 @@ class PostToPost extends Relationship {
 		foreach( $add_ids as $add ) {
 			$this->add_relationship( $post_id, $add );
 		}
+
+		do_action( 'tenup-content-connect-replace-relationships', $post_id, $related_ids );
 	}
 
 	/**
