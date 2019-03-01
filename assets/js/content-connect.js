@@ -1,192 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-},{}],2:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],3:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("/* line 56, stdin */\n#tenup-content-connect-relationships .inside {\n  margin: 0;\n  padding: 0; }\n\n/* Basically mimics the style of the vertical tab interface in the media modal */\n/* line 62, stdin */\n.vtab-frame {\n  display: flex;\n  flex-flow: row wrap;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif;\n  font-size: 12px; }\n  /* line 68, stdin */\n  .vtab-frame a {\n    border-bottom: none;\n    color: #0073aa; }\n\n/* line 74, stdin */\n.vtab-left {\n  flex: 0 200px; }\n\n/* line 78, stdin */\n.vtab-right {\n  flex: 1 calc(100% - 232px);\n  padding: 0 16px; }\n\n/* line 83, stdin */\n.vtab-frame-menu {\n  height: 100%; }\n\n/* line 87, stdin */\n.vtab-menu {\n  margin: 0;\n  padding: 10px 0;\n  border-right-width: 1px;\n  border-right-style: solid;\n  border-right-color: #ccc;\n  background: #f3f3f3;\n  height: calc(100% - 20px); }\n  /* line 96, stdin */\n  .vtab-menu .separator {\n    height: 0;\n    margin: 12px 20px;\n    padding: 0;\n    border-top: 1px solid #ddd; }\n  /* line 103, stdin */\n  .vtab-menu .active,\n  .vtab-menu .active:hover {\n    color: #23282d;\n    font-weight: 600; }\n\n/* line 110, stdin */\n.vtab-menu > a {\n  display: block;\n  position: relative;\n  padding: 8px 20px;\n  margin: 0;\n  color: #0073aa;\n  line-height: 18px;\n  font-size: 14px;\n  text-decoration: none;\n  cursor: pointer; }\n  /* line 121, stdin */\n  .vtab-menu > a:hover {\n    color: #0073aa;\n    background: rgba(0, 0, 0, 0.04); }\n\n/* line 127, stdin */\n.vtab-frame-title {\n  height: 50px;\n  display: flex;\n  align-items: center; }\n  /* line 132, stdin */\n  .vtab-frame-title i {\n    margin-right: 0.5em; }\n  /* line 136, stdin */\n  .vtab-frame-title h1 {\n    padding: 0;\n    font-size: 22px;\n    line-height: 50px;\n    margin: 0; }\n\n/* line 144, stdin */\n.vtab-frame-content {\n  background: #fff;\n  bottom: 61px; }\n\n/* line 153, stdin */\n.vtab-frame-toolbar {\n  border-top: 1px solid #ddd;\n  height: 60px; }\n\n/* line 158, stdin */\n.vtab-grid-list {\n  display: flex;\n  flex-wrap: wrap; }\n\n/* line 163, stdin */\n.vtab-grid-list-item {\n  margin: 10px;\n  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 0, 0, 0.1);\n  background: #eee;\n  cursor: pointer;\n  text-align: center;\n  width: 150px;\n  height: 150px;\n  position: relative; }\n\n/* line 174, stdin */\n.vtab-grid-list-item-icon {\n  height: 120px;\n  font-size: 64px;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n  /* line 181, stdin */\n  .vtab-grid-list-item-icon .dashicons {\n    font-size: inherit;\n    height: auto;\n    width: auto;\n    max-width: 80%;\n    max-height: 80%; }\n\n/* line 190, stdin */\n.vtab-grid-list-item-title {\n  box-sizing: border-box;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  margin: 0;\n  line-height: 1.2;\n  padding: 8px;\n  overflow: hidden;\n  max-height: 100%;\n  word-wrap: break-word;\n  text-align: center;\n  font-weight: bold;\n  background: rgba(255, 255, 255, 0.8);\n  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }")
 ;(function(){
 'use strict';
@@ -376,13 +188,13 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   module.hot.accept()
   module.hot.dispose(__vueify_style_dispose__)
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-449f0e82", __vue__options__)
+    hotAPI.createRecord("data-v-d311c216", __vue__options__)
   } else {
-    hotAPI.rerender("data-v-449f0e82", __vue__options__)
+    hotAPI.reload("data-v-d311c216", __vue__options__)
   }
 })()}
-},{"./components/picker-list.vue":4,"./components/picker-search.vue":5,"babel-runtime/core-js/json/stringify":7,"babel-runtime/core-js/object/assign":8,"vue":49,"vue-hot-reload-api":47,"vueify/lib/insert-css":51}],4:[function(require,module,exports){
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-22e6dc93] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-list-item[data-v-22e6dc93] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-list-item.sortable[data-v-22e6dc93] {\n\tcursor: move;\n}\n\n.content-connect-picker-list-item[data-v-22e6dc93]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-list-item.ghost[data-v-22e6dc93] {\n\topacity: 0.5;\n\tbackground: #c8ebfb;\n}\n\n.content-connect-grab-icon[data-v-22e6dc93] {\n\tfont-size: 16px;\n\tcolor: #bbb;\n}\n\n.content-connect-delete-button[data-v-22e6dc93] {\n\tcolor: #a00;\n\tvisibility: hidden;\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n\tcursor: pointer;\n}\n\n.content-connect-delete-button[data-v-22e6dc93]:hover {\n\tcolor: #dc3232;\n}\n\n.content-connect-picker-list-item:hover .content-connect-delete-button[data-v-22e6dc93] {\n\tvisibility: visible;\n}")
+},{"./components/picker-list.vue":2,"./components/picker-search.vue":3,"babel-runtime/core-js/json/stringify":5,"babel-runtime/core-js/object/assign":6,"vue":47,"vue-hot-reload-api":45,"vueify/lib/insert-css":49}],2:[function(require,module,exports){
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-3d281940] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-list-item[data-v-3d281940] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-list-item.sortable[data-v-3d281940] {\n\tcursor: move;\n}\n\n.content-connect-picker-list-item[data-v-3d281940]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-list-item.ghost[data-v-3d281940] {\n\topacity: 0.5;\n\tbackground: #c8ebfb;\n}\n\n.content-connect-grab-icon[data-v-3d281940] {\n\tfont-size: 16px;\n\tcolor: #bbb;\n}\n\n.content-connect-delete-button[data-v-3d281940] {\n\tcolor: #a00;\n\tvisibility: hidden;\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n\tcursor: pointer;\n}\n\n.content-connect-delete-button[data-v-3d281940]:hover {\n\tcolor: #dc3232;\n}\n\n.content-connect-picker-list-item:hover .content-connect-delete-button[data-v-3d281940] {\n\tvisibility: visible;\n}")
 ;(function(){
 'use strict';
 
@@ -423,20 +235,20 @@ var __vue__options__ = (typeof module.exports === "function"? module.exports.opt
 if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
 __vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"content-connect-picker-list-container"},[_c('ul',{staticClass:"content-connect-picker"},[(_vm.sortable === true)?_c('draggable',{attrs:{"options":{ghostClass: 'ghost'}},on:{"start":function($event){_vm.drag=true},"end":function($event){_vm.drag=false}},model:{value:(_vm.localItems),callback:function ($$v) {_vm.localItems=$$v},expression:"localItems"}},_vm._l((_vm.items),function(item){return _c('li',{staticClass:"content-connect-picker-list-item sortable"},[_c('span',{staticClass:"content-connect-grab-icon dashicons dashicons-move"}),_vm._v(" "),_c('span',{staticClass:"content-connect-selected-item-name"},[_vm._v(_vm._s(item.name))]),_vm._v(" "),_c('span',{staticClass:"delete-item content-connect-delete-button",on:{"click":function($event){$event.preventDefault();_vm.deleteItem(item)}}},[_vm._v("delete")])])})):_vm._e(),_vm._v(" "),_vm._l((_vm.items),function(item){return (_vm.sortable === false)?_c('li',{staticClass:"content-connect-picker-list-item"},[_c('span',{staticClass:"content-connect-selected-item-name"},[_vm._v(_vm._s(item.name))]),_vm._v(" "),_c('span',{staticClass:"delete-item content-connect-delete-button",on:{"click":function($event){$event.preventDefault();_vm.deleteItem(item)}}},[_vm._v("delete")])]):_vm._e()})],2)])}
 __vue__options__.staticRenderFns = []
-__vue__options__._scopeId = "data-v-22e6dc93"
+__vue__options__._scopeId = "data-v-3d281940"
 if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   module.hot.accept()
   module.hot.dispose(__vueify_style_dispose__)
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-22e6dc93", __vue__options__)
+    hotAPI.createRecord("data-v-3d281940", __vue__options__)
   } else {
-    hotAPI.reload("data-v-22e6dc93", __vue__options__)
+    hotAPI.reload("data-v-3d281940", __vue__options__)
   }
 })()}
-},{"vue":49,"vue-hot-reload-api":47,"vuedraggable":50,"vueify/lib/insert-css":51}],5:[function(require,module,exports){
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-037c595d] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-search-container[data-v-037c595d] {\n\tpadding-bottom: 20px;\n}\n\n.content-connect-picker-search-input-label[data-v-037c595d] {\n\tdisplay: block;\n}\n\n.content-connect-picker-search-input-container form[data-v-037c595d] {\n\tdisplay: flex;\n}\n\n.content-connect-picker-search-input[data-v-037c595d] {\n\tflex: 1;\n\tmargin-right: 0.5em;\n}\n\n.content-connect-picker-search-item[data-v-037c595d] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-search-item.result[data-v-037c595d]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-search-item.searching .spinner[data-v-037c595d] {\n\tfloat: left;\n\tmargin-top: 0;\n}\n\n.content-connect-already-added[data-v-037c595d],\n.content-connect-add-button[data-v-037c595d] {\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n}\n\n.content-connect-add-button[data-v-037c595d] {\n\tcolor: #0073aa;\n\tcursor: pointer;\n}\n\n.content-connect-already-added[data-v-037c595d] {\n\tcolor: #aaa;\n\tfont-style: italic;\n}\n\n.content-connect-add-button[data-v-037c595d]:hover {\n\tcolor: #00a0d2;\n}\n\n.content-connect-picker-pagination[data-v-037c595d] {\n\theight: 3em;\n\tborder-top: 1px solid #ddd;\n\tpadding-top: 20px;\n}\n\n.content-connect-picker-pagination a[data-v-037c595d] {\n\tcursor: pointer;\n}\n\n.content-connect-picker-pagination .next-page[data-v-037c595d] {\n\tfloat: right;\n}")
+},{"vue":47,"vue-hot-reload-api":45,"vuedraggable":48,"vueify/lib/insert-css":49}],3:[function(require,module,exports){
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*[data-v-db3dc26c] {\n\tbox-sizing: border-box;\n}\n\n.content-connect-picker-search-container[data-v-db3dc26c] {\n\tpadding-bottom: 20px;\n}\n\n.content-connect-picker-search-input-label[data-v-db3dc26c] {\n\tdisplay: block;\n}\n\n.content-connect-picker-search-input-container form[data-v-db3dc26c] {\n\tdisplay: flex;\n}\n\n.content-connect-picker-search-input[data-v-db3dc26c] {\n\tflex: 1;\n\tmargin-right: 0.5em;\n}\n\n.content-connect-picker-search-item[data-v-db3dc26c] {\n\twidth: 100%;\n\tposition: relative;\n\tpadding: 1em 1em 1em 0.5em;\n}\n\n.content-connect-picker-search-item.result[data-v-db3dc26c]:nth-child(odd) {\n\tbackground-color: #f9f9f9;\n}\n\n.content-connect-picker-search-item.searching .spinner[data-v-db3dc26c] {\n\tfloat: left;\n\tmargin-top: 0;\n}\n\n.content-connect-already-added[data-v-db3dc26c],\n.content-connect-add-button[data-v-db3dc26c] {\n\tdisplay: inline-block;\n\tfloat: right;\n\tposition: relative;\n}\n\n.content-connect-add-button[data-v-db3dc26c] {\n\tcolor: #0073aa;\n\tcursor: pointer;\n}\n\n.content-connect-already-added[data-v-db3dc26c] {\n\tcolor: #aaa;\n\tfont-style: italic;\n}\n\n.content-connect-add-button[data-v-db3dc26c]:hover {\n\tcolor: #00a0d2;\n}\n\n.content-connect-picker-pagination[data-v-db3dc26c] {\n\theight: 3em;\n\tborder-top: 1px solid #ddd;\n\tpadding-top: 20px;\n}\n\n.content-connect-picker-pagination a[data-v-db3dc26c] {\n\tcursor: pointer;\n}\n\n.content-connect-picker-pagination .next-page[data-v-db3dc26c] {\n\tfloat: right;\n}")
 ;(function(){
 'use strict';
 
@@ -477,19 +289,19 @@ var __vue__options__ = (typeof module.exports === "function"? module.exports.opt
 if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
 __vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"content-connect-picker-search-container"},[_c('label',{staticClass:"content-connect-picker-search-input-label",attrs:{"for":_vm._uid}},[_vm._v("Search")]),_vm._v(" "),_c('div',{staticClass:"content-connect-picker-search-input-container"},[_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.search($event)}}},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.searchtext),expression:"searchtext"}],staticClass:"content-connect-picker-search-input widefat",attrs:{"type":"text","id":_vm._uid},domProps:{"value":(_vm.searchtext)},on:{"input":function($event){if($event.target.composing){ return; }_vm.searchtext=$event.target.value}}}),_vm._v(" "),_c('button',{staticClass:"button",attrs:{"type":"submit"}},[_vm._v("Search")])])]),_vm._v(" "),_c('ul',{staticClass:"content-connect-picker-search-list"},[_vm._l((_vm.results),function(result){return _c('li',{staticClass:"content-connect-picker-search-item result"},[_c('span',{staticClass:"content-connect-selected-item-name"},[_vm._v(_vm._s(result.name))]),_vm._v(" "),(!result.added)?_c('span',{staticClass:"add-item content-connect-add-button",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.add(result)}}},[_vm._v("add")]):_vm._e(),_vm._v(" "),(result.added)?_c('span',{staticClass:"add-item content-connect-already-added"},[_vm._v("Added")]):_vm._e()])}),_vm._v(" "),(_vm.searching)?_c('li',{staticClass:"content-connect-picker-search-item searching"},[_vm._m(0)]):_vm._e(),_vm._v(" "),(! _vm.searching && _vm.searcherror.length > 0)?_c('li',{staticClass:"content-connect-picker-search-item error"},[_c('p',{staticClass:"error"},[_vm._v(_vm._s(_vm.searcherror))])]):_vm._e()],2),_vm._v(" "),(! _vm.searching && ( _vm.morePages || _vm.prevPages ))?_c('div',{staticClass:"content-connect-picker-pagination"},[(_vm.prevPages)?_c('a',{staticClass:"prev-page",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.prevPage()}}},[_vm._v("‹ Previous Page")]):_vm._e(),_vm._v(" "),(_vm.morePages)?_c('a',{staticClass:"next-page",on:{"click":function($event){$event.preventDefault();$event.stopPropagation();_vm.nextPage()}}},[_vm._v("Next Page ›")]):_vm._e()]):_vm._e()])}
 __vue__options__.staticRenderFns = [function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('p',[_c('span',{staticClass:"spinner is-active"}),_vm._v("\n\t\t\t\tSearching...\n\t\t\t")])}]
-__vue__options__._scopeId = "data-v-037c595d"
+__vue__options__._scopeId = "data-v-db3dc26c"
 if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   module.hot.accept()
   module.hot.dispose(__vueify_style_dispose__)
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-037c595d", __vue__options__)
+    hotAPI.createRecord("data-v-db3dc26c", __vue__options__)
   } else {
-    hotAPI.rerender("data-v-037c595d", __vue__options__)
+    hotAPI.reload("data-v-db3dc26c", __vue__options__)
   }
 })()}
-},{"vue":49,"vue-hot-reload-api":47,"vueify/lib/insert-css":51}],6:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":45,"vueify/lib/insert-css":49}],4:[function(require,module,exports){
 var Vue = require( 'vue' );
 var App = require( './App.vue' );
 
@@ -507,35 +319,35 @@ window.ContentConnectApp = new Vue({
 }).$mount( '#tenup-content-connect-app' );
 
 
-},{"./App.vue":3,"vue":49,"vue-resource":48}],7:[function(require,module,exports){
+},{"./App.vue":1,"vue":47,"vue-resource":46}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
-},{"core-js/library/fn/json/stringify":9}],8:[function(require,module,exports){
+},{"core-js/library/fn/json/stringify":7}],6:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/assign"), __esModule: true };
-},{"core-js/library/fn/object/assign":10}],9:[function(require,module,exports){
+},{"core-js/library/fn/object/assign":8}],7:[function(require,module,exports){
 var core = require('../../modules/_core');
 var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
 module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
   return $JSON.stringify.apply($JSON, arguments);
 };
 
-},{"../../modules/_core":15}],10:[function(require,module,exports){
+},{"../../modules/_core":13}],8:[function(require,module,exports){
 require('../../modules/es6.object.assign');
 module.exports = require('../../modules/_core').Object.assign;
 
-},{"../../modules/_core":15,"../../modules/es6.object.assign":45}],11:[function(require,module,exports){
+},{"../../modules/_core":13,"../../modules/es6.object.assign":43}],9:[function(require,module,exports){
 module.exports = function (it) {
   if (typeof it != 'function') throw TypeError(it + ' is not a function!');
   return it;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function (it) {
   if (!isObject(it)) throw TypeError(it + ' is not an object!');
   return it;
 };
 
-},{"./_is-object":28}],13:[function(require,module,exports){
+},{"./_is-object":26}],11:[function(require,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject');
@@ -560,18 +372,18 @@ module.exports = function (IS_INCLUDES) {
   };
 };
 
-},{"./_to-absolute-index":38,"./_to-iobject":40,"./_to-length":41}],14:[function(require,module,exports){
+},{"./_to-absolute-index":36,"./_to-iobject":38,"./_to-length":39}],12:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function (it) {
   return toString.call(it).slice(8, -1);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var core = module.exports = { version: '2.5.1' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
-},{}],16:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function (fn, that, length) {
@@ -593,20 +405,20 @@ module.exports = function (fn, that, length) {
   };
 };
 
-},{"./_a-function":11}],17:[function(require,module,exports){
+},{"./_a-function":9}],15:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function (it) {
   if (it == undefined) throw TypeError("Can't call method on  " + it);
   return it;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_fails":22}],19:[function(require,module,exports){
+},{"./_fails":20}],17:[function(require,module,exports){
 var isObject = require('./_is-object');
 var document = require('./_global').document;
 // typeof document.createElement is 'object' in old IE
@@ -615,13 +427,13 @@ module.exports = function (it) {
   return is ? document.createElement(it) : {};
 };
 
-},{"./_global":23,"./_is-object":28}],20:[function(require,module,exports){
+},{"./_global":21,"./_is-object":26}],18:[function(require,module,exports){
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
 
-},{}],21:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var global = require('./_global');
 var core = require('./_core');
 var ctx = require('./_ctx');
@@ -684,7 +496,7 @@ $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library`
 module.exports = $export;
 
-},{"./_core":15,"./_ctx":16,"./_global":23,"./_hide":25}],22:[function(require,module,exports){
+},{"./_core":13,"./_ctx":14,"./_global":21,"./_hide":23}],20:[function(require,module,exports){
 module.exports = function (exec) {
   try {
     return !!exec();
@@ -693,7 +505,7 @@ module.exports = function (exec) {
   }
 };
 
-},{}],23:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self
@@ -701,13 +513,13 @@ var global = module.exports = typeof window != 'undefined' && window.Math == Mat
   : Function('return this')();
 if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 
-},{}],24:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function (it, key) {
   return hasOwnProperty.call(it, key);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var dP = require('./_object-dp');
 var createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function (object, key, value) {
@@ -717,12 +529,12 @@ module.exports = require('./_descriptors') ? function (object, key, value) {
   return object;
 };
 
-},{"./_descriptors":18,"./_object-dp":30,"./_property-desc":35}],26:[function(require,module,exports){
+},{"./_descriptors":16,"./_object-dp":28,"./_property-desc":33}],24:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function () {
   return Object.defineProperty(require('./_dom-create')('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_descriptors":18,"./_dom-create":19,"./_fails":22}],27:[function(require,module,exports){
+},{"./_descriptors":16,"./_dom-create":17,"./_fails":20}],25:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 // eslint-disable-next-line no-prototype-builtins
@@ -730,12 +542,12 @@ module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
 
-},{"./_cof":14}],28:[function(require,module,exports){
+},{"./_cof":12}],26:[function(require,module,exports){
 module.exports = function (it) {
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
 
-},{}],29:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 // 19.1.2.1 Object.assign(target, source, ...)
 var getKeys = require('./_object-keys');
@@ -771,7 +583,7 @@ module.exports = !$assign || require('./_fails')(function () {
   } return T;
 } : $assign;
 
-},{"./_fails":22,"./_iobject":27,"./_object-gops":31,"./_object-keys":33,"./_object-pie":34,"./_to-object":42}],30:[function(require,module,exports){
+},{"./_fails":20,"./_iobject":25,"./_object-gops":29,"./_object-keys":31,"./_object-pie":32,"./_to-object":40}],28:[function(require,module,exports){
 var anObject = require('./_an-object');
 var IE8_DOM_DEFINE = require('./_ie8-dom-define');
 var toPrimitive = require('./_to-primitive');
@@ -789,10 +601,10 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   return O;
 };
 
-},{"./_an-object":12,"./_descriptors":18,"./_ie8-dom-define":26,"./_to-primitive":43}],31:[function(require,module,exports){
+},{"./_an-object":10,"./_descriptors":16,"./_ie8-dom-define":24,"./_to-primitive":41}],29:[function(require,module,exports){
 exports.f = Object.getOwnPropertySymbols;
 
-},{}],32:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var has = require('./_has');
 var toIObject = require('./_to-iobject');
 var arrayIndexOf = require('./_array-includes')(false);
@@ -811,7 +623,7 @@ module.exports = function (object, names) {
   return result;
 };
 
-},{"./_array-includes":13,"./_has":24,"./_shared-key":36,"./_to-iobject":40}],33:[function(require,module,exports){
+},{"./_array-includes":11,"./_has":22,"./_shared-key":34,"./_to-iobject":38}],31:[function(require,module,exports){
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys = require('./_object-keys-internal');
 var enumBugKeys = require('./_enum-bug-keys');
@@ -820,10 +632,10 @@ module.exports = Object.keys || function keys(O) {
   return $keys(O, enumBugKeys);
 };
 
-},{"./_enum-bug-keys":20,"./_object-keys-internal":32}],34:[function(require,module,exports){
+},{"./_enum-bug-keys":18,"./_object-keys-internal":30}],32:[function(require,module,exports){
 exports.f = {}.propertyIsEnumerable;
 
-},{}],35:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = function (bitmap, value) {
   return {
     enumerable: !(bitmap & 1),
@@ -833,14 +645,14 @@ module.exports = function (bitmap, value) {
   };
 };
 
-},{}],36:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var shared = require('./_shared')('keys');
 var uid = require('./_uid');
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
 
-},{"./_shared":37,"./_uid":44}],37:[function(require,module,exports){
+},{"./_shared":35,"./_uid":42}],35:[function(require,module,exports){
 var global = require('./_global');
 var SHARED = '__core-js_shared__';
 var store = global[SHARED] || (global[SHARED] = {});
@@ -848,7 +660,7 @@ module.exports = function (key) {
   return store[key] || (store[key] = {});
 };
 
-},{"./_global":23}],38:[function(require,module,exports){
+},{"./_global":21}],36:[function(require,module,exports){
 var toInteger = require('./_to-integer');
 var max = Math.max;
 var min = Math.min;
@@ -857,7 +669,7 @@ module.exports = function (index, length) {
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
 
-},{"./_to-integer":39}],39:[function(require,module,exports){
+},{"./_to-integer":37}],37:[function(require,module,exports){
 // 7.1.4 ToInteger
 var ceil = Math.ceil;
 var floor = Math.floor;
@@ -865,7 +677,7 @@ module.exports = function (it) {
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject');
 var defined = require('./_defined');
@@ -873,7 +685,7 @@ module.exports = function (it) {
   return IObject(defined(it));
 };
 
-},{"./_defined":17,"./_iobject":27}],41:[function(require,module,exports){
+},{"./_defined":15,"./_iobject":25}],39:[function(require,module,exports){
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer');
 var min = Math.min;
@@ -881,14 +693,14 @@ module.exports = function (it) {
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
 
-},{"./_to-integer":39}],42:[function(require,module,exports){
+},{"./_to-integer":37}],40:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function (it) {
   return Object(defined(it));
 };
 
-},{"./_defined":17}],43:[function(require,module,exports){
+},{"./_defined":15}],41:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -902,20 +714,20 @@ module.exports = function (it, S) {
   throw TypeError("Can't convert object to primitive value");
 };
 
-},{"./_is-object":28}],44:[function(require,module,exports){
+},{"./_is-object":26}],42:[function(require,module,exports){
 var id = 0;
 var px = Math.random();
 module.exports = function (key) {
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
 
-},{}],45:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 // 19.1.3.1 Object.assign(target, source)
 var $export = require('./_export');
 
 $export($export.S + $export.F, 'Object', { assign: require('./_object-assign') });
 
-},{"./_export":21,"./_object-assign":29}],46:[function(require,module,exports){
+},{"./_export":19,"./_object-assign":27}],44:[function(require,module,exports){
 /**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
@@ -2408,7 +2220,7 @@ $export($export.S + $export.F, 'Object', { assign: require('./_object-assign') }
 	return Sortable;
 });
 
-},{}],47:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var Vue // late bind
 var version
 var map = (window.__VUE_HOT_MAP__ = Object.create(null))
@@ -2627,7 +2439,7 @@ exports.reload = tryWrap(function (id, options) {
   })
 })
 
-},{}],48:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /*!
  * vue-resource v1.3.4
  * https://github.com/pagekit/vue-resource
@@ -4197,8 +4009,8 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 module.exports = plugin;
 
-},{"got":1}],49:[function(require,module,exports){
-(function (process,global){
+},{"got":50}],47:[function(require,module,exports){
+(function (process,global,setImmediate){
 /*!
  * Vue.js v2.5.2
  * (c) 2014-2017 Evan You
@@ -11961,8 +11773,8 @@ Vue$3.nextTick(function () {
 
 module.exports = Vue$3;
 
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":2}],50:[function(require,module,exports){
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
+},{"_process":51,"timers":52}],48:[function(require,module,exports){
 'use strict';
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -12336,7 +12148,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
     Vue.component('draggable', draggable);
   }
 })();
-},{"sortablejs":46}],51:[function(require,module,exports){
+},{"sortablejs":44}],49:[function(require,module,exports){
 var inserted = exports.cache = {}
 
 function noop () {}
@@ -12361,4 +12173,271 @@ exports.insert = function (css) {
   }
 }
 
-},{}]},{},[6]);
+},{}],50:[function(require,module,exports){
+
+},{}],51:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],52:[function(require,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = require('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
+},{"process/browser.js":51,"timers":52}]},{},[4]);
