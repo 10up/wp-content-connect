@@ -3,7 +3,7 @@
  * Plugin Name: WP Content Connect
  * Plugin URI: https://github.com/10up/wp-content-connect
  * Description: WordPress library that enables direct relationships for posts to posts and posts to users.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: Chris Marslender
  * Author URI:
  * License: MIT
