@@ -134,7 +134,16 @@ class PostToPost extends Relationship {
 			array( '%d', '%d', '%s' )
 		);
 
-		do_action( 'tenup-content-connect-add-relationship', $pid1, $pid2, $this->name );
+		/**
+		 * Fires after a relationship has been added
+		 * @since 1.3.0
+		 *
+		 * @param int $pid1 ID of the first item
+		 * @param int $pid2 ID of the second item
+		 * @param string $name relationship name
+		 * @param string $type relationship type (post-to-post|post-to-user)
+		 */
+		do_action( 'tenup-content-connect-add-relationship', $pid1, $pid2, $this->name, 'post-to-post' );
 	}
 
 	public function delete_relationship( $pid1, $pid2 ) {
@@ -150,7 +159,16 @@ class PostToPost extends Relationship {
 			array( '%d', '%d', '%s' )
 		);
 
-		do_action( 'tenup-content-connect-delete-relationship', $pid1, $pid2, $this->name );
+		/**
+		 * Fires after a relationship has been deleted
+		 * @since 1.3.0
+		 *
+		 * @param int $pid1 ID of the first item
+		 * @param int $pid2 ID of the second item
+		 * @param string $name relationship name
+		 * @param string $type relationship type (post-to-post|post-to-user)
+		 */
+		do_action( 'tenup-content-connect-delete-relationship', $pid1, $pid2, $this->name, 'post-to-post' );
 	}
 
 	/**
@@ -175,7 +193,15 @@ class PostToPost extends Relationship {
 			$this->add_relationship( $post_id, $add );
 		}
 
-		do_action( 'tenup-content-connect-replace-relationships', $post_id, $related_ids );
+		/**
+		 * Fires after a relationship has been replaced
+		 * @since 1.3.0
+		 *
+		 * @param int $pid1 ID of the first item
+		 * @param int $pid2 ID of the second item
+		 * @param string $type relationship type (post-to-post|post-to-user|user-to-post)
+		 */
+		do_action( 'tenup-content-connect-replace-relationships', $post_id, $related_ids, 'post-to-post' );
 	}
 
 	/**
