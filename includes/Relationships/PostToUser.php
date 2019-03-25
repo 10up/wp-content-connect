@@ -106,6 +106,11 @@ class PostToUser extends Relationship {
 			array( 'post_id' => $post_id, 'user_id' => $user_id, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-add-relationship', $post_id, $user_id, $this->name, 'post-to-user' );
 	}
 
 	/**
@@ -122,6 +127,11 @@ class PostToUser extends Relationship {
 			array( 'post_id' => $post_id, 'user_id' => $user_id, 'name' => $this->name ),
 			array( '%d', '%d', '%s' )
 		);
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-delete-relationship', $post_id, $user_id, $this->name, 'post-to-user' );
 	}
 
 	/**
@@ -145,6 +155,11 @@ class PostToUser extends Relationship {
 		foreach( $add_user_ids as $add_user_id ) {
 			$this->add_relationship( $post_id, $add_user_id );
 		}
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-replace-relationships', $post_id, $user_ids, 'post-to-user' );
 	}
 
 	/**
@@ -168,6 +183,11 @@ class PostToUser extends Relationship {
 		foreach( $add_post_ids as $add_post_id ) {
 			$this->add_relationship( $add_post_id, $user_id );
 		}
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-replace-relationships', $user_id, $post_ids, 'user-to-post' );
 	}
 
 	/**
