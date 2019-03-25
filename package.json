@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Post to Post and Post to User Library for WordPress",
   "main": "index.js",
   "directories": {
