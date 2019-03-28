@@ -53,14 +53,15 @@ class PostToPost extends PostUI {
 		$registry = Plugin::instance()->get_registry();
 
 		$data[] = array(
-			'reltype' => 'post-to-post',
-			'object_type' => 'post', // The object type we'll be querying for in searches on the front end
-			'post_type' => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship)
-			'relid' => $registry->get_relationship_key($this->relationship->from, $this->relationship->to, $this->relationship->name ),
-			'name' => $this->relationship->name,
-			'labels' => $this->labels,
-			'sortable' => $this->sortable,
-			'selected' => $final_posts,
+			'reltype'         => 'post-to-post',
+			'object_type'     => 'post', // The object type we'll be querying for in searches on the front end.
+			'post_type'       => $other_post_type, // The post type we'll be querying for in searches on the front end (so NOT the current post type, but the matching one in the relationship).
+			'relid'           => $registry->get_relationship_key( $this->relationship->from, $this->relationship->to, $this->relationship->name ),
+			'name'            => $this->relationship->name,
+			'labels'          => $this->labels,
+			'sortable'        => $this->sortable,
+			'selected'        => $final_posts,
+			'current_post_id' => $post->ID,
 		);
 
 		return $data;
