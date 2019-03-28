@@ -111,7 +111,7 @@ class Search {
 		/**
 		 * Filters the search users query args.
 		 *
-		 * @since  1.4.1
+		 * @since  1.5.0
 		 * @param  array $query_args The \WP_Query args.
 		 * @param  array $args       Optional. The search users args. Default empty.
 		 * @return array
@@ -154,7 +154,7 @@ class Search {
 		/**
 		 * Filters the search posts query args.
 		 *
-		 * @since  1.4.1
+		 * @since  1.5.0
 		 * @param  array $query_args The \WP_Query args.
 		 * @param  array $args       Optional. The search posts args. Default empty.
 		 * @return array
