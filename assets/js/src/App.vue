@@ -303,7 +303,9 @@
 					"object_type": this.activeRelationship.object_type,
 					"post_type": this.activeRelationship.post_type,
 					"search": this.searchText,
-					"paged": this.currentPage
+					"paged": this.currentPage,
+					"relationship_name": this.activeRelationship.name,
+					"current_post_id": this.activeRelationship.current_post_id,
 				} ).then( response => {
 					// success
 					var i, result;
