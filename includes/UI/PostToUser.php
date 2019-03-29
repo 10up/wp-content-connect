@@ -49,13 +49,14 @@ class PostToUser extends PostUI {
 		$registry = Plugin::instance()->get_registry();
 
 		$data[] = array(
-			'reltype' => 'post-to-user',
-			'object_type' => 'user', // The object type we'll be querying for in searches on the front end
-			'relid' => $registry->get_relationship_key( $this->relationship->post_type, 'user', $this->relationship->name ),
-			'name' => $this->relationship->name,
-			'labels' => $this->labels,
-			'sortable' => $this->sortable,
-			'selected' => $final_users,
+			'reltype'         => 'post-to-user',
+			'object_type'     => 'user', // The object type we'll be querying for in searches on the front end.
+			'relid'           => $registry->get_relationship_key( $this->relationship->post_type, 'user', $this->relationship->name ),
+			'name'            => $this->relationship->name,
+			'labels'          => $this->labels,
+			'sortable'        => $this->sortable,
+			'selected'        => $final_users,
+			'current_post_id' => $post->ID,
 		);
 
 		return $data;
