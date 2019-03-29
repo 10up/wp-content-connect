@@ -19,7 +19,7 @@ class Search {
 
 	public function localize_endpoints( $data ) {
 		$data['endpoints']['search'] = get_rest_url( get_current_blog_id(), 'content-connect/v1/search' );
-		$data['nonces']['search'] = wp_create_nonce( 'content-connect-search' );
+		$data['nonces']['search']    = wp_create_nonce( 'content-connect-search' );
 
 		return $data;
 	}
@@ -77,14 +77,18 @@ class Search {
 
 		$search_text = sanitize_text_field( $request->get_param( 'search' ) );
 
-		$paged = intval( $request->get_param( 'paged' ) );
+		$search_args = array(
+			'paged'             => intval( $request->get_param( 'paged' ) ),
+			'relationship_name' => sanitize_text_field( $request->get_param( 'relationship_name' ) ),
+			'current_post_id'   => intval( $request->get_param( 'current_post_id' ) ),
+		);
 
 		switch( $object_type ) {
 			case 'user':
-				$results = $this->search_users( $search_text, array( 'paged' => $paged ) );
+				$results = $this->search_users( $search_text, $search_args );
 				break;
 			case 'post':
-				$results = $this->search_posts( $search_text, $final_post_types, array( 'paged' => $paged ) );
+				$results = $this->search_posts( $search_text, $final_post_types, $search_args );
 				break;
 		}
 
@@ -92,15 +96,28 @@ class Search {
 	}
 
 	public function search_users( $search_text, $args = array() ) {
+
 		$defaults = array(
 			'paged' => 1,
 		);
+
 		$args = wp_parse_args( $args, $defaults );
 
-		$query = new \WP_User_Query( array(
+		$query_args = array(
 			'search' => "*{$search_text}*",
-			'paged' => $args['paged'],
-		) );
+			'paged'  => $args['paged'],
+		);
+
+		/**
+		 * Filters the search users query args.
+		 *
+		 * @since  1.5.0
+		 * @param  array $query_args The \WP_Query args.
+		 * @param  array $args       Optional. The search users args. Default empty.
+		 * @return array
+		 */
+		$query_args = apply_filters( 'tenup_content_connect_search_users_query_args', $query_args, $args );
+		$query      = new \WP_User_Query( $query_args );
 
 		// @todo pagination args
 		$results = array(
@@ -121,17 +138,29 @@ class Search {
 	}
 
 	public function search_posts( $search_text, $post_types, $args = array() ) {
+
 		$defaults = array(
 			'paged' => 1,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$query = new \WP_Query( array(
+		$query_args = array(
 			'post_type' => $post_types,
-			's' => $search_text,
-			'paged' => $args['paged'],
-		) );
+			's'         => $search_text,
+			'paged'     => $args['paged'],
+		);
+
+		/**
+		 * Filters the search posts query args.
+		 *
+		 * @since  1.5.0
+		 * @param  array $query_args The \WP_Query args.
+		 * @param  array $args       Optional. The search posts args. Default empty.
+		 * @return array
+		 */
+		$query_args = apply_filters( 'tenup_content_connect_search_posts_query_args', $query_args, $args );
+		$query      = new \WP_Query( $query_args );
 
 		$results = array(
 			'prev_pages' => ( $args['paged'] > 1 ),

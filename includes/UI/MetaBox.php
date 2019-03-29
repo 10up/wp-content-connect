@@ -16,10 +16,10 @@ class MetaBox {
 		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
-			'nonces' => array(
+			'nonces'        => array(
 				'wp_rest' => wp_create_nonce( 'wp_rest' ),
 			),
-			'endpoints' => array(),
+			'endpoints'     => array(),
 			'relationships' => $relationships,
 		);
 
