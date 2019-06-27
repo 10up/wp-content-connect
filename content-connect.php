@@ -6,8 +6,8 @@
  * Version: 1.5.0
  * Author: Chris Marslender
  * Author URI:
- * License: MIT
- * License URI: https://opensource.org/licenses/MIT
+ * License: GPLv3
+ * License URI: https://opensource.org/licenses/GPL-3.0
  */
 
 require_once __DIR__ . '/autoload.php';
