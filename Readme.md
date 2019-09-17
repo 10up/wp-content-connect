@@ -4,9 +4,33 @@
 
 [![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Release Version](https://img.shields.io/github/release/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/releases/latest) [![GPLv3 License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
 
-## Usage
+## Installation and Usage
 
-The easiest way to use this is to install as a plugin and activate. Alternatively, you can include this with composer, and bootstrap the plugin manually by calling `\TenUp\ContentConnect\Plugin::instance();`
+WP Content Connect can be used as a plugin or a standalone library. The easiest way to use this is to install as a plugin and activate.
+
+### Composer install
+If you prefer to use composer, first require it like this:
+
+`$ composer require 10up/wp-content-connect`
+
+or directly in `composer.json`
+
+```
+  "require": {
+    "10up/wp-content-connect": "^1.5.0",
+  }
+```
+
+This will install WP Content Connect to your `vendor` folder and allow you to to use it as a library by calling `\TenUp\ContentConnect\Plugin::instance();` from your code.
+
+Alternatively, if you prefer to have composer install it as a plugin, add an entry to your `composer.json` installer paths:
+```
+  "extra": {
+    "installer-paths": {
+      "plugins/wp-content-connect/": ["10up/wp-content-connect"],
+    }
+```
+
 
 ## Defining Relationships
 Relationships can be defined once any post types they utilize are defined by hooking into the `tenup-content-connect-init` action. This action is fired on the WordPress `init` action, at priority 100, so any post types must be registered prior to this. Currently supported relationships are post-to-post and post-to-user. Additionally, when registering a relationship, you must specify a `name`. Name enables multiple distinct relationships between the same object types. For instance, you could have a post-to-user relationship for post type `post` with a type of `researchers` to indicate that any user in the "researcher" relationship is a researcher for the post and have another post-to-user relationship defined for post type `post` with a name of `backer` to indicate that any user in the "backer" relationship contributes financially to the post.
