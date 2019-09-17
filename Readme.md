@@ -9,26 +9,58 @@
 WP Content Connect can be used as a plugin or a standalone library. The easiest way to use this is to install as a plugin and activate.
 
 ### Composer install
-If you prefer to use composer, first require it like this:
+
+#### As a library
+
+First, require this repository using the command line:
 
 `$ composer require 10up/wp-content-connect`
 
-or directly in `composer.json`
+or directly in `composer.json`:
 
 ```
   "require": {
-    "10up/wp-content-connect": "^1.5.0",
+    "10up/wp-content-connect": "^1.5.0"
   }
 ```
 
 This will install WP Content Connect to your `vendor` folder and allow you to to use it as a library by calling `\TenUp\ContentConnect\Plugin::instance();` from your code.
 
-Alternatively, if you prefer to have composer install it as a plugin, add an entry to your `composer.json` installer paths:
+#### As a plugin
+
+Alternatively, if you prefer to have composer install it as a plugin, you may redeclare this pakcage in your `composer.json` using the following example:
+
 ```
+{
+  "name": "your project name",
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "10up/wp-content-connect",
+        "type": "wordpress-plugin",
+        "version": "1.5.0",
+        "source": {
+          "url": "https://github.com/10up/wp-content-connect.git",
+          "type": "git",
+          "reference": "1.5.0"
+        }
+      }
+    }
+  ],
+  "require": {
+    "10up/wp-content-connect": "^1.5",
+    "composer/installers": "^1.7"
+  },
   "extra": {
     "installer-paths": {
-      "plugins/wp-content-connect/": ["10up/wp-content-connect"],
+      "plugins/wp-content-connect/": [
+        "10up/wp-content-connect"
+      ]
     }
+  }
+}
+
 ```
 
 
