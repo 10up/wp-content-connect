@@ -28,7 +28,7 @@ This will install WP Content Connect to your `vendor` folder and allow you to to
 
 #### As a plugin
 
-Alternatively, if you prefer to have composer install it as a plugin, you may redeclare this pakcage in your `composer.json` using the following example:
+Alternatively, if you prefer to have composer install it as a plugin, you may redeclare this package in your `composer.json` using the following example:
 
 ```
 {
