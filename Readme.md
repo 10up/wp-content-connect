@@ -2,7 +2,7 @@
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
 
-[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Release Version](https://img.shields.io/github/release/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/releases/latest) [![GPLv3 License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Release Version](https://img.shields.io/github/release/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.3%20tested-success.svg) [![GPLv3 License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
 
 ## Installation and Usage
 
