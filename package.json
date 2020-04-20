@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-js": "webpack",
+    "build-js": "webpack --config webpack.config.js",
     "dev-build-js": "webpack --config webpack.config.dev.js",
     "watch-js": "webpack --watch --config webpack.config.dev.js"
   },

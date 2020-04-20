@@ -208,10 +208,15 @@
 </style>
 
 <script>
-	var PickerList = require( './components/picker-list.vue' );
-	var PickerSearch = require( './components/picker-search.vue' );
+    /*
+    var PickerList = require( './components/picker-list.vue' );
+    var PickerSearch = require( './components/picker-search.vue' );
+    */
 
-	module.exports = {
+    var PickerList = require( './components/picker-list.vue' ).default;
+    var PickerSearch = require( './components/picker-search.vue' ).default;
+
+    module.exports = {
 		data: function() {
 			return Object.assign({}, {
 				"activeRelationship": window.ContentConnectData.relationships[0],
@@ -221,7 +226,8 @@
 				"searchText": "",
 				"prevPages": false,
 				"morePages": false,
-				"currentPage": 1
+                "currentPage": 1,
+                "didSearch": false,
 			}, window.ContentConnectData);
 		},
 		components: {

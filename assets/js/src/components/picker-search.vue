@@ -40,6 +40,7 @@
 
 	.content-connect-picker-search-container {
 		padding-bottom: 20px;
+        padding-top: 20px;
 	}
 
 	.content-connect-picker-search-input-label {
