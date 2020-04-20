@@ -1,7 +1,9 @@
-var Vue = require( 'vue' );
-var App = require( './App.vue' );
+import Vue from 'vue';
+import VueResource from 'vue-resource';
+import App from './App.vue';
 
-Vue.use( require( 'vue-resource' ) );
+Vue.use( VueResource );
+Vue.config.devtools = true;
 
 // Adds the global wp_rest nonce, so we can auth a user
 Vue.http.interceptors.push(function(request, next) {

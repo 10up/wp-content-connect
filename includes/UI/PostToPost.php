@@ -22,6 +22,7 @@ class PostToPost extends PostUI {
 		$final_posts = array();
 
 		$args = array(
+            'posts_per_page' => -1,
 			'post_type' => (array) $other_post_type,
 			'relationship_query' => array(
 				'name' => $this->relationship->name,
