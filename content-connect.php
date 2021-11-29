@@ -8,6 +8,8 @@
  * Author URI:
  * License: GPLv3
  * License URI: https://opensource.org/licenses/GPL-3.0
+ * Update URI: https://github.com/10up/wp-content-connect
+ * 
  */
 
 require_once __DIR__ . '/autoload.php';
