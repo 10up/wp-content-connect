@@ -20,7 +20,7 @@ class PostToUser extends PostUI {
 
 		$args = array(
 			'relationship_query' => array(
-				'name' => $this->relationship->name,
+				'name'            => $this->relationship->name,
 				'related_to_post' => $post->ID,
 			),
 		);
@@ -29,6 +29,16 @@ class PostToUser extends PostUI {
 			$args['orderby'] = 'relationship';
 		}
 
+		/**
+		 * Filters the Post UI user query args.
+		 *
+		 * @since  1.6.0
+		 * @param  array    $args The \WP_User_Query args.
+		 * @param  \WP_Post $post The post object.
+		 * @return array
+		 */
+		$args = apply_filters( 'tenup_content_connect_post_ui_user_query_args', $args, $post );
+
 		$query = new \WP_User_Query( $args );
 
 		$users = $query->get_results();
@@ -36,7 +46,7 @@ class PostToUser extends PostUI {
 			foreach ( $users as $user ) {
 
 				$final_user = array(
-					'ID' => $user->ID,
+					'ID'   => $user->ID,
 					'name' => $user->display_name,
 				);
 

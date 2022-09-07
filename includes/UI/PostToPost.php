@@ -22,9 +22,9 @@ class PostToPost extends PostUI {
 		$final_posts = array();
 
 		$args = array(
-			'post_type' => (array) $other_post_type,
+			'post_type'          => (array) $other_post_type,
 			'relationship_query' => array(
-				'name' => $this->relationship->name,
+				'name'            => $this->relationship->name,
 				'related_to_post' => $post->ID,
 			),
 		);
@@ -33,6 +33,16 @@ class PostToPost extends PostUI {
 			$args['orderby'] = 'relationship';
 		}
 
+		/**
+		 * Filters the Post UI query args.
+		 *
+		 * @since  1.6.0
+		 * @param  array    $args The \WP_Query args.
+		 * @param  \WP_Post $post The post object.
+		 * @return array
+		 */
+		$args = apply_filters( 'tenup_content_connect_post_ui_query_args', $args, $post );
+
 		$query = new \WP_Query( $args );
 
 		if ( $query->have_posts() ) {
@@ -40,7 +50,7 @@ class PostToPost extends PostUI {
 				$post = $query->next_post();
 
 				$final_post = array(
-					'ID' => $post->ID,
+					'ID'   => $post->ID,
 					'name' => $post->post_title,
 				);
 
