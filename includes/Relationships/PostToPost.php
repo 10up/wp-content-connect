@@ -16,7 +16,7 @@ class PostToPost extends Relationship {
 	/**
 	 * CPT Name of the second post type in the relationship
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $to;
 
