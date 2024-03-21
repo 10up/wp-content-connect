@@ -12,6 +12,11 @@ class MetaBox {
 	}
 
 	public function add_meta_boxes( $post_type, $post ) {
+
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+		
 		// If we have any relationships to show on this page, their data will be injected here by filters
 		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
