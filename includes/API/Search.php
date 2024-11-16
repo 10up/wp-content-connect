@@ -32,7 +32,7 @@ class Search {
 	public function check_permission( $request ) {
 		$user = wp_get_current_user();
 
-		if ( $user->ID === 0 ) {
+		if ( 0 === $user->ID ) {
 			return false;
 		}
 
@@ -56,15 +56,15 @@ class Search {
 	public function process_search( $request ) {
 		$object_type = $request->get_param( 'object_type' );
 
-		if ( ! in_array( $object_type, array( 'post', 'user' ) ) ) {
+		if ( ! in_array( $object_type, array( 'post', 'user' ), true ) ) {
 			return array();
 		}
 
 		$final_post_types = array();
-		if ( $object_type === 'post' ) {
+		if ( 'post' === $object_type ) {
 			$post_types = $request->get_param( 'post_type' );
 
-			foreach( (array) $post_types as $post_type ) {
+			foreach ( (array) $post_types as $post_type ) {
 				if ( post_type_exists( $post_type ) ) {
 					$final_post_types[] = $post_type;
 				}
@@ -83,7 +83,7 @@ class Search {
 			'current_post_id'   => intval( $request->get_param( 'current_post_id' ) ),
 		);
 
-		switch( $object_type ) {
+		switch ( $object_type ) {
 			case 'user':
 				$results = $this->search_users( $search_text, $search_args );
 				break;
@@ -123,13 +123,13 @@ class Search {
 		$results = array(
 			'prev_pages' => false,
 			'more_pages' => false,
-			'data' => array(),
+			'data'       => array(),
 		);
 
 		// Normalize Formatting
-		foreach( $query->get_results() as $user ) {
+		foreach ( $query->get_results() as $user ) {
 			$results['data'][] = array(
-				'ID' => $user->ID,
+				'ID'   => $user->ID,
 				'name' => $user->display_name,
 			);
 		}
@@ -165,16 +165,16 @@ class Search {
 		$results = array(
 			'prev_pages' => ( $args['paged'] > 1 ),
 			'more_pages' => ( $args['paged'] < $query->max_num_pages ),
-			'data' => array(),
+			'data'       => array(),
 		);
 
 		// Normalize Formatting
 		if ( $query->have_posts() ) {
-			while( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
 				$post = $query->next_post();
 
 				$results['data'][] = array(
-					'ID' => $post->ID,
+					'ID'   => $post->ID,
 					'name' => $post->post_title,
 				);
 			}
@@ -182,5 +182,4 @@ class Search {
 
 		return $results;
 	}
-
 }
