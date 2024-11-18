@@ -2,6 +2,7 @@
 
 namespace TenUp\ContentConnect;
 
+use TenUp\ContentConnect\API\Relationships;
 use TenUp\ContentConnect\API\Search;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
@@ -73,7 +74,7 @@ class Plugin {
 	}
 
 	public function __construct() {
-		$this->url = plugin_dir_url( dirname( __FILE__ ) );
+		$this->url     = plugin_dir_url( __DIR__ );
 		$this->version = '1.0.0';
 	}
 
@@ -104,11 +105,17 @@ class Plugin {
 		$this->meta_box = new MetaBox();
 		$this->meta_box->setup();
 
-		$this->search = new Search();
-		$this->search->setup();
-
 		$this->deleted_items = new DeletedItems();
 		$this->deleted_items->setup();
+
+		$routes = array(
+			new Relationships(),
+			new Search(),
+		);
+
+		foreach ( $routes as $route ) {
+			$route->setup();
+		}
 
 		add_action( 'init', array( $this, 'wp_init' ), 100 );
 	}
@@ -124,5 +131,4 @@ class Plugin {
 		$this->tables['p2u'] = new PostToUser();
 		$this->tables['p2u']->setup();
 	}
-
 }
