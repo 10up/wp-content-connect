@@ -13,22 +13,6 @@ use TenUp\ContentConnect\UI\MetaBox;
 
 class Plugin {
 
-	private static $instance;
-
-	/**
-	 * URL to the Plugin
-	 *
-	 * @var string
-	 */
-	public $url;
-
-	/**
-	 * Current plugin version
-	 *
-	 * @var string
-	 */
-	public $version;
-
 	/**
 	 * @var array
 	 */
@@ -64,18 +48,24 @@ class Plugin {
 	 */
 	public $deleted_items;
 
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var Plugin
+	 */
+	private static $instance;
+
+	/**
+	 * Get class instance.
+	 *
+	 * @return Plugin
+	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 			self::$instance->setup();
 		}
-
 		return self::$instance;
-	}
-
-	public function __construct() {
-		$this->url     = plugin_dir_url( __DIR__ );
-		$this->version = '1.0.0';
 	}
 
 	public function get_registry() {
