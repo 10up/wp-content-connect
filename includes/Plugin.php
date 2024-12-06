@@ -107,18 +107,87 @@ class Plugin {
 			$route->setup();
 		}
 
-		add_action( 'init', array( $this, 'wp_init' ), 100 );
+		add_action( 'init', array( $this, 'init' ), 100 );
+		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 	}
 
-	public function wp_init() {
-		do_action( 'tenup-content-connect-init', $this->registry );
+	/**
+	 * Initializes the plugin and fires an action other plugins can hook into.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		do_action( 'tenup-content-connect-init', $this->registry ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	}
 
+	/**
+	 * Register the REST API fields for the plugin.
+	 *
+	 * @return void
+	 */
+	public function rest_api_init() {
+		$post_types = get_post_types( array( 'public' => true ) );
+
+		foreach ( $post_types as $post_type ) {
+
+			register_rest_field(
+				$post_type,
+				'relationships',
+				array(
+					'get_callback'    => array( $this, 'get_post_relationships' ),
+					'update_callback' => null,
+					'schema'          => array(
+						'description' => __( 'Lists all relationships associated with this post.', 'tenup-content-connect' ),
+						'type'        => 'array',
+						'context'     => array( 'view', 'edit' ),
+					),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Register the tables for the plugin.
+	 *
+	 * @return void
+	 */
 	public function register_tables() {
 		$this->tables['p2p'] = new PostToPost();
 		$this->tables['p2p']->setup();
 
 		$this->tables['p2u'] = new PostToUser();
 		$this->tables['p2u']->setup();
+	}
+
+	/**
+	 * Get post relationships.
+	 *
+	 * REST API callback for the 'relationships' field.
+	 *
+	 * @param  array $post_data Raw post data from the REST API request.
+	 * @return array
+	 */
+	public function get_post_relationships( $post_data ) {
+
+		if ( empty( $post_data['id'] ) ) {
+			return array();
+		}
+
+		$post = get_post( $post_data['id'] );
+
+		if ( ! $post ) {
+			return array();
+		}
+
+		/**
+		 * Filter the relationship data for a post.
+		 *
+		 * @param  array    $relationships Empty array by default.
+		 * @param  \WP_Post $post          The post object.
+		 * @return array
+		 */
+		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
+
+		return $relationships;
 	}
 }
