@@ -16,8 +16,14 @@ class MetaBox {
 		if ( ! $post instanceof \WP_Post ) {
 			return;
 		}
-		
-		// If we have any relationships to show on this page, their data will be injected here by filters
+
+		/**
+		 * Filter the relationship data for a post.
+		 *
+		 * @param  array    $relationships Empty array by default.
+		 * @param  \WP_Post $post          The post object.
+		 * @return array
+		 */
 		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
