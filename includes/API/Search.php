@@ -2,6 +2,8 @@
 
 namespace TenUp\ContentConnect\API;
 
+use TenUp\ContentConnect\Plugin;
+
 class Search {
 
 	public function setup() {
@@ -10,11 +12,15 @@ class Search {
 	}
 
 	public function register_endpoint() {
-		register_rest_route( 'content-connect/v1', '/search', array(
-			'methods' => 'POST',
-			'callback' => array( $this, 'process_search' ),
-			'permission_callback' => array( $this, 'check_permission' ),
-		) );
+		register_rest_route(
+			'content-connect/v1',
+			'/search',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'process_search' ),
+				'permission_callback' => array( $this, 'check_permission' ),
+			)
+		);
 	}
 
 	public function localize_endpoints( $data ) {
@@ -32,7 +38,7 @@ class Search {
 	public function check_permission( $request ) {
 		$user = wp_get_current_user();
 
-		if ( $user->ID === 0 ) {
+		if ( 0 === $user->ID ) {
 			return false;
 		}
 
@@ -56,15 +62,15 @@ class Search {
 	public function process_search( $request ) {
 		$object_type = $request->get_param( 'object_type' );
 
-		if ( ! in_array( $object_type, array( 'post', 'user' ) ) ) {
+		if ( ! in_array( $object_type, array( 'post', 'user' ), true ) ) {
 			return array();
 		}
 
 		$final_post_types = array();
-		if ( $object_type === 'post' ) {
+		if ( 'post' === $object_type ) {
 			$post_types = $request->get_param( 'post_type' );
 
-			foreach( (array) $post_types as $post_type ) {
+			foreach ( (array) $post_types as $post_type ) {
 				if ( post_type_exists( $post_type ) ) {
 					$final_post_types[] = $post_type;
 				}
@@ -83,7 +89,7 @@ class Search {
 			'current_post_id'   => intval( $request->get_param( 'current_post_id' ) ),
 		);
 
-		switch( $object_type ) {
+		switch ( $object_type ) {
 			case 'user':
 				$results = $this->search_users( $search_text, $search_args );
 				break;
@@ -102,6 +108,16 @@ class Search {
 		);
 
 		$args = wp_parse_args( $args, $defaults );
+
+		$current_post_type = get_post_type( $args['current_post_id'] );
+		$registry          = Plugin::instance()->get_registry();
+		$relationship      = $registry->get_post_to_user_relationship_by_key(
+			sprintf(
+				'%s_user_%s',
+				$current_post_type,
+				$args['relationship_name']
+			)
+		);
 
 		$query_args = array(
 			'search' => "*{$search_text}*",
@@ -123,15 +139,18 @@ class Search {
 		$results = array(
 			'prev_pages' => false,
 			'more_pages' => false,
-			'data' => array(),
+			'data'       => array(),
 		);
 
 		// Normalize Formatting
-		foreach( $query->get_results() as $user ) {
-			$results['data'][] = array(
-				'ID' => $user->ID,
+		foreach ( $query->get_results() as $user ) {
+
+			$final_user = array(
+				'ID'   => $user->ID,
 				'name' => $user->display_name,
 			);
+
+			$results['data'][] = apply_filters( 'tenup_content_connect_final_user', $final_user, $relationship );
 		}
 
 		return $results;
@@ -144,6 +163,9 @@ class Search {
 		);
 
 		$args = wp_parse_args( $args, $defaults );
+
+		$registry          = Plugin::instance()->get_registry();
+		$current_post_type = get_post_type( $args['current_post_id'] );
 
 		$query_args = array(
 			'post_type' => $post_types,
@@ -165,22 +187,32 @@ class Search {
 		$results = array(
 			'prev_pages' => ( $args['paged'] > 1 ),
 			'more_pages' => ( $args['paged'] < $query->max_num_pages ),
-			'data' => array(),
+			'data'       => array(),
 		);
 
 		// Normalize Formatting
 		if ( $query->have_posts() ) {
-			while( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
 				$post = $query->next_post();
 
-				$results['data'][] = array(
-					'ID' => $post->ID,
+				$final_post = array(
+					'ID'   => $post->ID,
 					'name' => $post->post_title,
 				);
+
+				$relationship = $registry->get_post_to_post_relationship_by_key(
+					sprintf(
+						'%s_%s_%s',
+						$current_post_type,
+						$post->post_type,
+						$args['relationship_name']
+					)
+				);
+
+				$results['data'][] = apply_filters( 'tenup_content_connect_final_post', $final_post, $relationship );
 			}
 		}
 
 		return $results;
 	}
-
 }
