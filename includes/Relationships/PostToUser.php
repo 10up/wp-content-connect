@@ -27,7 +27,7 @@ class PostToUser extends Relationship {
 
 		$this->post_type = $post_type;
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$post_type}-user";
-		
+
 		parent::__construct( $name, $args );
 	}
 

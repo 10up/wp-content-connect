@@ -59,6 +59,12 @@ class Registry {
 		return true;
 	}
 
+	/**
+	 * Returns the post relationship object for the key provided.
+	 *
+	 * @param  string $key Relationship key.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
+	 */
 	public function get_post_to_post_relationship_by_key( $key ) {
 		if ( isset( $this->post_post_relationships[ $key ] ) ) {
 			return $this->post_post_relationships[ $key ];
@@ -141,6 +147,12 @@ class Registry {
 		return true;
 	}
 
+	/**
+	 * Returns the user relationship object for the key provided.
+	 *
+	 * @param  string $key Relationship key.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
+	 */
 	public function get_post_to_user_relationship_by_key( $key ) {
 		if ( isset( $this->post_user_relationships[ $key ] ) ) {
 			return $this->post_user_relationships[ $key ];
@@ -183,5 +195,4 @@ class Registry {
 
 		return $this->post_user_relationships[ $key ];
 	}
-
 }
