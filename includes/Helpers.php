@@ -5,12 +5,21 @@ namespace TenUp\ContentConnect\Helpers;
 use TenUp\ContentConnect\Plugin;
 
 /**
- * Returns the instance of the relationship registry
+ * Returns the instance of the plugin.
+ *
+ * @return \TenUp\ContentConnect\Plugin
+ */
+function get_plugin() {
+	return Plugin::instance();
+}
+
+/**
+ * Returns the instance of the relationship registry.
  *
  * @return \TenUp\ContentConnect\Registry
  */
 function get_registry() {
-	return Plugin::instance()->registry;
+	return get_plugin()->get_registry();
 }
 
 /**
@@ -25,7 +34,7 @@ function get_registry() {
  */
 function get_related_ids_by_name( $post_id, $relationship_name ) {
 
-	$table = Plugin::instance()->get_table( 'p2p' );
+	$table = get_plugin()->get_table( 'p2p' );
 
 	if ( empty( $table ) ) {
 		return array();
