@@ -26,6 +26,11 @@ class Registry {
 	protected $post_user_relationships = array();
 
 	/**
+	 * Setup the registry.
+	 */
+	public function setup() {}
+
+	/**
 	 * Gets a key that uniquely identifies a relationship between two entities.
 	 *
 	 * @param string $from Post type.
