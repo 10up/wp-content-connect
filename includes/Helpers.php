@@ -7,6 +7,8 @@ use TenUp\ContentConnect\Plugin;
 /**
  * Returns the instance of the plugin.
  *
+ * @since 1.7.0
+ *
  * @return \TenUp\ContentConnect\Plugin
  */
 function get_plugin() {
@@ -62,6 +64,8 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 /**
  * Gets post to post relationships by a given field.
  *
+ * @since 1.7.0
+ *
  * @param  string $field The field to query against. Accepts 'key', 'post_type', 'from', or 'to'.
  *                       'key' will return a single relationship by key.
  *                       'post_type' will return all relationships for a given post type.
@@ -111,6 +115,8 @@ function get_post_to_post_relationships_by( $field, $value ) {
 /**
  * Gets post to users relationships by a given field.
  *
+ * @since 1.7.0
+ *
  * @param  string $field The field to query against. Accepts 'key', or 'post_type'.
  * 'key' will return a single relationship by key.
  * 'post_type' will return all relationships for a given post type.
@@ -147,6 +153,8 @@ function get_post_to_user_relationships_by( $field, $value ) {
 
 /**
  * Get post relationship data.
+ *
+ * @since 1.7.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
  * @param  string       $other_post_type Optional. The post type to get relationships for.
