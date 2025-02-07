@@ -7,26 +7,48 @@ use TenUp\ContentConnect\Relationships\PostToUser;
 use TenUp\ContentConnect\Relationships\Relationship;
 
 /**
- * Creates and Tracks any relationships between post types
+ * Creates and tracks any relationships between post types and users.
  */
 class Registry {
 
+	/**
+	 * Array of all post to post relationships.
+	 *
+	 * @var array
+	 */
 	protected $post_post_relationships = array();
 
+	/**
+	 * Array of all post to user relationships.
+	 *
+	 * @var array
+	 */
 	protected $post_user_relationships = array();
 
+	/**
+	 * Setup the registry.
+	 */
 	public function setup() {}
 
 	/**
-	 * Gets a key that uniquely identifies a relationship between two CPTs
+	 * Gets all post to post relationships.
 	 *
-	 * @param string $from
-	 * @param string $to
-	 * @param string $name
+	 * @return array
+	 */
+	public function get_post_to_post_relationships() {
+		return $this->post_post_relationships;
+	}
+
+	/**
+	 * Gets a key that uniquely identifies a relationship between two entities.
 	 *
+	 * @param string $from Post type.
+	 * @param string $to   Post type or user.
+	 * @param string $name Relationship name.
 	 * @return string
 	 */
 	public function get_relationship_key( $from, $to, $name ) {
+
 		$from = (array) $from;
 		sort( $from );
 		$from = implode( '.', $from );
@@ -39,14 +61,13 @@ class Registry {
 	}
 
 	/**
-	 * Checks if a relationship exists between two post types.
+	 * Checks if a post to post relationship exists.
 	 *
-	 * Order of post type doesn't matter when checking if the relationship already exists.
+	 * The order of CPT arguments does not matter.
 	 *
-	 * @param string $cpt1
-	 * @param string $cpt2
-	 * @param string $name
-	 *
+	 * @param string $cpt1 First post type.
+	 * @param string $cpt2 Second post type.
+	 * @param string $name Relationship name.
 	 * @return bool
 	 */
 	public function post_to_post_relationship_exists( $cpt1, $cpt2, $name ) {
@@ -59,6 +80,12 @@ class Registry {
 		return true;
 	}
 
+	/**
+	 * Returns the post to post relationship object by key.
+	 *
+	 * @param string $key Relationship key.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
+	 */
 	public function get_post_to_post_relationship_by_key( $key ) {
 		if ( isset( $this->post_post_relationships[ $key ] ) ) {
 			return $this->post_post_relationships[ $key ];
@@ -68,27 +95,29 @@ class Registry {
 	}
 
 	/**
-	 * Returns the relationship object for the post types provided. Order of CPT args is unimportant.
+	 * Returns the post to post relationship object for the post types provided.
 	 *
-	 * @param string $cpt1
-	 * @param string $cpt2
-	 * @param string $name
+	 * The order of CPT arguments does not matter.
 	 *
-	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false
+	 * @param string $cpt1 First post type.
+	 * @param string $cpt2 Second post type.
+	 * @param string $name Relationship name.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
 	 */
 	public function get_post_to_post_relationship( $cpt1, $cpt2, $name ) {
 		$key = $this->get_relationship_key( $cpt1, $cpt2, $name );
 
 		$relationship = $this->get_post_to_post_relationship_by_key( $key );
 
-		if ( $relationship ) {
+		if ( $relationship instanceof Relationship ) {
 			return $relationship;
 		}
 
-		// Try the inverse, only if "cpt2" isn't an array
+		// Try the inverse, only if "cpt2" isn't an array.
 		if ( is_array( $cpt2 ) ) {
 			return false;
 		}
+
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $name );
 
 		$relationship = $this->get_post_to_post_relationship_by_key( $key );
@@ -97,20 +126,22 @@ class Registry {
 	}
 
 	/**
-	 * Defines a new many to many relationship between two post types
+	 * Defines a new many to many relationship between two post types.
 	 *
-	 * @param string $from
-	 * @param string $to
-	 * @param string $name
+	 * @param string       $from First post type in the relationship.
+	 * @param string|array $to   Second post type(s) in the relationship.
+	 * @param string       $name Relationship name.
+	 * @param array        Array of options for the relationship.
 	 *
 	 * @throws \Exception
 	 *
 	 * @return Relationship
 	 */
 	public function define_post_to_post( $from, $to, $name, $args = array() ) {
+
 		if ( $this->post_to_post_relationship_exists( $from, $to, $name ) ) {
 			$to = implode( ', ', (array) $to );
-			throw new \Exception( "A relationship already exists between {$from} and {$to} with name {$name}" );
+			throw new \Exception( esc_html( "A relationship already exists between {$from} and {$to} with name {$name}" ) );
 		}
 
 		$key = $this->get_relationship_key( $from, $to, $name );
@@ -118,17 +149,25 @@ class Registry {
 		$this->post_post_relationships[ $key ] = new PostToPost( $from, $to, $name, $args );
 		$this->post_post_relationships[ $key ]->setup();
 
-		return $this->post_post_relationships[ $key ];
+		$relationship = $this->post_post_relationships[ $key ];
+
+		return $relationship;
 	}
 
-	/* POST TO USER RELATIONSHIPS */
+	/**
+	 * Gets all post to user relationships.
+	 *
+	 * @return array
+	 */
+	public function get_post_to_user_relationships() {
+		return $this->post_user_relationships;
+	}
 
 	/**
-	 * Checks if a relationship exists between a post type and users
+	 * Checks if a post to user relationship exists.
 	 *
-	 * @param string $post_type
-	 * @param string $name
-	 *
+	 * @param string $post_type Post type.
+	 * @param string $name      Relationship name.
 	 * @return bool
 	 */
 	public function post_to_user_relationship_exists( $post_type, $name ) {
@@ -141,6 +180,12 @@ class Registry {
 		return true;
 	}
 
+	/**
+	 * Returns the post to user relationship object by key.
+	 *
+	 * @param string $key Relationship key.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
+	 */
 	public function get_post_to_user_relationship_by_key( $key ) {
 		if ( isset( $this->post_user_relationships[ $key ] ) ) {
 			return $this->post_user_relationships[ $key ];
@@ -150,30 +195,35 @@ class Registry {
 	}
 
 	/**
-	 * Returns the relationship object between users and the post type provided.
+	 * Returns the post to user relationship object for the post type provided.
 	 *
-	 * @param string $post_type
-	 * @param string $name
+	 * @param string $post_type Post type.
+	 * @param string $name      Relationship name.
+	 * @return @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
 	 */
 	public function get_post_to_user_relationship( $post_type, $name ) {
 		$key = $this->get_relationship_key( $post_type, 'user', $name );
 
-		return $this->get_post_to_user_relationship_by_key( $key );
+		$relationship = $this->get_post_to_user_relationship_by_key( $key );
+
+		return $relationship;
 	}
 
 	/**
-	 * Defines a new many to many relationship between users and a post type
+	 * Defines a new many to many relationship between users and a post type.
 	 *
-	 * @param string $post_type
-	 * @param string $name
-	 * @param array $args
+	 * @param string $post_type The post type to be related to users.
+	 * @param string $name      Relationship name.
+	 * @param array  $args      Array of options for the relationship.
 	 *
-	 * @return mixed
 	 * @throws \Exception
+
+	 * @return Relationship
 	 */
 	public function define_post_to_user( $post_type, $name, $args = array() ) {
+
 		if ( $this->post_to_user_relationship_exists( $post_type, $name ) ) {
-			throw new \Exception( "A relationship already exists between users and post type {$post_type} named {$name}" );
+			throw new \Exception( esc_html( "A relationship already exists between users and post type {$post_type} named {$name}" ) );
 		}
 
 		$key = $this->get_relationship_key( $post_type, 'user', $name );
@@ -181,7 +231,8 @@ class Registry {
 		$this->post_user_relationships[ $key ] = new PostToUser( $post_type, $name, $args );
 		$this->post_user_relationships[ $key ]->setup();
 
-		return $this->post_user_relationships[ $key ];
-	}
+		$relationship = $this->post_user_relationships[ $key ];
 
+		return $relationship;
+	}
 }
