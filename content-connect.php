@@ -5,7 +5,7 @@
  * Description:       WordPress library that enables direct relationships for posts to posts and posts to users.
  * Version:           1.6.0
  * Requires at least: 6.5
- * Requires PHP:      8.0
+ * Requires PHP:      7.4
  * Author:            Chris Marslender, 10up
  * Author URI:        https://10up.com
  * License:           GPL-3.0
