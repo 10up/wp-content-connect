@@ -129,7 +129,7 @@ class Registry {
 	 * Defines a new many to many relationship between two post types.
 	 *
 	 * @param string       $from First post type in the relationship.
-	 * @param string|array $to   Second post type(s) in the relationship
+	 * @param string|array $to   Second post type(s) in the relationship.
 	 * @param string       $name Relationship name.
 	 * @param array        Array of options for the relationship.
 	 *
@@ -210,7 +210,7 @@ class Registry {
 	}
 
 	/**
-	 * Defines a new many to many relationship between users and a post type
+	 * Defines a new many to many relationship between users and a post type.
 	 *
 	 * @param string $post_type The post type to be related to users.
 	 * @param string $name      Relationship name.
