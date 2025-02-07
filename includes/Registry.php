@@ -31,6 +31,15 @@ class Registry {
 	public function setup() {}
 
 	/**
+	 * Gets all post to post relationships.
+	 *
+	 * @return array
+	 */
+	public function get_post_to_post_relationships() {
+		return $this->post_post_relationships;
+	}
+
+	/**
 	 * Gets a key that uniquely identifies a relationship between two entities.
 	 *
 	 * @param string $from Post type.
@@ -143,6 +152,15 @@ class Registry {
 		$relationship = $this->post_post_relationships[ $key ];
 
 		return $relationship;
+	}
+
+	/**
+	 * Gets all post to user relationships.
+	 *
+	 * @return array
+	 */
+	public function get_post_to_user_relationships() {
+		return $this->post_user_relationships;
 	}
 
 	/**
