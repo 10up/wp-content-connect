@@ -1,6 +1,8 @@
 <?php
 
-namespace TenUp\ContentConnect\API;
+namespace TenUp\ContentConnect\API\V2;
+
+use TenUp\ContentConnect\API\Route;
 
 class Relationships extends Route {
 

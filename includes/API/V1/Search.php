@@ -1,8 +1,16 @@
 <?php
 
-namespace TenUp\ContentConnect\API;
+namespace TenUp\ContentConnect\API\V1;
+
+use TenUp\ContentConnect\API\Route;
+use TenUp\ContentConnect\Plugin;
 
 class Search extends Route {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $namespace = 'content-connect/v1';
 
 	/**
 	 * {@inheritDoc}
