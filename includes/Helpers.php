@@ -72,7 +72,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  *                       'from' will return all relationships where the 'from' post type matches the value.
  *                       'to' will return all relationships where the 'to' post type matches the value.
  * @param  string $value The field value.
- * @return array
+ * @return Relationship|array
  */
 function get_post_to_post_relationships_by( $field, $value ) {
 
@@ -121,7 +121,7 @@ function get_post_to_post_relationships_by( $field, $value ) {
  * 'key' will return a single relationship by key.
  * 'post_type' will return all relationships for a given post type.
  * @param  string $value The field value.
- * @return array
+ * @return Relationship|array
  */
 function get_post_to_user_relationships_by( $field, $value ) {
 
