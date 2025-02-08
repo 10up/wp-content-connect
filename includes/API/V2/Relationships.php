@@ -4,6 +4,8 @@ namespace TenUp\ContentConnect\API\V2;
 
 use TenUp\ContentConnect\API\Route;
 
+use function TenUp\ContentConnect\Helpers\get_registry;
+
 class Relationships extends Route {
 
 	/**
@@ -114,12 +116,12 @@ class Relationships extends Route {
 			return $object;
 		}
 
-		$name           = $request->get_param( 'name' );
-		$relation       = $request->get_param( 'relation' );
-		$paged          = $request->get_param( 'page' );
-		$status         = $request->get_param( 'post_status' );
-		$paged          = $request->get_param( 'page' );
-		$posts_per_page = $request->get_param( 'per_page' );
+		$relationship_name = $request->get_param( 'name' );
+		$relation          = $request->get_param( 'relation' );
+		$paged             = $request->get_param( 'page' );
+		$status            = $request->get_param( 'post_status' );
+		$paged             = $request->get_param( 'page' );
+		$posts_per_page    = $request->get_param( 'per_page' );
 
 		$relationship_query = array(
 			'relation' => $relation,
@@ -128,13 +130,13 @@ class Relationships extends Route {
 		switch ( $type ) {
 			case 'post-to-post':
 				$relationship_query[] = array(
-					'name'            => $name,
+					'name'            => $relationship_name,
 					'related_to_post' => $object->ID,
 				);
 				break;
 			case 'post-to-user':
 				$relationship_query[] = array(
-					'name'            => $name,
+					'name'            => $relationship_name,
 					'related_to_user' => $object->ID,
 				);
 				break;
@@ -229,7 +231,32 @@ class Relationships extends Route {
 			return $object;
 		}
 
-		// @todo validate the relationship name.
+		$relationship_name = $request->get_param( 'name' );
+
+		$relationships = array();
+		if ( 'post-to-user' === $type ) {
+			$relationships = get_registry()->get_post_to_user_relationships();
+		} else {
+			$relationships = get_registry()->get_post_to_post_relationships();
+		}
+
+		if ( empty( $relationships ) ) {
+			return new \WP_Error(
+				'rest_relationship_not_found',
+				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$relationship_names = wp_list_pluck( $relationships, 'name' );
+
+		if ( ! in_array( $relationship_name, $relationship_names, true ) ) {
+			return new \WP_Error(
+				'rest_relationship_not_found',
+				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
+				array( 'status' => 404 )
+			);
+		}
 
 		return true;
 	}
