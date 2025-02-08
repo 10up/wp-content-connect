@@ -10,6 +10,8 @@ use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\MetaBox;
 
+use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
+
 class Plugin {
 
 	/**
@@ -179,14 +181,7 @@ class Plugin {
 			return array();
 		}
 
-		/**
-		 * Filter the relationship data for a post.
-		 *
-		 * @param  array    $relationships Empty array by default.
-		 * @param  \WP_Post $post          The post object.
-		 * @return array
-		 */
-		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
+		$relationships = get_post_relationship_data( $post );
 
 		return $relationships;
 	}
