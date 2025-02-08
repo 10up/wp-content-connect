@@ -120,6 +120,16 @@ class Search extends Route {
 
 		$args = wp_parse_args( $args, $defaults );
 
+		$current_post_type = get_post_type( $args['current_post_id'] );
+		$registry          = Plugin::instance()->get_registry();
+		$relationship      = $registry->get_post_to_user_relationship_by_key(
+			sprintf(
+				'%s_user_%s',
+				$current_post_type,
+				$args['relationship_name']
+			)
+		);
+
 		$query_args = array(
 			'search' => "*{$search_text}*",
 			'paged'  => $args['paged'],
@@ -145,10 +155,13 @@ class Search extends Route {
 
 		// Normalize Formatting
 		foreach ( $query->get_results() as $user ) {
-			$results['data'][] = array(
+
+			$final_user = array(
 				'ID'   => $user->ID,
 				'name' => $user->display_name,
 			);
+
+			$results['data'][] = apply_filters( 'tenup_content_connect_final_user', $final_user, $relationship );
 		}
 
 		return $results;
@@ -161,6 +174,9 @@ class Search extends Route {
 		);
 
 		$args = wp_parse_args( $args, $defaults );
+
+		$registry          = Plugin::instance()->get_registry();
+		$current_post_type = get_post_type( $args['current_post_id'] );
 
 		$query_args = array(
 			'post_type' => $post_types,
@@ -190,10 +206,21 @@ class Search extends Route {
 			while ( $query->have_posts() ) {
 				$post = $query->next_post();
 
-				$results['data'][] = array(
+				$final_post = array(
 					'ID'   => $post->ID,
 					'name' => $post->post_title,
 				);
+
+				$relationship = $registry->get_post_to_post_relationship_by_key(
+					sprintf(
+						'%s_%s_%s',
+						$current_post_type,
+						$post->post_type,
+						$args['relationship_name']
+					)
+				);
+
+				$results['data'][] = apply_filters( 'tenup_content_connect_final_post', $final_post, $relationship );
 			}
 		}
 
