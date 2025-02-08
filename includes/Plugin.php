@@ -100,6 +100,7 @@ class Plugin {
 		$routes = array(
 			new API\V1\Search(),
 			new API\V2\Relationships(),
+			new API\V2\Search(),
 		);
 
 		foreach ( $routes as $route ) {
