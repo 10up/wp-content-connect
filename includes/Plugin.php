@@ -2,8 +2,7 @@
 
 namespace TenUp\ContentConnect;
 
-use TenUp\ContentConnect\API\Relationships;
-use TenUp\ContentConnect\API\Search;
+use TenUp\ContentConnect\API;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -99,8 +98,8 @@ class Plugin {
 		$this->deleted_items->setup();
 
 		$routes = array(
-			new Relationships(),
-			new Search(),
+			new API\V1\Search(),
+			new API\V2\Relationships(),
 		);
 
 		foreach ( $routes as $route ) {

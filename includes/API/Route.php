@@ -9,7 +9,7 @@ abstract class Route {
 	 *
 	 * @var string
 	 */
-	protected $namespace = 'content-connect/v1';
+	protected $namespace = 'content-connect/v2';
 
 	/**
 	 * Route base.
