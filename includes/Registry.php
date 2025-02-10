@@ -12,14 +12,14 @@ use TenUp\ContentConnect\Relationships\Relationship;
 class Registry {
 
 	/**
-	 * Array of all post to post relationships.
+	 * Array of all post-to-post relationships.
 	 *
 	 * @var array
 	 */
 	protected $post_post_relationships = array();
 
 	/**
-	 * Array of all post to user relationships.
+	 * Array of all post-to-user relationships.
 	 *
 	 * @var array
 	 */
@@ -31,7 +31,7 @@ class Registry {
 	public function setup() {}
 
 	/**
-	 * Gets all post to post relationships.
+	 * Gets all post-to-post relationships.
 	 *
 	 * @return array
 	 */
@@ -61,7 +61,7 @@ class Registry {
 	}
 
 	/**
-	 * Checks if a post to post relationship exists.
+	 * Checks if a post-to-post relationship exists.
 	 *
 	 * The order of CPT arguments does not matter.
 	 *
@@ -81,7 +81,7 @@ class Registry {
 	}
 
 	/**
-	 * Returns the post to post relationship object by key.
+	 * Returns the post-to-post relationship object by key.
 	 *
 	 * @param string $key Relationship key.
 	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
@@ -95,7 +95,7 @@ class Registry {
 	}
 
 	/**
-	 * Returns the post to post relationship object for the post types provided.
+	 * Returns the post-to-post relationship object for the post types provided.
 	 *
 	 * The order of CPT arguments does not matter.
 	 *
@@ -131,9 +131,9 @@ class Registry {
 	 * @param string       $from First post type in the relationship.
 	 * @param string|array $to   Second post type(s) in the relationship.
 	 * @param string       $name Relationship name.
-	 * @param array        Array of options for the relationship.
+	 * @param array        $args Optional. Array of options for the relationship.
 	 *
-	 * @throws \Exception
+	 * @throws \Exception If a relationship already exists between the two post types with the same name.
 	 *
 	 * @return Relationship
 	 */
@@ -155,7 +155,7 @@ class Registry {
 	}
 
 	/**
-	 * Gets all post to user relationships.
+	 * Gets all post-to-user relationships.
 	 *
 	 * @return array
 	 */
@@ -164,7 +164,7 @@ class Registry {
 	}
 
 	/**
-	 * Checks if a post to user relationship exists.
+	 * Checks if a post-to-user relationship exists.
 	 *
 	 * @param string $post_type Post type.
 	 * @param string $name      Relationship name.
@@ -181,7 +181,7 @@ class Registry {
 	}
 
 	/**
-	 * Returns the post to user relationship object by key.
+	 * Returns the post-to-user relationship object by key.
 	 *
 	 * @param string $key Relationship key.
 	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
@@ -195,7 +195,7 @@ class Registry {
 	}
 
 	/**
-	 * Returns the post to user relationship object for the post type provided.
+	 * Returns the post-to-user relationship object for the post type provided.
 	 *
 	 * @param string $post_type Post type.
 	 * @param string $name      Relationship name.
@@ -214,9 +214,9 @@ class Registry {
 	 *
 	 * @param string $post_type The post type to be related to users.
 	 * @param string $name      Relationship name.
-	 * @param array  $args      Array of options for the relationship.
+	 * @param array  $args      Optional. Array of options for the relationship.
 	 *
-	 * @throws \Exception
+	 * @throws \Exception If a relationship already exists between users and the post type with the same name.
 
 	 * @return Relationship
 	 */
