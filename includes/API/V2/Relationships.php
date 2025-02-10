@@ -31,6 +31,14 @@ class Relationships extends Route {
 						'required'          => true,
 						'minLength'         => 1,
 					),
+					'reltype'   => array(
+						'description'       => __( 'The relationship type to filter relatioships by.', 'tenup-content-connect' ),
+						'type'              => 'string',
+						'default'           => 'all',
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => 'rest_validate_request_arg',
+						'enum'              => array( 'all', 'post-to-post', 'post-to-user' ),
+					),
 					'post_type' => array(
 						'description'       => __( 'The post type to filter relationships by.', 'tenup-content-connect' ),
 						'type'              => 'string',
@@ -62,9 +70,10 @@ class Relationships extends Route {
 			return $object;
 		}
 
+		$reltype   = $request->get_param( 'reltype' );
 		$post_type = $request->get_param( 'post_type' );
 
-		$relationships = get_post_relationship_data( $object, $post_type );
+		$relationships = get_post_relationship_data( $object, $reltype, $post_type );
 		$response      = rest_ensure_response( $relationships );
 
 		return $response;
