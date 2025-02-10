@@ -159,13 +159,13 @@ function get_post_to_user_relationships_by( $field, $value ) {
  * @since 1.7.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
- * @param  string       $reltype         Optional. The relationship type.
+ * @param  string       $reltype         Optional. The relationship type. Accepts 'all', 'post-to-post', or 'post-to-user'.
  * @param  string       $other_post_type Optional. The post type to filter relationships by.
  *                                       If provided, only relationships to this post type will be returned.
  *                                       If not provided (or false), all relationships for the post will be returned.
  * @return array An array of relationship data.
  */
-function get_post_relationship_data( $post, $reltype = '', $other_post_type = false ) {
+function get_post_relationship_data( $post, $reltype = 'all', $other_post_type = false ) {
 
 	$post = get_post( $post );
 
@@ -179,6 +179,10 @@ function get_post_relationship_data( $post, $reltype = '', $other_post_type = fa
 
 	if ( 'post-to-post' === $reltype ) {
 		return get_post_to_post_relationships_data( $post, $other_post_type );
+	}
+
+	if ( 'all' !== $reltype ) {
+		return array();
 	}
 
 	$relationship_data = array_merge(
