@@ -23,13 +23,20 @@ class Relationships extends Route {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
 				'args' => array(
-					'id' => array(
+					'id'        => array(
 						'description'       => __( 'The post ID.', 'tenup-content-connect' ),
 						'type'              => 'integer',
 						'sanitize_callback' => 'absint',
 						'validate_callback' => 'rest_validate_request_arg',
 						'required'          => true,
 						'minLength'         => 1,
+					),
+					'post_type' => array(
+						'description'       => __( 'The post type to filter relationships by.', 'tenup-content-connect' ),
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => 'rest_validate_request_arg',
 					),
 				),
 				array(
@@ -55,7 +62,9 @@ class Relationships extends Route {
 			return $object;
 		}
 
-		$relationships = get_post_relationship_data( $object );
+		$post_type = $request->get_param( 'post_type' );
+
+		$relationships = get_post_relationship_data( $object, $post_type );
 		$response      = rest_ensure_response( $relationships );
 
 		return $response;
@@ -73,6 +82,21 @@ class Relationships extends Route {
 
 		if ( is_wp_error( $object ) ) {
 			return $object;
+		}
+
+		$post_type = $request->get_param( 'post_type' );
+
+		if ( ! empty( $post_type ) ) {
+
+			$post_types = get_post_types();
+
+			if ( ! in_array( $post_type, $post_types, true ) ) {
+				return new \WP_Error(
+					'rest_invalid_post_type',
+					__( 'Invalid post type.', 'tenup-content-connect' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 
 		return true;
