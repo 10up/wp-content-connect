@@ -62,17 +62,17 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 }
 
 /**
- * Gets post to post relationships by a given field.
+ * Retrieves post-to-post relationships based on a specified field.
  *
  * @since 1.7.0
  *
  * @param  string $field The field to query against. Accepts 'key', 'post_type', 'from', or 'to'.
- *                       'key' will return a single relationship by key.
- *                       'post_type' will return all relationships for a given post type.
- *                       'from' will return all relationships where the 'from' post type matches the value.
- *                       'to' will return all relationships where the 'to' post type matches the value.
- * @param  string $value The field value.
- * @return array
+ *                       - 'key': Returns a single relationship by its unique key.
+ *                       - 'post_type': Returns all relationships involving the specified post type.
+ *                       - 'from': Returns all relationships originating from the specified post type.
+ *                       - 'to': Returns all relationships targeting the specified post type.
+ * @param  string $value The value to match against the specified field.
+ * @return Relationship|array A single Relationship object if 'key' is used and found, otherwise an array of Relationship objects.
  */
 function get_post_to_post_relationships_by( $field, $value ) {
 
@@ -113,15 +113,15 @@ function get_post_to_post_relationships_by( $field, $value ) {
 }
 
 /**
- * Gets post to users relationships by a given field.
+ * Retrieves post-to-user relationships based on a specified field.
  *
  * @since 1.7.0
  *
- * @param  string $field The field to query against. Accepts 'key', or 'post_type'.
- * 'key' will return a single relationship by key.
- * 'post_type' will return all relationships for a given post type.
- * @param  string $value The field value.
- * @return array
+ * @param  string $field The field to query against. Accepts 'key' or 'post_type'.
+ *                       - 'key': Returns a single relationship by its unique key.
+ *                       - 'post_type': Returns all relationships involving the specified post type.
+ * @param  string $value The value to match against the specified field.
+ * @return Relationship|array A single Relationship object if 'key' is used and found, otherwise an array of Relationship objects.
  */
 function get_post_to_user_relationships_by( $field, $value ) {
 
@@ -154,12 +154,15 @@ function get_post_to_user_relationships_by( $field, $value ) {
 /**
  * Get post relationship data.
  *
+ * Retrieves relationship data for a given post, optionally filtered by a specific post type.
+ *
  * @since 1.7.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
- * @param  string       $other_post_type Optional. The post type to get relationships for.
- *                                       If not provided, all relationships for the post will be returned.
- * @return array
+ * @param  string       $other_post_type Optional. The post type to filter relationships by.
+ *                                       If provided, only relationships to this post type will be returned.
+ *                                       If not provided (or false), all relationships for the post will be returned.
+ * @return array An array of relationship data.
  */
 function get_post_relationship_data( $post, $other_post_type = false ) {
 
