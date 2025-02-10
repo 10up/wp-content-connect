@@ -131,9 +131,9 @@ class Registry {
 	 * @param string       $from First post type in the relationship.
 	 * @param string|array $to   Second post type(s) in the relationship.
 	 * @param string       $name Relationship name.
-	 * @param array        Array of options for the relationship.
+	 * @param array        $args Optional. Array of options for the relationship.
 	 *
-	 * @throws \Exception
+	 * @throws \Exception If a relationship already exists between the two post types with the same name.
 	 *
 	 * @return Relationship
 	 */
@@ -214,9 +214,9 @@ class Registry {
 	 *
 	 * @param string $post_type The post type to be related to users.
 	 * @param string $name      Relationship name.
-	 * @param array  $args      Array of options for the relationship.
+	 * @param array  $args      Optional. Array of options for the relationship.
 	 *
-	 * @throws \Exception
+	 * @throws \Exception If a relationship already exists between users and the post type with the same name.
 
 	 * @return Relationship
 	 */
