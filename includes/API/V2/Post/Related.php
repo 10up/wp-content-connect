@@ -2,6 +2,8 @@
 
 namespace TenUp\ContentConnect\API\V2\Post;
 
+use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_by;
+use function TenUp\ContentConnect\Helpers\get_post_to_user_relationships_by;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
 class Related extends PostRoute {
@@ -317,6 +319,16 @@ class Related extends PostRoute {
 
 		$items = $query->get_posts();
 
+		if ( empty( $items ) ) {
+			return array(
+				'items' => array(),
+				'total' => 0,
+			);
+		}
+
+		$relationship = get_post_to_post_relationships_by( 'to', $post_type );
+		$relationship = reset( $relationship );
+
 		$prepared_items = array();
 		foreach ( $items as $item ) {
 
@@ -326,7 +338,7 @@ class Related extends PostRoute {
 			);
 
 			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $item );
+			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $item, $relationship );
 
 			$prepared_items[] = $item_data;
 		}
@@ -383,6 +395,16 @@ class Related extends PostRoute {
 
 		$items = $query->get_results();
 
+		if ( empty( $items ) ) {
+			return array(
+				'items' => array(),
+				'total' => 0,
+			);
+		}
+
+		$relationship = get_post_to_user_relationships_by( 'post_type', $post->post_type );
+		$relationship = reset( $relationship );
+
 		$prepared_items = array();
 		foreach ( $items as $item ) {
 
@@ -400,7 +422,7 @@ class Related extends PostRoute {
 			);
 
 			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_user_ui_item_data', $item_data, $item );
+			$item_data = apply_filters( 'tenup_content_connect_user_ui_item_data', $item_data, $item, $relationship );
 
 			$prepared_items[] = $item_data;
 		}
