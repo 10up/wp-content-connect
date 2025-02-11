@@ -365,7 +365,7 @@
 			deleteItem( item ) {
 				// In case the removed is also in search results, update the "added" indicator
 				for ( let i in this.searchResults ) {
-					if ( this.searchResults[ i ].id === item.id ) {
+					if ( this.searchResults[ i ].ID === item.ID ) {
 						this.searchResults[ i ].added = false;
 						break;
 					}
