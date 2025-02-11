@@ -20,7 +20,7 @@ or directly in `composer.json`:
 
 ```
   "require": {
-    "10up/wp-content-connect": "^1.5.0"
+    "10up/wp-content-connect": "^1.6.0"
   }
 ```
 
@@ -39,11 +39,11 @@ Alternatively, if you prefer to have composer install it as a plugin, you may re
       "package": {
         "name": "10up/wp-content-connect",
         "type": "wordpress-plugin",
-        "version": "1.5.0",
+        "version": "1.6.0",
         "source": {
           "url": "https://github.com/10up/wp-content-connect.git",
           "type": "git",
-          "reference": "1.5.0"
+          "reference": "1.6.0"
         }
       }
     }
@@ -113,7 +113,7 @@ function my_define_relationships( $registry ) {
         ),
     );
 
-    $relationship = $registry->define_post_to_post( 'car', 'tire', 'car-tires', $args );    
+    $relationship = $registry->define_post_to_post( 'car', 'tire', 'car-tires', $args );
 }
 add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 
@@ -155,8 +155,8 @@ function my_define_relationships( $registry ) {
             ),
         ),
     )
-    
-    $relationship = $registry->define_post_to_user( 'post', 'related', $args );   
+
+    $relationship = $registry->define_post_to_user( 'post', 'related', $args );
 }
 add_action( 'tenup-content-connect-init', 'my_define_relationships' );
 ```
@@ -255,8 +255,8 @@ Returns the relationship object between the two post types with the provided nam
 
 #### Parameters:
 
-`$cpt1` (String) The first post type in the relationship 
- 
+`$cpt1` (String) The first post type in the relationship
+
 `$cpt2` (String) The second post type in the relationship
 
 `$name` (String) The name of the relationship, as passed to define_post_to_post_relationship
@@ -275,7 +275,7 @@ Returns the relationship object between the post types and users with the provid
 
 #### Parameters:
 
-`$post_type` (String) The post type in the post to user relationship 
+`$post_type` (String) The post type in the post to user relationship
 
 `$name` (String) The name of the relationship, as passed to define_post_to_user_relationship
 
@@ -305,7 +305,7 @@ $relationship->add_relationship( 1, 2 ); // Adds a relationship between post ID 
 ```
 
 ### `PostToPost->delete_relationship( $pid1, $pid2 )`
-This methods deletes a relationship between one post and another, in a post to post relationship. When calling this method, the order of IDs passed is not important. 
+This methods deletes a relationship between one post and another, in a post to post relationship. When calling this method, the order of IDs passed is not important.
 
 #### Parameters:
 
@@ -317,7 +317,7 @@ This methods deletes a relationship between one post and another, in a post to p
 ```php
 // $relationship is the return value from ->define_post_to_post()
 // Note that the example above added these in the reverse order, but the relationship is still deleted
-$relationship->delete_relationship( 2, 1 ); // Deletes the relationship between post ID 1 and post ID 2. 
+$relationship->delete_relationship( 2, 1 ); // Deletes the relationship between post ID 1 and post ID 2.
 ```
 
 ### `PostToPost->replace_relationships( $post_id, $related_ids )`
@@ -357,7 +357,7 @@ $relationship->save_sort_data( 5, array( 7, 6, 3, 8, 2 ) );
 ```
 
 ### `PostToUser->add_relationship( $post_id, $user_id )`
-This method adds a relationship between a post and a user, in a post to user relationship. 
+This method adds a relationship between a post and a user, in a post to user relationship.
 
 #### Parameters:
 
@@ -372,7 +372,7 @@ This method adds a relationship between a post and a user, in a post to user rel
 $relationship->add_relationship( 1, 5 ); // Adds a relationship between post 1 and user 5
 ```
 
-### `PostToUser->delete_relationship( $post_id, $user_id )` 
+### `PostToUser->delete_relationship( $post_id, $user_id )`
 This method deletes a relationship between a post and a user, in a post to user relationship.
 
 #### Parameters:
@@ -442,7 +442,7 @@ Post ID has 5 users that need to be stored in the following order: 2, 4, 1, 6, 3
 $relationship->save_post_to_user_sort_data( 5, array( 2, 4, 1, 6, 3 ) );
 ```
 
-### `PostToUser->save_user_to_post_sort_data( $user_id, $ordered_post_ids )` 
+### `PostToUser->save_user_to_post_sort_data( $user_id, $ordered_post_ids )`
 For a relationship with sorting enabled, this saves the order of posts for a particular user
 
 #### Parameters:
