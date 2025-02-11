@@ -159,13 +159,13 @@ function get_post_to_user_relationships_by( $field, $value ) {
  * @since 1.7.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
- * @param  string       $reltype         Optional. The relationship type. Accepts 'all', 'post-to-post', or 'post-to-user'.
+ * @param  string       $rel_type        Optional. The relationship type. Accepts 'any', 'post-to-post', or 'post-to-user'.
  * @param  string       $other_post_type Optional. The post type to filter relationships by.
  *                                       If provided, only relationships to this post type will be returned.
  *                                       If not provided (or false), all relationships for the post will be returned.
  * @return array An array of relationship data.
  */
-function get_post_relationship_data( $post, $reltype = 'all', $other_post_type = false ) {
+function get_post_relationship_data( $post, $rel_type = 'any', $other_post_type = false ) {
 
 	$post = get_post( $post );
 
@@ -173,16 +173,20 @@ function get_post_relationship_data( $post, $reltype = 'all', $other_post_type =
 		return array();
 	}
 
-	if ( 'post-to-user' === $reltype ) {
+	if ( 'post-to-user' === $rel_type ) {
 		return get_post_to_user_relationships_data( $post );
 	}
 
-	if ( 'post-to-post' === $reltype ) {
+	if ( 'post-to-post' === $rel_type ) {
 		return get_post_to_post_relationships_data( $post, $other_post_type );
 	}
 
-	if ( 'all' !== $reltype ) {
+	if ( 'any' !== $rel_type ) {
 		return array();
+	}
+
+	if ( ! empty( $other_post_type ) ) {
+		return get_post_to_post_relationships_data( $post, $other_post_type );
 	}
 
 	$relationship_data = array_merge(
@@ -255,25 +259,24 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false ) 
 		$related_posts = array();
 		foreach ( $queried_posts as $queried_post ) {
 
-			$post_data = array(
+			$item_data = array(
 				'ID'   => $queried_post->ID,
 				'name' => $queried_post->post_title,
 			);
 
 			/** This filter is documented in includes/UI/MetaBox.php */
-			$post_data = apply_filters( 'tenup_content_connect_final_post', $post_data, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 			/**
-			 * Filters the Post UI post data.
+			 * Filters the Post UI item data.
 			 *
 			 * @since 1.7.0
-			 * @param array        $post_data The post data.
-			 * @param \WP_Post     $post      The post object.
-			 * @param Relationship $relationship The relationship object.
+			 * @param array    $item_data The item data.
+			 * @param \WP_Post $post      The post object.
 			 */
-			$post_data = apply_filters( 'tenup_content_connect_post_ui_post_data', $post_data, $queried_post, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $queried_post );
 
-			$related_posts[] = $post_data;
+			$related_posts[] = $item_data;
 		}
 
 		$relid = $registry->get_relationship_key( $relationship->from, $relationship->to, $relationship->name );
@@ -345,25 +348,24 @@ function get_post_to_user_relationships_data( $post ) {
 		$related_users = array();
 		foreach ( $queried_users as $queried_user ) {
 
-			$user_data = array(
+			$item_data = array(
 				'ID'   => $queried_user->ID,
 				'name' => $queried_user->display_name,
 			);
 
 			/** This filter is documented in includes/UI/MetaBox.php */
-			$user_data = apply_filters( 'tenup_content_connect_final_user', $user_data, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 			/**
-			 * Filters the Post UI user data.
+			 * Filters the Post UI item data.
 			 *
 			 * @since 1.7.0
-			 * @param array        $user_data The user data.
-			 * @param \WP_Post     $user      The user object.
-			 * @param Relationship $relationship The relationship object.
+			 * @param array    $item_data The item data.
+			 * @param \WP_Post $user      The user object.
 			 */
-			$user_data = apply_filters( 'tenup_content_connect_post_ui_user_data', $user_data, $queried_user, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $queried_user );
 
-			$related_users[] = $user_data;
+			$related_users[] = $item_data;
 		}
 
 		$relid = $registry->get_relationship_key( $relationship->post_type, 'user', $relationship->name );

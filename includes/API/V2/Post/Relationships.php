@@ -1,17 +1,10 @@
 <?php
 
-namespace TenUp\ContentConnect\API\V2;
-
-use TenUp\ContentConnect\API\Route;
+namespace TenUp\ContentConnect\API\V2\Post;
 
 use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
 
-class Relationships extends Route {
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected $rest_base = 'relationships';
+class Relationships extends PostRoute {
 
 	/**
 	 * {@inheritDoc}
@@ -20,7 +13,7 @@ class Relationships extends Route {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/relationships',
 			array(
 				'args' => array(
 					'id'        => array(
@@ -31,13 +24,13 @@ class Relationships extends Route {
 						'required'          => true,
 						'minLength'         => 1,
 					),
-					'reltype'   => array(
+					'rel_type'  => array(
 						'description'       => __( 'The relationship type to filter relatioships by.', 'tenup-content-connect' ),
 						'type'              => 'string',
-						'default'           => 'all',
+						'default'           => 'any',
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => 'rest_validate_request_arg',
-						'enum'              => array( 'all', 'post-to-post', 'post-to-user' ),
+						'enum'              => array( 'any', 'post-to-post', 'post-to-user' ),
 					),
 					'post_type' => array(
 						'description'       => __( 'The post type to filter relationships by.', 'tenup-content-connect' ),
@@ -62,18 +55,18 @@ class Relationships extends Route {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
+	public function get_items( \WP_REST_Request $request ) {
 
-		$object = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
 
-		if ( is_wp_error( $object ) ) {
-			return $object;
+		if ( is_wp_error( $post ) ) {
+			return $post;
 		}
 
-		$reltype   = $request->get_param( 'reltype' );
+		$rel_type  = $request->get_param( 'rel_type' );
 		$post_type = $request->get_param( 'post_type' );
 
-		$relationships = get_post_relationship_data( $object, $reltype, $post_type );
+		$relationships = get_post_relationship_data( $post, $rel_type, $post_type );
 		$response      = rest_ensure_response( $relationships );
 
 		return $response;
@@ -83,14 +76,22 @@ class Relationships extends Route {
 	 * Checks if a given request has access to retrieve relationships for a post.
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has read access for the item, WP_Error object or false otherwise.
+	 * @return bool|WP_Error True if the request has read access, WP_Error object or false otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		$object = $this->get_post( $request['id'] );
+		if ( ! is_user_logged_in() ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'Sorry, you are not allowed to view relationships for this post.', 'tenup-content-connect' ),
+				array( 'status' => 401 )
+			);
+		}
 
-		if ( is_wp_error( $object ) ) {
-			return $object;
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
 		}
 
 		$post_type = $request->get_param( 'post_type' );
