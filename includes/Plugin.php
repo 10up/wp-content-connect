@@ -74,7 +74,7 @@ class Plugin {
 
 	public function __construct() {
 		$this->url = plugin_dir_url( dirname( __FILE__ ) );
-		$this->version = '1.0.0';
+		$this->version = '1.6.0';
 	}
 
 	public function get_registry() {
