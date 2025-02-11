@@ -6,7 +6,7 @@ use TenUp\ContentConnect\Plugin;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 
-class RelationshipQuery{
+class RelationshipQuery {
 
 	/**
 	 * The raw args from the relationship query passed to WP_Query
