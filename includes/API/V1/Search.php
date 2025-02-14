@@ -2,40 +2,21 @@
 
 namespace TenUp\ContentConnect\API\V1;
 
-use TenUp\ContentConnect\API\Route;
 use TenUp\ContentConnect\Plugin;
 
-class Search extends Route {
+class Search {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected $namespace = 'content-connect/v1';
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected $rest_base = 'search';
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public function setup() {
-		parent::setup();
-
+		add_action( 'rest_api_init', array( $this, 'register_endpoint' ) );
 		add_filter( 'tenup_content_connect_localize_data', array( $this, 'localize_endpoints' ) );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register_routes() {
-
+	public function register_endpoint() {
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
+			'content-connect/v1',
+			'/search',
 			array(
-				'methods'             => \WP_REST_Server::CREATABLE,
+				'methods'             => 'POST',
 				'callback'            => array( $this, 'process_search' ),
 				'permission_callback' => array( $this, 'check_permission' ),
 			)

@@ -1,10 +1,17 @@
 <?php
 
-namespace TenUp\ContentConnect\API\V2\Post;
+namespace TenUp\ContentConnect\API\V2\Post\Route;
 
 use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
 
-class Relationships extends PostRoute {
+/**
+ * Class Relationships
+ *
+ * REST API endpoint for post relationships.
+ *
+ * @package TenUp\ContentConnect\API\V2\Post
+ */
+class Relationships extends AbstractPostRoute {
 
 	/**
 	 * {@inheritDoc}

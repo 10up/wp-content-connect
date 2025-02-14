@@ -1,8 +1,15 @@
 <?php
 
-namespace TenUp\ContentConnect\API;
+namespace TenUp\ContentConnect\API\V2;
 
-abstract class Route {
+/**
+ * Abstract class for REST API routes.
+ *
+ * This class provides a common setup method for registering REST API routes.
+ *
+ * @package TenUp\ContentConnect\API\V2
+ */
+abstract class AbstractRoute {
 
 	/**
 	 * Endpoint namespace.
