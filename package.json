@@ -1,7 +1,15 @@
 {
   "name": "wp-content-connect",
   "version": "1.6.0",
-  "description": "Post to Post and Post to User Library for WordPress",
+  "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
+  "homepage": "https://github.com/10up/wp-content-connect",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "10up",
+    "email": "opensource@10up.com",
+    "url": "https://10up.com",
+    "role": "developer"
+  },
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -11,8 +19,6 @@
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
   },
-  "author": "Chris Marslender <chris.marslender@10up.com>",
-  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-plugin-transform-runtime": "^6.23.0",
