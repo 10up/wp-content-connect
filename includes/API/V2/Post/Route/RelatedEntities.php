@@ -1,12 +1,19 @@
 <?php
 
-namespace TenUp\ContentConnect\API\V2\Post;
+namespace TenUp\ContentConnect\API\V2\Post\Route;
 
 use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_by;
 use function TenUp\ContentConnect\Helpers\get_post_to_user_relationships_by;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
-class Related extends PostRoute {
+/**
+ * Class RelatedEntities
+ *
+ * REST API endpoint for post related entities (posts or users).
+ *
+ * @package TenUp\ContentConnect\API\V2\Post
+ */
+class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * {@inheritDoc}

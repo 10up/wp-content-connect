@@ -101,9 +101,9 @@ class Plugin {
 
 		$routes = array(
 			new API\V1\Search(),
-			new API\V2\Post\Relationships(),
-			new API\V2\Post\Related(),
-			new API\V2\Search(),
+			new API\V2\Post\Field\Relationships(),
+			new API\V2\Post\Route\Relationships(),
+			new API\V2\Post\Route\RelatedEntities(),
 		);
 
 		foreach ( $routes as $route ) {
@@ -111,7 +111,6 @@ class Plugin {
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );
-		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 	}
 
 	/**
@@ -121,32 +120,6 @@ class Plugin {
 	 */
 	public function init() {
 		do_action( 'tenup-content-connect-init', $this->registry ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-	}
-
-	/**
-	 * Register the REST API fields for the plugin.
-	 *
-	 * @return void
-	 */
-	public function rest_api_init() {
-		$post_types = get_post_types( array( 'public' => true ) );
-
-		foreach ( $post_types as $post_type ) {
-
-			register_rest_field(
-				$post_type,
-				'relationships',
-				array(
-					'get_callback'    => array( $this, 'get_post_relationships' ),
-					'update_callback' => null,
-					'schema'          => array(
-						'description' => __( 'Lists all relationships associated with this post.', 'tenup-content-connect' ),
-						'type'        => 'array',
-						'context'     => array( 'view', 'edit' ),
-					),
-				)
-			);
-		}
 	}
 
 	/**
@@ -160,30 +133,5 @@ class Plugin {
 
 		$this->tables['p2u'] = new PostToUser();
 		$this->tables['p2u']->setup();
-	}
-
-	/**
-	 * Get post relationships.
-	 *
-	 * REST API callback for the 'relationships' field.
-	 *
-	 * @param  array $post_data Raw post data from the REST API request.
-	 * @return array
-	 */
-	public function get_post_relationships( $post_data ) {
-
-		if ( empty( $post_data['id'] ) ) {
-			return array();
-		}
-
-		$post = get_post( $post_data['id'] );
-
-		if ( ! $post ) {
-			return array();
-		}
-
-		$relationships = get_post_relationship_data( $post );
-
-		return $relationships;
 	}
 }
