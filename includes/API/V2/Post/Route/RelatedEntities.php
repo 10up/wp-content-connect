@@ -42,6 +42,14 @@ class RelatedEntities extends AbstractPostRoute {
 						'required'          => true,
 						'minLength'         => 1,
 					),
+					'rel_key'   => array(
+						'description'       => __( 'The relationship key.', 'tenup-content-connect' ),
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => 'rest_validate_request_arg',
+						'required'          => true,
+						'minLength'         => 1,
+					),
 					'rel_type'  => array(
 						'description'       => __( 'The relationship type.', 'tenup-content-connect' ),
 						'type'              => 'string',
@@ -49,14 +57,6 @@ class RelatedEntities extends AbstractPostRoute {
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => 'rest_validate_request_arg',
 						'enum'              => array( 'post-to-post', 'post-to-user' ),
-					),
-					'rel_name'  => array(
-						'description'       => __( 'The relationship name.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-						'required'          => true,
-						'minLength'         => 1,
 					),
 					'post_type' => array(
 						'description'       => __( 'The type of post to query for.', 'tenup-content-connect' ),
@@ -495,15 +495,14 @@ class RelatedEntities extends AbstractPostRoute {
 			return $post;
 		}
 
-		$registry  = get_registry();
-		$rel_type  = $request->get_param( 'rel_type' );
-		$rel_name  = $request->get_param( 'rel_name' );
-		$post_type = $request->get_param( 'post_type' );
+		$registry = get_registry();
+		$rel_key  = $request->get_param( 'rel_key' );
+		$rel_type = $request->get_param( 'rel_type' );
 
 		if ( 'post-to-user' === $rel_type ) {
-			$this->relationship = $registry->get_post_to_user_relationship( $post->post_type, $rel_name );
+			$this->relationship = $registry->get_post_to_user_relationship_by_key( $rel_key );
 		} else {
-			$this->relationship = $registry->get_post_to_post_relationship( $post->post_type, $post_type, $rel_name );
+			$this->relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
 		}
 
 		if ( empty( $this->relationship ) ) {
@@ -528,7 +527,6 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	protected function get_related_posts( \WP_Post $post, \WP_REST_Request $request ) {
 
-		$rel_name    = $request->get_param( 'rel_name' );
 		$post_type   = $request->get_param( 'post_type' );
 		$post_status = $request->get_param( 'post_status' );
 		$page        = (int) $request->get_param( 'page' );
@@ -543,7 +541,7 @@ class RelatedEntities extends AbstractPostRoute {
 			'posts_per_page'     => $per_page,
 			'relationship_query' => array(
 				array(
-					'name'            => $rel_name,
+					'name'            => $this->relationship->name,
 					'related_to_post' => $post->ID,
 				),
 			),
@@ -595,7 +593,6 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	protected function get_related_users( \WP_Post $post, \WP_REST_Request $request ) {
 
-		$rel_name = $request->get_param( 'rel_name' );
 		$page     = (int) $request->get_param( 'page' );
 		$per_page = (int) $request->get_param( 'per_page' );
 		$order    = $request->get_param( 'order' );
@@ -606,7 +603,7 @@ class RelatedEntities extends AbstractPostRoute {
 			'number'             => $per_page,
 			'relationship_query' => array(
 				array(
-					'name'            => $rel_name,
+					'name'            => $this->relationship->name,
 					'related_to_post' => $post->ID,
 				),
 			),
