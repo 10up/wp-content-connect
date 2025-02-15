@@ -246,26 +246,24 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$rel_type = $request->get_param( 'rel_type' );
 
-		$sortable = $this->relationship->from_sortable;
-
 		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
 			$this->relationship->replace_post_to_user_relationships( $post->ID, $related_ids );
 
-			if ( $sortable ) {
+			if ( $this->relationship->from_sortable ) {
 				$this->relationship->save_post_to_user_sort_data( $post->ID, $related_ids );
 			}
 
-			$items          = $this->relationship->get_related_user_ids( $post->ID, $sortable );
+			$items          = $this->relationship->get_related_user_ids( $post->ID, $this->relationship->from_sortable );
 			$prepared_items = $this->prepare_user_items( $items, $this->relationship );
 		} else {
 			$this->relationship->replace_relationships( $post->ID, $related_ids );
 
-			if ( $sortable ) {
+			if ( $this->relationship->from_sortable ) {
 				$this->relationship->save_sort_data( $post->ID, $related_ids );
 			}
 
-			$items          = $this->relationship->get_related_object_ids( $post->ID, $sortable );
+			$items          = $this->relationship->get_related_object_ids( $post->ID, $this->relationship->from_sortable );
 			$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 		}
 
@@ -438,7 +436,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$prepared_items = $this->prepare_user_items( $items, $this->relationship );
+		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 
 		$total_items = $query->found_posts;
 
