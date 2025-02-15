@@ -17,6 +17,8 @@ class Relationships extends AbstractField {
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 1.7.0
 	 */
 	public function register_fields() {
 		$post_types = get_post_types( array( 'public' => true ) );
@@ -41,6 +43,8 @@ class Relationships extends AbstractField {
 
 	/**
 	 * Retrieves a collection of relationships for a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  array $post_data Raw post data from the REST API request.
 	 * @return array

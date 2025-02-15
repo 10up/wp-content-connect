@@ -15,6 +15,8 @@ class Relationships extends AbstractPostRoute {
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 1.7.0
 	 */
 	public function register_routes() {
 
@@ -24,7 +26,7 @@ class Relationships extends AbstractPostRoute {
 			array(
 				'args' => array(
 					'id'        => array(
-						'description'       => __( 'The post ID.', 'tenup-content-connect' ),
+						'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
 						'type'              => 'integer',
 						'sanitize_callback' => 'absint',
 						'validate_callback' => 'rest_validate_request_arg',
@@ -59,6 +61,8 @@ class Relationships extends AbstractPostRoute {
 	/**
 	 * Retrieves a collection of relationships for a post.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
 	 */
@@ -81,6 +85,8 @@ class Relationships extends AbstractPostRoute {
 
 	/**
 	 * Checks if a given request has access to retrieve relationships for a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.

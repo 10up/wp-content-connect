@@ -16,12 +16,16 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * The relationship object.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @var \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser
 	 */
 	protected $relationship = null;
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 1.7.0
 	 */
 	public function register_routes() {
 
@@ -31,7 +35,7 @@ class RelatedEntities extends AbstractPostRoute {
 			array(
 				'args' => array(
 					'id'        => array(
-						'description'       => __( 'The post ID.', 'tenup-content-connect' ),
+						'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
 						'type'              => 'integer',
 						'sanitize_callback' => 'absint',
 						'validate_callback' => 'rest_validate_request_arg',
@@ -124,6 +128,8 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Retrieves a collection of related entities for a post.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
 	 */
@@ -191,6 +197,8 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to retrieve related entities for a post.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
@@ -209,6 +217,8 @@ class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * Updates related entities for a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
@@ -236,12 +246,9 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$rel_type = $request->get_param( 'rel_type' );
 
-		$data = array(
-			'related_ids' => array(),
-		);
-
 		$sortable = $this->relationship->from_sortable;
 
+		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
 			$this->relationship->replace_post_to_user_relationships( $post->ID, $related_ids );
 
@@ -249,7 +256,8 @@ class RelatedEntities extends AbstractPostRoute {
 				$this->relationship->save_post_to_user_sort_data( $post->ID, $related_ids );
 			}
 
-			$data['related_ids'] = $this->relationship->get_related_user_ids( $post->ID, $sortable );
+			$items          = $this->relationship->get_related_user_ids( $post->ID, $sortable );
+			$prepared_items = $this->prepare_user_items( $items, $this->relationship );
 		} else {
 			$this->relationship->replace_relationships( $post->ID, $related_ids );
 
@@ -257,16 +265,19 @@ class RelatedEntities extends AbstractPostRoute {
 				$this->relationship->save_sort_data( $post->ID, $related_ids );
 			}
 
-			$data['related_ids'] = $this->relationship->get_related_object_ids( $post->ID, $sortable );
+			$items          = $this->relationship->get_related_object_ids( $post->ID, $sortable );
+			$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 		}
 
-		$response = rest_ensure_response( $data );
+		$response = rest_ensure_response( $prepared_items );
 
 		return $response;
 	}
 
 	/**
 	 * Checks if a given request has access to update related entities for a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -294,6 +305,8 @@ class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * Performs a permissions check for managing related entities for a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -331,6 +344,8 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Validate the `post_type` request parameter.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @param mixed            $value   The value of the 'post_type' request parameter.
 	 * @param \WP_REST_Request $request The request object.
 	 * @return bool|\WP_Error True if valid, WP_Error otherwise.
@@ -359,6 +374,8 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Validate the `orderby` request parameter.
 	 *
+	 * @since 1.7.0
+	 *
 	 * @param mixed            $value   The value of the 'orderby' request parameter.
 	 * @param \WP_REST_Request $request The request object.
 	 * @return array
@@ -375,6 +392,8 @@ class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * Get posts related to a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
@@ -419,19 +438,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$prepared_items = array();
-		foreach ( $items as $item ) {
-
-			$item_data = array(
-				'ID'   => $item->ID,
-				'name' => $item->post_title,
-			);
-
-			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $item, $this->relationship );
-
-			$prepared_items[] = $item_data;
-		}
+		$prepared_items = $this->prepare_user_items( $items, $this->relationship );
 
 		$total_items = $query->found_posts;
 
@@ -452,6 +459,8 @@ class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * Get users related to a post.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
@@ -492,27 +501,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$prepared_items = array();
-		foreach ( $items as $item ) {
-
-			$item_name = $item->display_name;
-
-			if ( empty( $item_name ) ) {
-				$item_name = array( $item->first_name, $item->last_name );
-				$item_name = array_filter( $item_name );
-				$item_name = implode( ' ', $item_name );
-			}
-
-			$item_data = array(
-				'ID'   => $item->ID,
-				'name' => $item_name,
-			);
-
-			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_user_ui_item_data', $item_data, $item, $this->relationship );
-
-			$prepared_items[] = $item_data;
-		}
+		$prepared_items = $this->prepare_user_items( $items, $this->relationship );
 
 		$total_items = $query->get_total();
 
