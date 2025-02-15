@@ -13,6 +13,8 @@ abstract class AbstractField {
 
 	/**
 	 * Setup actions and filters.
+	 *
+	 * @since 1.7.0
 	 */
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'register_fields' ) );
@@ -20,6 +22,8 @@ abstract class AbstractField {
 
 	/**
 	 * Registers the REST API fields.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @return void
 	 */
