@@ -11,6 +11,8 @@
  * License:           GPL-3.0-or-later
  * License URI:       https://spdx.org/licenses/GPL-3.0-or-later.html
  * Update URI:        https://github.com/10up/wp-content-connect
+ *
+ * @package           TenUp\ContentConnect
  */
 
 define( 'CONTENT_CONNECT_VERSION', '1.7.0' );

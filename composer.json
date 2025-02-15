@@ -14,10 +14,6 @@
         {
             "name": "Chris Marslender",
             "email": "chris.marslender@10up.com"
-        },
-        {
-            "name": "10up",
-            "email": "info@10up.com"
         }
     ],
     "minimum-stability": "dev",
