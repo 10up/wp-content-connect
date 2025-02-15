@@ -117,9 +117,47 @@ class RelatedEntities extends AbstractPostRoute {
 					),
 				),
 				array(
-					'methods'             => \WP_REST_Server::EDITABLE,
+					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'update_items' ),
 					'permission_callback' => array( $this, 'update_items_permissions_check' ),
+					'args'                => array(
+						'related_ids' => array(
+							'description'       => __( 'List of related IDs.', 'tenup-content-connect' ),
+							'type'              => 'array',
+							'default'           => array(),
+							'sanitize_callback' => 'wp_parse_id_list',
+							'validate_callback' => 'rest_validate_request_arg',
+							'items'             => array(
+								'type' => 'integer',
+							),
+						),
+					),
+				),
+				array(
+					'methods'             => 'PUT',
+					'callback'            => array( $this, 'add_item' ),
+					'permission_callback' => array( $this, 'add_item_permissions_check' ),
+					'args'                => array(
+						'related_id' => array(
+							'description'       => __( 'The related ID.', 'tenup-content-connect' ),
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+							'validate_callback' => 'rest_validate_request_arg',
+						),
+					),
+				),
+				array(
+					'methods'             => \WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'related_id' => array(
+							'description'       => __( 'The related ID.', 'tenup-content-connect' ),
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+							'validate_callback' => 'rest_validate_request_arg',
+						),
+					),
 				),
 			),
 		);
@@ -143,16 +181,16 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$rel_type = $request->get_param( 'rel_type' );
 
-		$result = array();
+		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
-			$result = $this->get_users( $post, $request );
+			$prepared_items = $this->get_related_users( $post, $request );
 		} else {
-			$result = $this->get_posts( $post, $request );
+			$prepared_items = $this->get_related_posts( $post, $request );
 		}
 
 		$page     = (int) $request->get_param( 'page' );
 		$per_page = (int) $request->get_param( 'per_page' );
-		$total    = $result['total'];
+		$total    = $prepared_items['total'];
 
 		$max_pages = (int) ceil( $total / (int) $per_page );
 
@@ -164,7 +202,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$response = rest_ensure_response( $result['items'] );
+		$response = rest_ensure_response( $prepared_items['items'] );
 
 		$response->header( 'X-WP-Total', (int) $total );
 		$response->header( 'X-WP-TotalPages', (int) $max_pages );
@@ -241,30 +279,13 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$related_ids = array_map( 'absint', $related_ids );
-		$related_ids = array_unique( $related_ids );
-
 		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
-			$this->relationship->replace_post_to_user_relationships( $post->ID, $related_ids );
-
-			if ( $this->relationship->from_sortable ) {
-				$this->relationship->save_post_to_user_sort_data( $post->ID, $related_ids );
-			}
-
-			$items          = $this->relationship->get_related_user_ids( $post->ID, $this->relationship->from_sortable );
-			$prepared_items = $this->prepare_user_items( $items, $this->relationship );
+			$prepared_items = $this->update_related_users( $post, $request );
 		} else {
-			$this->relationship->replace_relationships( $post->ID, $related_ids );
-
-			if ( $this->relationship->from_sortable ) {
-				$this->relationship->save_sort_data( $post->ID, $related_ids );
-			}
-
-			$items          = $this->relationship->get_related_object_ids( $post->ID, $this->relationship->from_sortable );
-			$prepared_items = $this->prepare_post_items( $items, $this->relationship );
+			$prepared_items = $this->update_related_posts( $post, $request );
 		}
 
 		$response = rest_ensure_response( $prepared_items );
@@ -302,14 +323,14 @@ class RelatedEntities extends AbstractPostRoute {
 	}
 
 	/**
-	 * Performs a permissions check for managing related entities for a post.
+	 * Adds a related entity for a post.
 	 *
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function permissions_check( $request ) {
+	public function add_item( $request ) {
 
 		$post = $this->get_post( $request['id'] );
 
@@ -317,26 +338,96 @@ class RelatedEntities extends AbstractPostRoute {
 			return $post;
 		}
 
-		$registry  = get_registry();
-		$rel_type  = $request->get_param( 'rel_type' );
-		$rel_name  = $request->get_param( 'rel_name' );
-		$post_type = $request->get_param( 'post_type' );
+		$related_id = $request->get_param( 'related_id' );
 
-		if ( 'post-to-user' === $rel_type ) {
-			$this->relationship = $registry->get_post_to_user_relationship( $post->post_type, $rel_name );
-		} else {
-			$this->relationship = $registry->get_post_to_post_relationship( $post->post_type, $post_type, $rel_name );
-		}
-
-		if ( empty( $this->relationship ) ) {
+		if ( empty( $related_id ) ) {
 			return new \WP_Error(
-				'rest_relationship_not_found',
-				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
-				array( 'status' => 404 )
+				'rest_invalid_param',
+				__( 'No related entity provided.', 'tenup-content-connect' ),
+				array( 'status' => 400 )
 			);
 		}
 
-		return true;
+		$this->relationship->add_relationship( $post->ID, $related_id );
+
+		$rel_type = $request->get_param( 'rel_type' );
+
+		$prepared_items = array();
+		if ( 'post-to-user' === $rel_type ) {
+			$prepared_items = $this->get_related_users( $post, $request );
+		} else {
+			$prepared_items = $this->get_related_posts( $post, $request );
+		}
+
+		$response = rest_ensure_response( $prepared_items['items'] );
+
+		return $response;
+	}
+
+	/**
+	 * Checks if a given request has access to add a related entity for a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function add_item_permissions_check( $request ) {
+		return $this->update_items_permissions_check( $request );
+	}
+
+	/**
+	 * Deletes a related entity for a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function delete_item( $request ) {
+
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$related_id = $request->get_param( 'related_id' );
+
+		if ( empty( $related_id ) ) {
+			return new \WP_Error(
+				'rest_invalid_param',
+				__( 'No related entity provided.', 'tenup-content-connect' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$this->relationship->delete_relationship( $post->ID, $related_id );
+
+		$rel_type = $request->get_param( 'rel_type' );
+
+		$prepared_items = array();
+		if ( 'post-to-user' === $rel_type ) {
+			$prepared_items = $this->get_related_users( $post, $request );
+		} else {
+			$prepared_items = $this->get_related_posts( $post, $request );
+		}
+
+		$response = rest_ensure_response( $prepared_items['items'] );
+
+		return $response;
+	}
+
+	/**
+	 * Checks if a given request has access to delete a related entity for a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		return $this->update_items_permissions_check( $request );
 	}
 
 	/**
@@ -389,6 +480,44 @@ class RelatedEntities extends AbstractPostRoute {
 	}
 
 	/**
+	 * Performs a permissions check for managing related entities for a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	protected function permissions_check( $request ) {
+
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$registry  = get_registry();
+		$rel_type  = $request->get_param( 'rel_type' );
+		$rel_name  = $request->get_param( 'rel_name' );
+		$post_type = $request->get_param( 'post_type' );
+
+		if ( 'post-to-user' === $rel_type ) {
+			$this->relationship = $registry->get_post_to_user_relationship( $post->post_type, $rel_name );
+		} else {
+			$this->relationship = $registry->get_post_to_post_relationship( $post->post_type, $post_type, $rel_name );
+		}
+
+		if ( empty( $this->relationship ) ) {
+			return new \WP_Error(
+				'rest_relationship_not_found',
+				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get posts related to a post.
 	 *
 	 * @since 1.7.0
@@ -397,7 +526,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return array
 	 */
-	protected function get_posts( \WP_Post $post, \WP_REST_Request $request ) {
+	protected function get_related_posts( \WP_Post $post, \WP_REST_Request $request ) {
 
 		$rel_name    = $request->get_param( 'rel_name' );
 		$post_type   = $request->get_param( 'post_type' );
@@ -464,7 +593,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return array
 	 */
-	protected function get_users( \WP_Post $post, \WP_REST_Request $request ) {
+	protected function get_related_users( \WP_Post $post, \WP_REST_Request $request ) {
 
 		$rel_name = $request->get_param( 'rel_name' );
 		$page     = (int) $request->get_param( 'page' );
@@ -516,5 +645,61 @@ class RelatedEntities extends AbstractPostRoute {
 			'items' => $prepared_items,
 			'total' => $total_items,
 		);
+	}
+
+	/**
+	 * Update posts related to a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param \WP_Post         $post    The post object.
+	 * @param \WP_REST_Request $request The request object.
+	 * @return array
+	 */
+	protected function update_related_posts( \WP_Post $post, \WP_REST_Request $request ) {
+
+		$related_ids = $request->get_param( 'related_ids' );
+		$related_ids = array_map( 'absint', $related_ids );
+		$related_ids = array_unique( $related_ids );
+
+		$this->relationship->replace_relationships( $post->ID, $related_ids );
+
+		if ( $this->relationship->from_sortable ) {
+			$this->relationship->save_sort_data( $post->ID, $related_ids );
+		}
+
+		$items = $this->relationship->get_related_object_ids( $post->ID, $this->relationship->from_sortable );
+
+		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
+
+		return $prepared_items;
+	}
+
+	/**
+	 * Update users related to a post.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param \WP_Post         $post    The post object.
+	 * @param \WP_REST_Request $request The request object.
+	 * @return array
+	 */
+	protected function update_related_users( \WP_Post $post, \WP_REST_Request $request ) {
+
+		$related_ids = $request->get_param( 'related_ids' );
+		$related_ids = array_map( 'absint', $related_ids );
+		$related_ids = array_unique( $related_ids );
+
+		$this->relationship->replace_post_to_user_relationships( $post->ID, $related_ids );
+
+		if ( $this->relationship->from_sortable ) {
+			$this->relationship->save_post_to_user_sort_data( $post->ID, $related_ids );
+		}
+
+		$items = $this->relationship->get_related_user_ids( $post->ID, $this->relationship->from_sortable );
+
+		$prepared_items = $this->prepare_user_items( $items, $this->relationship );
+
+		return $prepared_items;
 	}
 }
