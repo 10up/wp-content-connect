@@ -1,9 +1,16 @@
 {
     "name": "10up/wp-content-connect",
-    "description": "Post to Post and Post to User Library for WordPress",
+    "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
     "type": "library",
+    "homepage": "https://github.com/10up/wp-content-connect",
     "license": "GPL-3.0-or-later",
     "authors": [
+        {
+            "name": "10up",
+            "email": "opensource@10up.com",
+            "homepage": "https://10up.com",
+            "role": "developer"
+        },
         {
             "name": "Chris Marslender",
             "email": "chris.marslender@10up.com"
