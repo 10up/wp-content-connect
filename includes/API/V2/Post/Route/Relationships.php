@@ -83,7 +83,7 @@ class Relationships extends AbstractPostRoute {
 	 * Checks if a given request has access to retrieve relationships for a post.
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has read access, WP_Error object or false otherwise.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
