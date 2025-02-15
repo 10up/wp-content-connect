@@ -2,8 +2,6 @@
 
 namespace TenUp\ContentConnect\API\V2\Post\Route;
 
-use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_by;
-use function TenUp\ContentConnect\Helpers\get_post_to_user_relationships_by;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
 /**
@@ -16,6 +14,13 @@ use function TenUp\ContentConnect\Helpers\get_registry;
 class RelatedEntities extends AbstractPostRoute {
 
 	/**
+	 * The relationship object.
+	 *
+	 * @var \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser
+	 */
+	protected $relationship = null;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function register_routes() {
@@ -25,7 +30,7 @@ class RelatedEntities extends AbstractPostRoute {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/related',
 			array(
 				'args' => array(
-					'id'          => array(
+					'id'        => array(
 						'description'       => __( 'The post ID.', 'tenup-content-connect' ),
 						'type'              => 'integer',
 						'sanitize_callback' => 'absint',
@@ -33,7 +38,7 @@ class RelatedEntities extends AbstractPostRoute {
 						'required'          => true,
 						'minLength'         => 1,
 					),
-					'rel_type'    => array(
+					'rel_type'  => array(
 						'description'       => __( 'The relationship type.', 'tenup-content-connect' ),
 						'type'              => 'string',
 						'default'           => 'post-to-post',
@@ -41,7 +46,7 @@ class RelatedEntities extends AbstractPostRoute {
 						'validate_callback' => 'rest_validate_request_arg',
 						'enum'              => array( 'post-to-post', 'post-to-user' ),
 					),
-					'rel_name'    => array(
+					'rel_name'  => array(
 						'description'       => __( 'The relationship name.', 'tenup-content-connect' ),
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -49,61 +54,63 @@ class RelatedEntities extends AbstractPostRoute {
 						'required'          => true,
 						'minLength'         => 1,
 					),
-					'post_type'   => array(
+					'post_type' => array(
 						'description'       => __( 'The type of post to query for.', 'tenup-content-connect' ),
 						'type'              => 'string',
 						'default'           => '',
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => array( $this, 'validate_post_type_request_arg' ),
 					),
-					'post_status' => array(
-						'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'tenup-content-connect' ),
-						'type'              => 'array',
-						'default'           => 'publish',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-						'items'             => array(
-							'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
-							'type' => 'string',
-						),
-					),
-					'page'        => array(
-						'description'       => __( 'Current page of the collection.', 'tenup-content-connect' ),
-						'type'              => 'integer',
-						'default'           => 1,
-						'sanitize_callback' => 'absint',
-						'validate_callback' => 'rest_validate_request_arg',
-						'minimum'           => 1,
-					),
-					'per_page'    => array(
-						'description'       => __( 'Maximum number of items to be returned in result set.', 'tenup-content-connect' ),
-						'type'              => 'integer',
-						'default'           => 10,
-						'minimum'           => 1,
-						'maximum'           => 100,
-						'sanitize_callback' => 'absint',
-						'validate_callback' => 'rest_validate_request_arg',
-					),
-					'order'       => array(
-						'description'       => __( 'Order sort attribute ascending or descending.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'default'           => 'asc',
-						'enum'              => array( 'asc', 'desc' ),
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-					),
-					'orderby'     => array(
-						'description'       => __( 'Sort collection by relationship or object attribute.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'default'           => 'relationship',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => array( $this, 'validate_orderby_request_arg' ),
-					),
 				),
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => array(
+						'post_status' => array(
+							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'tenup-content-connect' ),
+							'type'              => 'array',
+							'default'           => 'publish',
+							'sanitize_callback' => 'sanitize_text_field',
+							'validate_callback' => 'rest_validate_request_arg',
+							'items'             => array(
+								'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
+								'type' => 'string',
+							),
+						),
+						'page'        => array(
+							'description'       => __( 'Current page of the collection.', 'tenup-content-connect' ),
+							'type'              => 'integer',
+							'default'           => 1,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => 'rest_validate_request_arg',
+							'minimum'           => 1,
+						),
+						'per_page'    => array(
+							'description'       => __( 'Maximum number of items to be returned in result set.', 'tenup-content-connect' ),
+							'type'              => 'integer',
+							'default'           => 10,
+							'minimum'           => 1,
+							'maximum'           => 100,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => 'rest_validate_request_arg',
+						),
+						'order'       => array(
+							'description'       => __( 'Order sort attribute ascending or descending.', 'tenup-content-connect' ),
+							'type'              => 'string',
+							'default'           => 'asc',
+							'enum'              => array( 'asc', 'desc' ),
+							'sanitize_callback' => 'sanitize_text_field',
+							'validate_callback' => 'rest_validate_request_arg',
+						),
+						'orderby'     => array(
+							'description'       => __( 'Sort collection by relationship or object attribute.', 'tenup-content-connect' ),
+							'type'              => 'string',
+							'default'           => 'relationship',
+							'sanitize_callback' => 'sanitize_text_field',
+							'validate_callback' => array( $this, 'validate_orderby_request_arg' ),
+						),
+					),
 				),
 				array(
 					'methods'             => \WP_REST_Server::EDITABLE,
@@ -156,9 +163,9 @@ class RelatedEntities extends AbstractPostRoute {
 		$response->header( 'X-WP-Total', (int) $total );
 		$response->header( 'X-WP-TotalPages', (int) $max_pages );
 
-		$request_params    = $request->get_query_params();
-		$relationships_url = rest_url( sprintf( '/%s/%s/%d/related', $this->namespace, $this->rest_base, $request['id'] ) );
-		$base              = add_query_arg( urlencode_deep( $request_params ), $relationships_url );
+		$request_params = $request->get_query_params();
+		$url            = rest_url( sprintf( '/%s/%s/%d/related', $this->namespace, $this->rest_base, $request['id'] ) );
+		$base           = add_query_arg( urlencode_deep( $request_params ), $url );
 
 		if ( $page > 1 ) {
 			$prev_page = $page - 1;
@@ -185,17 +192,28 @@ class RelatedEntities extends AbstractPostRoute {
 	 * Checks if a given request has access to retrieve related entities for a post.
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return bool|\WP_Error True if the request has read access, WP_Error object or false otherwise.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
 		if ( ! is_user_logged_in() ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view related entities for this post.', 'tenup-content-connect' ),
+				__( 'Sorry, you are not allowed to retrieve related entities for this post.', 'tenup-content-connect' ),
 				array( 'status' => 401 )
 			);
 		}
+
+		return $this->permissions_check( $request );
+	}
+
+	/**
+	 * Updates related entities for a post.
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function update_items( $request ) {
 
 		$post = $this->get_post( $request['id'] );
 
@@ -203,27 +221,103 @@ class RelatedEntities extends AbstractPostRoute {
 			return $post;
 		}
 
-		$rel_type = $request->get_param( 'rel_type' );
+		$related_ids = $request->get_param( 'related_ids' );
 
-		$relationships = array();
-		if ( 'post-to-user' === $rel_type ) {
-			$relationships = get_registry()->get_post_to_user_relationships();
-		} else {
-			$relationships = get_registry()->get_post_to_post_relationships();
-		}
-
-		if ( empty( $relationships ) ) {
+		if ( empty( $related_ids ) ) {
 			return new \WP_Error(
-				'rest_relationships_not_found',
-				__( 'Relationships not found.', 'tenup-content-connect' ),
-				array( 'status' => 404 )
+				'rest_invalid_param',
+				__( 'No related entities provided.', 'tenup-content-connect' ),
+				array( 'status' => 400 )
 			);
 		}
 
-		$rel_name  = $request->get_param( 'rel_name' );
-		$rel_names = wp_list_pluck( $relationships, 'name' );
+		$related_ids = array_map( 'absint', $related_ids );
+		$related_ids = array_unique( $related_ids );
 
-		if ( ! in_array( $rel_name, $rel_names, true ) ) {
+		$rel_type = $request->get_param( 'rel_type' );
+
+		$data = array(
+			'related_ids' => array(),
+		);
+
+		$sortable = $this->relationship->from_sortable;
+
+		if ( 'post-to-user' === $rel_type ) {
+			$this->relationship->replace_post_to_user_relationships( $post->ID, $related_ids );
+
+			if ( $sortable ) {
+				$this->relationship->save_post_to_user_sort_data( $post->ID, $related_ids );
+			}
+
+			$data['related_ids'] = $this->relationship->get_related_user_ids( $post->ID, $sortable );
+		} else {
+			$this->relationship->replace_relationships( $post->ID, $related_ids );
+
+			if ( $sortable ) {
+				$this->relationship->save_sort_data( $post->ID, $related_ids );
+			}
+
+			$data['related_ids'] = $this->relationship->get_related_object_ids( $post->ID, $sortable );
+		}
+
+		$response = rest_ensure_response( $data );
+
+		return $response;
+	}
+
+	/**
+	 * Checks if a given request has access to update related entities for a post.
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function update_items_permissions_check( $request ) {
+
+		if ( ! is_user_logged_in() ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'Sorry, you are not allowed to update related entities for this post.', 'tenup-content-connect' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
+			return new \WP_Error(
+				'rest_cannot_edit',
+				__( 'Sorry, you are not allowed to update this post.', 'tenup-content-connect' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		return $this->permissions_check( $request );
+	}
+
+	/**
+	 * Performs a permissions check for managing related entities for a post.
+	 *
+	 * @param  \WP_REST_Request $request Full details about the request.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function permissions_check( $request ) {
+
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$registry  = get_registry();
+		$rel_type  = $request->get_param( 'rel_type' );
+		$rel_name  = $request->get_param( 'rel_name' );
+		$post_type = $request->get_param( 'post_type' );
+
+		if ( 'post-to-user' === $rel_type ) {
+			$this->relationship = $registry->get_post_to_user_relationship( $post->post_type, $rel_name );
+		} else {
+			$this->relationship = $registry->get_post_to_post_relationship( $post->post_type, $post_type, $rel_name );
+		}
+
+		if ( empty( $this->relationship ) ) {
 			return new \WP_Error(
 				'rest_relationship_not_found',
 				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
@@ -232,14 +326,6 @@ class RelatedEntities extends AbstractPostRoute {
 		}
 
 		return true;
-	}
-
-	public function update_items() {
-		// @todo Implement this.
-	}
-
-	public function update_items_permissions_check() {
-		// @todo Implement this.
 	}
 
 	/**
@@ -333,9 +419,6 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$relationship = get_post_to_post_relationships_by( 'to', $post_type );
-		$relationship = reset( $relationship );
-
 		$prepared_items = array();
 		foreach ( $items as $item ) {
 
@@ -345,7 +428,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 
 			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $item, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $item, $this->relationship );
 
 			$prepared_items[] = $item_data;
 		}
@@ -409,9 +492,6 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		$relationship = get_post_to_user_relationships_by( 'post_type', $post->post_type );
-		$relationship = reset( $relationship );
-
 		$prepared_items = array();
 		foreach ( $items as $item ) {
 
@@ -429,7 +509,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 
 			/** This filter is documented in includes/Helpers.php */
-			$item_data = apply_filters( 'tenup_content_connect_user_ui_item_data', $item_data, $item, $relationship );
+			$item_data = apply_filters( 'tenup_content_connect_user_ui_item_data', $item_data, $item, $this->relationship );
 
 			$prepared_items[] = $item_data;
 		}

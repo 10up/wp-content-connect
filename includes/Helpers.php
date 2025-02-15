@@ -245,7 +245,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false ) 
 			'update_post_term_cache' => false,
 		);
 
-		if ( $relationship->to_sortable ) {
+		if ( $relationship->from_sortable ) {
 			$query_args['orderby'] = 'relationship';
 		}
 
@@ -335,7 +335,7 @@ function get_post_to_user_relationships_data( $post ) {
 			),
 		);
 
-		if ( $relationship->to_sortable ) {
+		if ( $relationship->from_sortable ) {
 			$query_args['orderby'] = 'relationship';
 		}
 
