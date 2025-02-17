@@ -10,8 +10,6 @@ use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\MetaBox;
 
-use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
-
 class Plugin {
 
 	/**
