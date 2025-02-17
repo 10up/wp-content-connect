@@ -245,7 +245,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false ) 
 			'update_post_term_cache' => false,
 		);
 
-		if ( $relationship->to_sortable ) {
+		if ( $relationship->from_sortable ) {
 			$query_args['orderby'] = 'relationship';
 		}
 
@@ -280,17 +280,17 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false ) 
 			$related_posts[] = $item_data;
 		}
 
-		$relid = $registry->get_relationship_key( $relationship->from, $relationship->to, $relationship->name );
+		$rel_key = $registry->get_relationship_key( $relationship->from, $relationship->to, $relationship->name );
 
-		$relationship_data[ $relid ] = array(
-			'reltype'         => 'post-to-post',
+		$relationship_data[ $rel_key ] = array(
+			'rel_key'         => $rel_key,
+			'rel_type'        => 'post-to-post',
+			'rel_name'        => $relationship->name,
 			'object_type'     => 'post',
 			'post_type'       => $relationship->to,
-			'relid'           => $relid,
-			'name'            => $relationship->name,
 			'labels'          => $relationship->from_labels,
 			'sortable'        => $relationship->from_sortable,
-			'selected'        => $related_posts,
+			'related'         => $related_posts,
 			'current_post_id' => $post->ID,
 		);
 	}
@@ -335,7 +335,7 @@ function get_post_to_user_relationships_data( $post ) {
 			),
 		);
 
-		if ( $relationship->to_sortable ) {
+		if ( $relationship->from_sortable ) {
 			$query_args['orderby'] = 'relationship';
 		}
 
@@ -370,16 +370,16 @@ function get_post_to_user_relationships_data( $post ) {
 			$related_users[] = $item_data;
 		}
 
-		$relid = $registry->get_relationship_key( $relationship->post_type, 'user', $relationship->name );
+		$rel_key = $registry->get_relationship_key( $relationship->post_type, 'user', $relationship->name );
 
-		$relationship_data[ $relid ] = array(
-			'reltype'         => 'post-to-user',
+		$relationship_data[ $rel_key ] = array(
+			'rel_key'         => $rel_key,
+			'rel_type'        => 'post-to-user',
+			'rel_name'        => $relationship->name,
 			'object_type'     => 'user',
-			'relid'           => $relid,
-			'name'            => $relationship->name,
 			'labels'          => $relationship->from_labels,
 			'sortable'        => $relationship->from_sortable,
-			'selected'        => $related_users,
+			'related'         => $related_users,
 			'current_post_id' => $post->ID,
 		);
 	}
