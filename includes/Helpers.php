@@ -152,18 +152,19 @@ function get_post_to_user_relationships_by( $field, $value ) {
 }
 
 /**
- * Get post relationship data.
+ * Retrieves relationships (post-to-post and post-to-user) for a given post.
  *
- * Retrieves relationship data for a given post, optionally filtered by a specific post type.
+ * Retrieves relationship data for a specific post, optionally filtered by relationship type
+ * ('post-to-post' or 'post-to-user') and, for post-to-post relationships, by post type.
  *
  * @since 1.7.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
- * @param  string       $rel_type        Optional. The relationship type. Accepts 'any', 'post-to-post', or 'post-to-user'.
- * @param  string       $other_post_type Optional. The post type to filter relationships by.
- *                                       If provided, only relationships to this post type will be returned.
- *                                       If not provided (or false), all relationships for the post will be returned.
- * @return array An array of relationship data.
+ * @param  string       $rel_type        Optional. The relationship type. Accepts 'post-to-post', 'post-to-user', or 'any' (default).
+ *                                       If 'any', the function retrieves both post-to-post and post-to-user relationships.
+ * @param  string|false $other_post_type Optional. The post type to filter post-to-post relationships by.
+ *                                       Ignored for post-to-user relationships. Default false (returns all relationships).
+ * @return array<int, array<string, mixed>> An array of relationship data.
  */
 function get_post_relationship_data( $post, $rel_type = 'any', $other_post_type = false ) {
 
