@@ -58,13 +58,6 @@ class RelatedEntities extends AbstractPostRoute {
 						'validate_callback' => 'rest_validate_request_arg',
 						'enum'              => array( 'post-to-post', 'post-to-user' ),
 					),
-					'post_type' => array(
-						'description'       => __( 'The type of post to query for.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'default'           => '',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => array( $this, 'validate_post_type_request_arg' ),
-					),
 				),
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
@@ -431,36 +424,6 @@ class RelatedEntities extends AbstractPostRoute {
 	}
 
 	/**
-	 * Validate the `post_type` request parameter.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param mixed            $value   The value of the 'post_type' request parameter.
-	 * @param \WP_REST_Request $request The request object.
-	 * @return bool|\WP_Error True if valid, WP_Error otherwise.
-	 */
-	public function validate_post_type_request_arg( $value, \WP_REST_Request $request ) {
-		$rel_type = $request->get_param( 'rel_type' );
-
-		if ( 'post-to-post' === $rel_type ) {
-			$valid_post_types = array_keys( get_post_types() );
-			if ( ! in_array( $value, $valid_post_types, true ) ) {
-				return new \WP_Error(
-					'rest_invalid_param',
-					sprintf(
-						/* translators: %s: post type */
-						__( 'Invalid post type: %s.', 'tenup-content-connect' ),
-						$value
-					),
-					array( 'status' => 400 )
-				);
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * Validate the `orderby` request parameter.
 	 *
 	 * @since 1.7.0
@@ -527,7 +490,6 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	protected function get_related_posts( \WP_Post $post, \WP_REST_Request $request ) {
 
-		$post_type   = $request->get_param( 'post_type' );
 		$post_status = $request->get_param( 'post_status' );
 		$page        = (int) $request->get_param( 'page' );
 		$per_page    = (int) $request->get_param( 'per_page' );
@@ -535,7 +497,7 @@ class RelatedEntities extends AbstractPostRoute {
 		$orderby     = $request->get_param( 'orderby' );
 
 		$query_args = array(
-			'post_type'          => $post_type,
+			'post_type'          => $this->relationship->to,
 			'post_status'        => $post_status,
 			'paged'              => $page,
 			'posts_per_page'     => $per_page,
