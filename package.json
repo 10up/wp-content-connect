@@ -16,11 +16,11 @@
   },
   "scripts": {
     "start": "10up-toolkit build --watch",
-		"build": "10up-toolkit build",
-		"format-js": "10up-toolkit format-js",
-		"lint-js": "10up-toolkit lint-js",
-		"lint-style": "10up-toolkit lint-style",
-		"test": "10up-toolkit test-unit-jest"
+    "build": "10up-toolkit build",
+    "format-js": "10up-toolkit format-js",
+    "lint-js": "10up-toolkit lint-js",
+    "lint-style": "10up-toolkit lint-style",
+    "test": "10up-toolkit test-unit-jest"
   },
   "dependencies": {
     "10up-toolkit": "^6.4.0"
@@ -29,5 +29,10 @@
     "entry": {
       "wp-content-connect": "assets/js/index.ts"
     }
+  },
+  "devDependencies": {
+    "@wordpress/api-fetch": "^7.18.0",
+    "@wordpress/data": "^10.18.0",
+    "@wordpress/url": "^4.18.0"
   }
 }
