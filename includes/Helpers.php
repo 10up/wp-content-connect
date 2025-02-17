@@ -199,17 +199,19 @@ function get_post_relationship_data( $post, $rel_type = 'any', $other_post_type 
 }
 
 /**
- * Get post-to-post relationship data.
- *
  * Retrieves post-to-post relationship data for a given post.
+ *
+ * Fetches related posts based on post-to-post relationships configured in Content Connect.
+ * Optionally filters results by a specific post type.
  *
  * @since 1.7.0
  *
- * @param  \WP_Post $post            The post object.
- * @param  string   $other_post_type Optional. The post type to filter relationships by.
- *                                   If provided, only relationships to this post type will be returned.
- *                                   If not provided (or false), all relationships for the post will be returned.
- * @return array An array of post-to-post relationship data.
+ * @param  int|\WP_Post $post            Post ID or post object.
+ * @param  string|false $other_post_type Optional. A post type to filter relationships by.
+ *                                       Only relationships to this post type will be returned.
+ *                                       Defaults to false (returns all post-to-post relationships).
+ * @return array<int, array<string, mixed>> Associative array containing relationship data.
+ *                                          Each entry contains relationship details and related posts.
  */
 function get_post_to_post_relationships_data( $post, $other_post_type = false ) {
 
@@ -300,14 +302,15 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false ) 
 }
 
 /**
- * Get post-to-user relationship data.
- *
  * Retrieves post-to-user relationship data for a given post.
+ *
+ * Fetches related users based on post-to-user relationships configured in Content Connect.
  *
  * @since 1.7.0
  *
- * @param  \WP_Post $post The post object.
- * @return array An array of post-to-user relationship data.
+ * @param  int|\WP_Post $post Post ID or post object.
+ * @return array<int, array<string, mixed>> Associative array containing relationship data.
+ *                                          Each entry contains relationship details and related users.
  */
 function get_post_to_user_relationships_data( $post ) {
 
