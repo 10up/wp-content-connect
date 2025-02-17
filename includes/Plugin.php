@@ -8,6 +8,7 @@ use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
+use TenUp\ContentConnect\UI\BlockEditor;
 use TenUp\ContentConnect\UI\MetaBox;
 
 class Plugin {
@@ -36,6 +37,11 @@ class Plugin {
 	 * @var MetaBox
 	 */
 	public $meta_box;
+
+	/**
+	 * @var BlockEditor
+	 */
+	public $block_editor;
 
 	/**
 	 * @var Search
@@ -93,6 +99,9 @@ class Plugin {
 
 		$this->meta_box = new MetaBox();
 		$this->meta_box->setup();
+
+		$this->block_editor = new BlockEditor();
+		$this->block_editor->setup();
 
 		$this->deleted_items = new DeletedItems();
 		$this->deleted_items->setup();
