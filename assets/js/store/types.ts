@@ -30,3 +30,13 @@ export type ContentConnectRelationships = {
 export type ContentConnectUpdateRelationshipsBody = {
 	related_ids: number[];
 };
+
+export type ContentConnectState = {
+	relationships: {
+		[postId: number]: ContentConnectRelationships;
+	};
+	relatedPosts: {
+		[key: string]: ContentConnectRelatedPosts;
+	};
+	dirtyPostIds: Set<number>;
+};

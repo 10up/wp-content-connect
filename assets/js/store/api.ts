@@ -6,7 +6,7 @@ export const CONTENT_CONNECT_ENDPOINT = '/content-connect/v2';
 
 export async function getRelationships(
 	postId: number,
-	options: {
+	options?: {
 		rel_type?: string;
 		post_type?: string;
 		context?: 'embed';
