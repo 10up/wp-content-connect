@@ -48,6 +48,13 @@ class Relationships extends AbstractPostRoute {
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => 'rest_validate_request_arg',
 					),
+					'context'   => array(
+						'description'       => __( 'Scope under which the request is made; determines fields present in response.' ),
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+						'validate_callback' => 'rest_validate_request_arg',
+						'enum'              => array( 'view', 'embed' ),
+					),
 				),
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
@@ -76,8 +83,9 @@ class Relationships extends AbstractPostRoute {
 
 		$rel_type  = $request->get_param( 'rel_type' );
 		$post_type = $request->get_param( 'post_type' );
+		$context   = $request->get_param( 'context' );
 
-		$relationships = get_post_relationship_data( $post, $rel_type, $post_type );
+		$relationships = get_post_relationship_data( $post, $rel_type, $post_type, $context );
 		$response      = rest_ensure_response( $relationships );
 
 		return $response;
