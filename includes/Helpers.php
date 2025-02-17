@@ -74,7 +74,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  *                       - 'from': Returns all relationships originating from the specified post type.
  *                       - 'to': Returns all relationships targeting the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<int, \TenUp\ContentConnect\Relationships\Relationship>
+ * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
  *         A single Relationship object if 'key' is specified and found,
  *         otherwise an associative array of Relationship objects indexed by relationship key.
  */
@@ -125,7 +125,7 @@ function get_post_to_post_relationships_by( $field, $value ) {
  *                       - 'key': Returns a single relationship by its unique key.
  *                       - 'post_type': Returns all relationships involving the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<int, \TenUp\ContentConnect\Relationships\Relationship>
+ * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
  *         A single Relationship object if 'key' is specified and found,
  *         otherwise an associative array of Relationship objects indexed by relationship key.
  */
@@ -258,23 +258,18 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 		return array();
 	}
 
-	$registry = get_registry();
-
 	$relationship_data = array();
 
-	foreach ( $relationships as $relationship ) {
-
-		$rel_key = $registry->get_relationship_key( $relationship->from, $relationship->to, $relationship->name );
+	foreach ( $relationships as $rel_key => $relationship ) {
 
 		$relationship_data[ $rel_key ] = array(
-			'rel_key'         => $rel_key,
-			'rel_type'        => 'post-to-post',
-			'rel_name'        => $relationship->name,
-			'object_type'     => 'post',
-			'post_type'       => $relationship->to,
-			'labels'          => $relationship->from_labels,
-			'sortable'        => $relationship->from_sortable,
-			'current_post_id' => $post->ID,
+			'rel_key'     => $rel_key,
+			'rel_type'    => 'post-to-post',
+			'rel_name'    => $relationship->name,
+			'object_type' => 'post',
+			'post_type'   => $relationship->to,
+			'labels'      => $relationship->from_labels,
+			'sortable'    => $relationship->from_sortable,
 		);
 
 		if ( 'embed' === $context ) {
@@ -373,22 +368,17 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 		return array();
 	}
 
-	$registry = get_registry();
-
 	$relationship_data = array();
 
-	foreach ( $relationships as $relationship ) {
-
-		$rel_key = $registry->get_relationship_key( $relationship->post_type, 'user', $relationship->name );
+	foreach ( $relationships as $rel_key => $relationship ) {
 
 		$relationship_data[ $rel_key ] = array(
-			'rel_key'         => $rel_key,
-			'rel_type'        => 'post-to-user',
-			'rel_name'        => $relationship->name,
-			'object_type'     => 'user',
-			'labels'          => $relationship->from_labels,
-			'sortable'        => $relationship->from_sortable,
-			'current_post_id' => $post->ID,
+			'rel_key'     => $rel_key,
+			'rel_type'    => 'post-to-user',
+			'rel_name'    => $relationship->name,
+			'object_type' => 'user',
+			'labels'      => $relationship->from_labels,
+			'sortable'    => $relationship->from_sortable,
 		);
 
 		if ( 'embed' === $context ) {
