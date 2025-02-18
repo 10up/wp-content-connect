@@ -4,28 +4,32 @@ import { ContentConnectRelatedPosts, ContentConnectRelationships, ContentConnect
 
 export const CONTENT_CONNECT_ENDPOINT = '/content-connect/v2';
 
+export type GetRelationshipsOptions = {
+	rel_type?: string;
+	post_type?: string;
+	context?: 'embed';
+}
+
 export async function getRelationships(
 	postId: number,
-	options?: {
-		rel_type?: string;
-		post_type?: string;
-		context?: 'embed';
-	}
+	options?: GetRelationshipsOptions
 ) {
 	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/relationships`, options);
 	const relationships = await apiFetch<ContentConnectRelationships>({ path });
 	return relationships;
 }
 
+export type GetRelatedPostsOptions = {
+	rel_key: string;
+	order?: 'desc' | 'asc';
+	orderby?: string;
+	per_page?: number;
+	page?: number;
+}
+
 export async function getRelatedPosts(
 	postId: number,
-	options: {
-		rel_key: string;
-		order?: 'desc' | 'asc';
-		orderby?: string;
-		per_page?: number;
-		page?: number;
-	}
+	options: GetRelatedPostsOptions
 ) {
 	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, options);
 	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path });
