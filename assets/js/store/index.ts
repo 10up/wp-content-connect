@@ -67,8 +67,12 @@ const actions = {
 			type: 'CLEAR_DIRTY_POSTS',
 		};
 	},
-	updateRelatedPosts(postId: number, relKey: string, relatedIds: number[]) {
+	updateRelatedPosts(postId: number | null, relKey: string, relatedIds: number[]) {
 		return async function thunk({dispatch}) {
+			if (postId === null) {
+				return;
+			}
+
 			await api.updateRelatedPosts(
 				postId,
 				relKey,
@@ -122,10 +126,16 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	actions,
 	selectors: {
-		getRelationships(state: ContentConnectState, postId: number, options?: api.GetRelationshipsOptions) {
+		getRelationships(state: ContentConnectState, postId: number | null, options?: api.GetRelationshipsOptions) {
+			if (postId === null) {
+				return {};
+			}
 			return state.relationships[postId] || {};
 		},
-		getRelatedPosts(state: ContentConnectState, postId: number, options: api.GetRelatedPostsOptions) {
+		getRelatedPosts(state: ContentConnectState, postId: number | null, options: api.GetRelatedPostsOptions) {
+			if (postId === null) {
+				return [];
+			}
 			const key = `related-${postId}-${options.rel_key}`;
 			return state.relatedPosts[key] || [];
 		},
