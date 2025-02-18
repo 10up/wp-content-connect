@@ -17,8 +17,10 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "composer/installers": "^1.2"
+        "php": ">=7.4",
+        "composer/installers": "^2.3"
     },
     "autoload": {
         "psr-4": {
@@ -31,7 +33,14 @@
         ]
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7",
-        "10up/wp_mock": "0.2.0"
+        "10up/phpcs-composer": "^3.0",
+        "phpcompatibility/php-compatibility": "dev-develop as 9.99.99",
+        "phpunit/phpunit": "^12.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

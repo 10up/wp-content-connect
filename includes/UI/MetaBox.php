@@ -16,8 +16,14 @@ class MetaBox {
 		if ( ! $post instanceof \WP_Post ) {
 			return;
 		}
-		
-		// If we have any relationships to show on this page, their data will be injected here by filters
+
+		/**
+		 * Filter the relationship data for a post.
+		 *
+		 * @param  array    $relationships Empty array by default.
+		 * @param  \WP_Post $post          The post object.
+		 * @return array
+		 */
 		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
@@ -34,7 +40,7 @@ class MetaBox {
 
 		\add_meta_box( 'tenup-content-connect-relationships', __( "Relationships", "tenup-content-connect" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 
-		wp_enqueue_script( 'tenup-content-connect', Plugin::instance()->url . 'assets/js/content-connect.js', array(), Plugin::instance()->version, true );
+		wp_enqueue_script( 'tenup-content-connect', CONTENT_CONNECT_URL . 'assets/js/content-connect.js', array(), CONTENT_CONNECT_VERSION, true );
 		wp_localize_script( 'tenup-content-connect', 'ContentConnectData', apply_filters( 'tenup_content_connect_localize_data', $relationship_data ) );
 	}
 

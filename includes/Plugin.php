@@ -2,7 +2,7 @@
 
 namespace TenUp\ContentConnect;
 
-use TenUp\ContentConnect\API\Search;
+use TenUp\ContentConnect\API;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -11,22 +11,6 @@ use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\MetaBox;
 
 class Plugin {
-
-	private static $instance;
-
-	/**
-	 * URL to the Plugin
-	 *
-	 * @var string
-	 */
-	public $url;
-
-	/**
-	 * Current plugin version
-	 *
-	 * @var string
-	 */
-	public $version;
 
 	/**
 	 * @var array
@@ -63,18 +47,24 @@ class Plugin {
 	 */
 	public $deleted_items;
 
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var Plugin
+	 */
+	private static $instance;
+
+	/**
+	 * Get class instance.
+	 *
+	 * @return Plugin
+	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 			self::$instance->setup();
 		}
-
 		return self::$instance;
-	}
-
-	public function __construct() {
-		$this->url = plugin_dir_url( dirname( __FILE__ ) );
-		$this->version = '1.6.0';
 	}
 
 	public function get_registry() {
@@ -104,19 +94,38 @@ class Plugin {
 		$this->meta_box = new MetaBox();
 		$this->meta_box->setup();
 
-		$this->search = new Search();
-		$this->search->setup();
-
 		$this->deleted_items = new DeletedItems();
 		$this->deleted_items->setup();
 
-		add_action( 'init', array( $this, 'wp_init' ), 100 );
+		$routes = array(
+			new API\V1\Search(),
+			new API\V2\Post\Field\Relationships(),
+			new API\V2\Post\Route\Relationships(),
+			new API\V2\Post\Route\RelatedEntities(),
+			new API\V2\Post\Route\Search(),
+		);
+
+		foreach ( $routes as $route ) {
+			$route->setup();
+		}
+
+		add_action( 'init', array( $this, 'init' ), 100 );
 	}
 
-	public function wp_init() {
-		do_action( 'tenup-content-connect-init', $this->registry );
+	/**
+	 * Initializes the plugin and fires an action other plugins can hook into.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		do_action( 'tenup-content-connect-init', $this->registry ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	}
 
+	/**
+	 * Register the tables for the plugin.
+	 *
+	 * @return void
+	 */
 	public function register_tables() {
 		$this->tables['p2p'] = new PostToPost();
 		$this->tables['p2p']->setup();
@@ -124,5 +133,4 @@ class Plugin {
 		$this->tables['p2u'] = new PostToUser();
 		$this->tables['p2u']->setup();
 	}
-
 }

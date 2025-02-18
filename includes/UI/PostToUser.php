@@ -41,13 +41,13 @@ class PostToUser extends PostUI {
 
 		$query = new \WP_User_Query( $args );
 
-		$users = $query->get_results();
-		if ( ! empty( $users ) ) {
-			foreach ( $users as $user ) {
+		$queried_users = $query->get_results();
+		if ( ! empty( $queried_users ) ) {
+			foreach ( $queried_users as $queried_user ) {
 
 				$final_user = array(
-					'ID'   => $user->ID,
-					'name' => $user->display_name,
+					'ID'   => $queried_user->ID,
+					'name' => $queried_user->display_name,
 				);
 
 				$final_users[] = apply_filters( 'tenup_content_connect_final_user', $final_user, $this->relationship );

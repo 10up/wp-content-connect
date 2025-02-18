@@ -3,7 +3,7 @@
  * Plugin Name:       WP Content Connect
  * Plugin URI:        https://github.com/10up/wp-content-connect
  * Description:       WordPress library that enables direct relationships for posts to posts and posts to users.
- * Version:           1.6.0
+ * Version:           1.7.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Author:            10up
@@ -11,9 +11,16 @@
  * License:           GPL-3.0-or-later
  * License URI:       https://spdx.org/licenses/GPL-3.0-or-later.html
  * Update URI:        https://github.com/10up/wp-content-connect
+ *
+ * @package           TenUp\ContentConnect
  */
 
+define( 'CONTENT_CONNECT_VERSION', '1.7.0' );
+define( 'CONTENT_CONNECT_URL', plugin_dir_url( __FILE__ ) );
+define( 'CONTENT_CONNECT_PATH', plugin_dir_path( __FILE__ ) );
+
 require_once __DIR__ . '/autoload.php';
+
 wp_content_connect_autoloader();
 
 // Kick things off
