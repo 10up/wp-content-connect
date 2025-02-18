@@ -45,6 +45,6 @@ export async function updateRelatedPosts(
 		related_ids: relatedIds,
 	};
 	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey });
-	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path, method: 'POST', body: JSON.stringify(body) });
+	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path, method: 'POST', data: body });
 	return relatedPosts;
 }
