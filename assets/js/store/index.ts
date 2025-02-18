@@ -1,4 +1,4 @@
-import { createReduxStore, register, select as wpSelect, dispatch } from '@wordpress/data';
+import { createReduxStore, register, select, dispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import * as api from './api';
 import { ContentConnectRelatedPosts, ContentConnectRelationships, ContentConnectState } from './types';
@@ -20,6 +20,15 @@ type Action = {
 	relationships?: ContentConnectRelationships;
 	relatedPosts?: ContentConnectRelatedPosts;
 	key?: string;
+	options?: {
+		rel_key: string;
+		order?: 'desc' | 'asc';
+		orderby?: string;
+		per_page?: number;
+		page?: number;
+	};
+	relKey?: string;
+	relatedIds?: number[];
 };
 
 const actions = {
@@ -50,17 +59,13 @@ const actions = {
 	},
 	updateRelatedPosts(postId: number, relKey: string, relatedIds: number[]) {
 		return async function thunk({dispatch}) {
-			const key = `related-${postId}-${relKey}`;
-
 			await api.updateRelatedPosts(
 				postId,
-				{ rel_key: relKey, related_ids: relatedIds },
-				{ related_ids: relatedIds }
+				relKey,
+				relatedIds
 			);
 
-			// Fetch the updated posts to ensure our state is in sync
-			const updatedPosts = await api.getRelatedPosts(postId, { rel_key: relKey });
-			dispatch.setRelatedPosts(key, updatedPosts);
+			dispatch.invalidateResolutionForStoreSelector('getRelatedPosts');
 			dispatch.markPostAsDirty(postId);
 		};
 	},
@@ -97,11 +102,11 @@ export const store = createReduxStore(STORE_NAME, {
 				if (!action.postId) {
 					return state;
 				}
-				const newDirtyPostIds = new Set(state.dirtyPostIds);
-				newDirtyPostIds.add(action.postId);
+				const dirtyPostIds = new Set(state.dirtyPostIds);
+				dirtyPostIds.add(action.postId);
 				return {
 					...state,
-					dirtyPostIds: newDirtyPostIds,
+					dirtyPostIds,
 				};
 
 			case 'CLEAR_DIRTY_POSTS':
@@ -115,11 +120,21 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	actions,
 	selectors: {
-		getRelationships(state: ContentConnectState, postId: number) {
+		getRelationships(state: ContentConnectState, postId: number, options?: {
+			rel_type?: string;
+			post_type?: string;
+			context?: 'embed';
+		}) {
 			return state.relationships[postId] || {};
 		},
-		getRelatedPosts(state: ContentConnectState, postId: number, relKey: string) {
-			const key = `related-${postId}-${relKey}`;
+		getRelatedPosts(state: ContentConnectState, postId: number, options: {
+			rel_key: string;
+			order?: 'desc' | 'asc';
+			orderby?: string;
+			per_page?: number;
+			page?: number;
+		}) {
+			const key = `related-${postId}-${options.rel_key}`;
 			return state.relatedPosts[key] || [];
 		},
 		getDirtyPostIds(state: ContentConnectState) {
@@ -127,13 +142,23 @@ export const store = createReduxStore(STORE_NAME, {
 		},
 	},
 	resolvers: {
-		getRelationships: (postId: number) => async function thunk({dispatch}) {
-			const relationships = await api.getRelationships(postId);
+		getRelationships: (postId: number, options?: {
+			rel_type?: string;
+			post_type?: string;
+			context?: 'embed';
+		}) => async function thunk({dispatch}) {
+			const relationships = await api.getRelationships(postId, options);
 			dispatch.setRelationships(postId, relationships);
 		},
-		getRelatedPosts: (postId: number, relKey: string) => async function thunk({dispatch}) {
-			const key = `related-${postId}-${relKey}`;
-			const relatedPosts = await api.getRelatedPosts(postId, { rel_key: relKey });
+		getRelatedPosts: (postId: number, options: {
+			rel_key: string;
+			order?: 'desc' | 'asc';
+			orderby?: string;
+			per_page?: number;
+			page?: number;
+		}) => async function thunk({dispatch}) {
+			const key = `related-${postId}-${options.rel_key}`;
+			const relatedPosts = await api.getRelatedPosts(postId, options);
 			dispatch.setRelatedPosts(key, relatedPosts);
 		},
 	},
@@ -142,29 +167,24 @@ export const store = createReduxStore(STORE_NAME, {
 register(store);
 
 async function persistContentConnectionChanges() {
-	const dirtyPostIds = wpSelect(STORE_NAME).getDirtyPostIds();
+	const dirtyPostIds = select(STORE_NAME).getDirtyPostIds();
 
 	// Process each dirty post
 	await Promise.all(
 		dirtyPostIds.map(async (postId) => {
-			const relationships = wpSelect(STORE_NAME).getRelationships(postId);
+			const relationships = select(STORE_NAME).getRelationships(postId);
 
 			// Update each relationship for the post
 			await Promise.all(
 				Object.entries(relationships).map(async ([relKey, relationship]) => {
-					const relatedPosts = wpSelect(STORE_NAME).getRelatedPosts(
-						`related-${postId}-${relKey}`
-					);
+					const relatedPosts = select(STORE_NAME).getRelatedPosts(postId, {
+						rel_key: relKey,
+					});
 
 					await api.updateRelatedPosts(
 						postId,
-						{
-							rel_key: relKey,
-							related_ids: relatedPosts.map(post => post.ID),
-						},
-						{
-							related_ids: relatedPosts.map(post => post.ID),
-						}
+						relKey,
+						relatedPosts.map(post => post.ID),
 					);
 				})
 			);

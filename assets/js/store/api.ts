@@ -34,13 +34,13 @@ export async function getRelatedPosts(
 
 export async function updateRelatedPosts(
 	postId: number,
-	options: {
-		rel_key: string;
-		related_ids: number[];
-	},
-	body: ContentConnectUpdateRelationshipsBody
+	relKey: string,
+	relatedIds: number[]
 ) {
-	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, options);
+	const body: ContentConnectUpdateRelationshipsBody = {
+		related_ids: relatedIds,
+	};
+	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey });
 	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path, method: 'POST', body: JSON.stringify(body) });
 	return relatedPosts;
 }
