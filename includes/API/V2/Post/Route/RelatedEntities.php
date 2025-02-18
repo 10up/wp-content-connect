@@ -9,7 +9,7 @@ use function TenUp\ContentConnect\Helpers\get_registry;
  *
  * REST API endpoint for post related entities (posts or users).
  *
- * @package TenUp\ContentConnect\API\V2\Post
+ * @package TenUp\ContentConnect\API\V2\Post\Route
  */
 class RelatedEntities extends AbstractPostRoute {
 
@@ -24,8 +24,6 @@ class RelatedEntities extends AbstractPostRoute {
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @since 1.7.0
 	 */
 	public function register_routes() {
 
@@ -33,32 +31,7 @@ class RelatedEntities extends AbstractPostRoute {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/related',
 			array(
-				'args' => array(
-					'id'        => array(
-						'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
-						'type'              => 'integer',
-						'sanitize_callback' => 'absint',
-						'validate_callback' => 'rest_validate_request_arg',
-						'required'          => true,
-						'minLength'         => 1,
-					),
-					'rel_key'   => array(
-						'description'       => __( 'The relationship key.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-						'required'          => true,
-						'minLength'         => 1,
-					),
-					'rel_type'  => array(
-						'description'       => __( 'The relationship type.', 'tenup-content-connect' ),
-						'type'              => 'string',
-						'default'           => 'post-to-post',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-						'enum'              => array( 'post-to-post', 'post-to-user' ),
-					),
-				),
+				'args' => $this->get_route_params(),
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
@@ -162,16 +135,11 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 * @return \WP_REST_Response
 	 */
 	public function get_items( \WP_REST_Request $request ) {
 
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
+		$post     = $this->get_post( $request['id'] );
 		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
@@ -201,7 +169,14 @@ class RelatedEntities extends AbstractPostRoute {
 		$response->header( 'X-WP-TotalPages', (int) $max_pages );
 
 		$request_params = $request->get_query_params();
-		$url            = rest_url( sprintf( '/%s/%s/%d/related', $this->namespace, $this->rest_base, $request['id'] ) );
+		$url            = rest_url(
+			sprintf(
+				'/%s/%s/%d/related',
+				$this->namespace,
+				$this->rest_base,
+				$request['id']
+			)
+		);
 		$base           = add_query_arg( urlencode_deep( $request_params ), $url );
 
 		if ( $page > 1 ) {
@@ -252,16 +227,11 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 * @return \WP_REST_Response
 	 */
 	public function update_items( $request ) {
 
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
+		$post        = $this->get_post( $request['id'] );
 		$related_ids = $request->get_param( 'related_ids' );
 
 		if ( empty( $related_ids ) ) {
@@ -321,16 +291,11 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 * @return \WP_REST_Response
 	 */
 	public function add_item( $request ) {
 
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
+		$post       = $this->get_post( $request['id'] );
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
@@ -375,16 +340,11 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 * @return \WP_REST_Response
 	 */
 	public function delete_item( $request ) {
 
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
+		$post       = $this->get_post( $request['id'] );
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
@@ -486,7 +446,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
-	 * @return array
+	 * @return array<string, mixed> Associative array containing:
+	 *                              - 'items' (array) The related posts.
+	 *                              - 'total' (int) The total number of posts found.
 	 */
 	protected function get_related_posts( \WP_Post $post, \WP_REST_Request $request ) {
 
@@ -551,7 +513,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
-	 * @return array
+	 * @return array<string, mixed> Associative array containing:
+	 *                              - 'items' (array) The related users.
+	 *                              - 'total' (int) The total number of users found.
 	 */
 	protected function get_related_users( \WP_Post $post, \WP_REST_Request $request ) {
 

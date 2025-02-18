@@ -9,14 +9,12 @@ use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
  *
  * REST API endpoint for post relationships.
  *
- * @package TenUp\ContentConnect\API\V2\Post
+ * @package TenUp\ContentConnect\API\V2\Post\Route
  */
 class Relationships extends AbstractPostRoute {
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @since 1.7.0
 	 */
 	public function register_routes() {
 
@@ -71,16 +69,11 @@ class Relationships extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or WP_Error object on failure.
+	 * @return \WP_REST_Response
 	 */
 	public function get_items( \WP_REST_Request $request ) {
 
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
+		$post      = $this->get_post( $request['id'] );
 		$rel_type  = $request->get_param( 'rel_type' );
 		$post_type = $request->get_param( 'post_type' );
 		$context   = $request->get_param( 'context' );
@@ -97,7 +90,7 @@ class Relationships extends AbstractPostRoute {
 	 * @since 1.7.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
