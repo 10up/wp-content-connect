@@ -1,15 +1,9 @@
 import { store } from '../store';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from 'react';
+import { GetRelatedPostsOptions } from '../store/api';
 
-export function useRelatedPosts(postId: number,
-	options: {
-		rel_key: string;
-		order?: 'desc' | 'asc';
-		orderby?: string;
-		per_page?: number;
-		page?: number;
-	}) {
+export function useRelatedPosts(postId: number, options: GetRelatedPostsOptions) {
 		const { hasResolved, relatedPosts } = useSelect(
 			(select) => {
 				const params = [postId, options] as const;

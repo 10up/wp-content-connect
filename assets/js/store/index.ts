@@ -14,45 +14,55 @@ const DEFAULT_STATE: ContentConnectState = {
 	dirtyPostIds: new Set(),
 };
 
-type Action = {
-	type: string;
-	postId?: number;
-	relationships?: ContentConnectRelationships;
-	relatedPosts?: ContentConnectRelatedPosts;
-	key?: string;
-	options?: {
-		rel_key: string;
-		order?: 'desc' | 'asc';
-		orderby?: string;
-		per_page?: number;
-		page?: number;
-	};
-	relKey?: string;
-	relatedIds?: number[];
+type SetRelationshipsAction = {
+	type: 'SET_RELATIONSHIPS';
+	postId: number;
+	relationships: ContentConnectRelationships;
 };
 
+type SetRelatedPostsAction = {
+	type: 'SET_RELATED_POSTS';
+	key: string;
+	relatedPosts: ContentConnectRelatedPosts;
+};
+
+type MarkPostAsDirtyAction = {
+	type: 'MARK_POST_AS_DIRTY';
+	postId: number;
+};
+
+type ClearDirtyPostsAction = {
+	type: 'CLEAR_DIRTY_POSTS';
+};
+
+type Action =
+	| SetRelationshipsAction
+	| SetRelatedPostsAction
+	| MarkPostAsDirtyAction
+	| ClearDirtyPostsAction;
+
 const actions = {
-	setRelationships(postId: number, relationships: ContentConnectRelationships) {
+	setRelationships(postId: number, relationships: ContentConnectRelationships): SetRelationshipsAction {
 		return {
 			type: 'SET_RELATIONSHIPS',
 			postId,
 			relationships,
 		};
 	},
-	setRelatedPosts(key: string, relatedPosts: ContentConnectRelatedPosts) {
+	setRelatedPosts(key: string, relatedPosts: ContentConnectRelatedPosts): SetRelatedPostsAction {
 		return {
 			type: 'SET_RELATED_POSTS',
 			key,
 			relatedPosts,
 		};
 	},
-	markPostAsDirty(postId: number) {
+	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
 		return {
 			type: 'MARK_POST_AS_DIRTY',
 			postId,
 		};
 	},
-	clearDirtyPosts() {
+	clearDirtyPosts(): ClearDirtyPostsAction {
 		return {
 			type: 'CLEAR_DIRTY_POSTS',
 		};
@@ -72,12 +82,9 @@ const actions = {
 };
 
 export const store = createReduxStore(STORE_NAME, {
-	reducer(state = DEFAULT_STATE, action: Action) {
+	reducer(state: ContentConnectState = DEFAULT_STATE, action: Action) {
 		switch (action.type) {
 			case 'SET_RELATIONSHIPS':
-				if (!action.postId || !action.relationships) {
-					return state;
-				}
 				return {
 					...state,
 					relationships: {
@@ -87,9 +94,6 @@ export const store = createReduxStore(STORE_NAME, {
 				};
 
 			case 'SET_RELATED_POSTS':
-				if (!action.key || !action.relatedPosts) {
-					return state;
-				}
 				return {
 					...state,
 					relatedPosts: {
@@ -98,16 +102,14 @@ export const store = createReduxStore(STORE_NAME, {
 					},
 				};
 
-			case 'MARK_POST_AS_DIRTY':
-				if (!action.postId) {
-					return state;
-				}
+			case 'MARK_POST_AS_DIRTY': {
 				const dirtyPostIds = new Set(state.dirtyPostIds);
 				dirtyPostIds.add(action.postId);
 				return {
 					...state,
 					dirtyPostIds,
 				};
+			}
 
 			case 'CLEAR_DIRTY_POSTS':
 				return {
@@ -120,20 +122,10 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	actions,
 	selectors: {
-		getRelationships(state: ContentConnectState, postId: number, options?: {
-			rel_type?: string;
-			post_type?: string;
-			context?: 'embed';
-		}) {
+		getRelationships(state: ContentConnectState, postId: number, options?: api.GetRelationshipsOptions) {
 			return state.relationships[postId] || {};
 		},
-		getRelatedPosts(state: ContentConnectState, postId: number, options: {
-			rel_key: string;
-			order?: 'desc' | 'asc';
-			orderby?: string;
-			per_page?: number;
-			page?: number;
-		}) {
+		getRelatedPosts(state: ContentConnectState, postId: number, options: api.GetRelatedPostsOptions) {
 			const key = `related-${postId}-${options.rel_key}`;
 			return state.relatedPosts[key] || [];
 		},
@@ -142,21 +134,11 @@ export const store = createReduxStore(STORE_NAME, {
 		},
 	},
 	resolvers: {
-		getRelationships: (postId: number, options?: {
-			rel_type?: string;
-			post_type?: string;
-			context?: 'embed';
-		}) => async function thunk({dispatch}) {
+		getRelationships: (postId: number, options?: api.GetRelationshipsOptions) => async function thunk({dispatch}) {
 			const relationships = await api.getRelationships(postId, options);
 			dispatch.setRelationships(postId, relationships);
 		},
-		getRelatedPosts: (postId: number, options: {
-			rel_key: string;
-			order?: 'desc' | 'asc';
-			orderby?: string;
-			per_page?: number;
-			page?: number;
-		}) => async function thunk({dispatch}) {
+		getRelatedPosts: (postId: number, options: api.GetRelatedPostsOptions) => async function thunk({dispatch}) {
 			const key = `related-${postId}-${options.rel_key}`;
 			const relatedPosts = await api.getRelatedPosts(postId, options);
 			dispatch.setRelatedPosts(key, relatedPosts);

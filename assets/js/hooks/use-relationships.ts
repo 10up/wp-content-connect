@@ -1,13 +1,10 @@
 import { store } from '../store';
 import { useSelect } from '@wordpress/data';
+import { GetRelationshipsOptions } from '../store/api';
 
 export function useRelationships(
 	postId: number,
-	options?: {
-		rel_type?: string;
-		post_type?: string;
-		context?: 'embed';
-	}
+	options?: GetRelationshipsOptions
 ) {
 	const { relationships, hasResolved } = useSelect(
 		(select) => {
