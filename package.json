@@ -33,6 +33,9 @@
   "devDependencies": {
     "@wordpress/api-fetch": "^7.18.0",
     "@wordpress/data": "^10.18.0",
+    "@wordpress/edit-post": "^8.18.0",
+    "@wordpress/editor": "^14.18.0",
+    "@wordpress/html-entities": "^4.18.0",
     "@wordpress/url": "^4.18.0"
   }
 }
