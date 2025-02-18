@@ -312,14 +312,14 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 				/**
-				 * Filters the Post UI item data.
+				 * Filters the post item data.
 				 *
 				 * @since 1.7.0
 				 * @param array    $item_data The item data.
 				 * @param \WP_Post $post      The post object.
 				 * @param Relationship $relationship The relationship object.
 				 */
-				$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $queried_post, $relationship );
+				$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $queried_post, $relationship );
 
 				$related_posts[] = $item_data;
 			}
@@ -413,14 +413,14 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 				$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 				/**
-				 * Filters the Post UI item data.
+				 * Filters the user item data.
 				 *
 				 * @since 1.7.0
 				 * @param array        $item_data The item data.
-				 * @param \WP_Post     $user      The user object.
+				 * @param \WP_User     $user      The user object.
 				 * @param Relationship $relationship The relationship object.
 				 */
-				$item_data = apply_filters( 'tenup_content_connect_post_ui_item_data', $item_data, $queried_user, $relationship );
+				$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $queried_user, $relationship );
 
 				$related_users[] = $item_data;
 			}
