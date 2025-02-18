@@ -233,16 +233,7 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$post        = $this->get_post( $request['id'] );
 		$related_ids = $request->get_param( 'related_ids' );
-
-		if ( empty( $related_ids ) ) {
-			return new \WP_Error(
-				'rest_invalid_param',
-				__( 'No related entities provided.', 'tenup-content-connect' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		$rel_type = $request->get_param( 'rel_type' );
+		$rel_type    = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
