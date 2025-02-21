@@ -74,20 +74,24 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  *                       - 'from': Returns all relationships originating from the specified post type.
  *                       - 'to': Returns all relationships targeting the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
- *         A single Relationship object if 'key' is specified and found,
- *         otherwise an associative array of Relationship objects indexed by relationship key.
+ * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToPost> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
 function get_post_to_post_relationships_by( $field, $value ) {
+
+	if ( 'key' === $field ) {
+		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
+
+		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
+			return [ $value => $relationship ];
+		}
+
+		return false;
+	}
 
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
 		return array();
-	}
-
-	if ( 'key' === $field ) {
-		return get_registry()->get_post_to_post_relationship_by_key( $value );
 	}
 
 	$post_to_post_relationships = array();
@@ -96,7 +100,7 @@ function get_post_to_post_relationships_by( $field, $value ) {
 
 		switch ( $field ) {
 			case 'post_type':
-				if ( $relationship->from === $value || $relationship->to === $value ) {
+				if ( $relationship->from === $value || in_array( $value, $relationship->to, true ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
@@ -125,20 +129,24 @@ function get_post_to_post_relationships_by( $field, $value ) {
  *                       - 'key': Returns a single relationship by its unique key.
  *                       - 'post_type': Returns all relationships involving the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
- *         A single Relationship object if 'key' is specified and found,
- *         otherwise an associative array of Relationship objects indexed by relationship key.
+ * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToUser> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
 function get_post_to_user_relationships_by( $field, $value ) {
+
+	if ( 'key' === $field ) {
+		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
+
+		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
+			return [ $value => $relationship ];
+		}
+
+		return false;
+	}
 
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
 		return array();
-	}
-
-	if ( 'key' === $field ) {
-		return get_registry()->get_post_to_user_relationship_by_key( $value );
 	}
 
 	$post_to_user_relationships = array();
@@ -252,34 +260,42 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 		return array();
 	}
 
-	$relationships = get_post_to_post_relationships_by( 'from', $post->post_type );
+	$relationships = get_post_to_post_relationships_by( 'post_type', $post->post_type );
 
 	if ( empty( $relationships ) ) {
 		return array();
 	}
 
-	$relationship_data = array();
+	$relationships_data = array();
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
-		$relationship_data[ $rel_key ] = array(
+		$relationship_data = array(
 			'rel_key'     => $rel_key,
 			'rel_type'    => 'post-to-post',
 			'rel_name'    => $relationship->name,
 			'object_type' => 'post',
-			'post_type'   => $relationship->to,
-			'labels'      => $relationship->from_labels,
-			'sortable'    => $relationship->from_sortable,
 		);
+
+		if ( $post->post_type === $relationship->from ) {
+			$relationship_data['labels']    = $relationship->from_labels;
+			$relationship_data['enable_ui'] = $relationship->enable_from_ui;
+			$relationship_data['sortable']  = $relationship->from_sortable;
+			$relationship_data['post_type'] = $relationship->to;
+		} else {
+			$relationship_data['labels']    = $relationship->to_labels;
+			$relationship_data['enable_ui'] = $relationship->enable_to_ui;
+			$relationship_data['sortable']  = $relationship->to_sortable;
+			$relationship_data['post_type'] = $relationship->from;
+		}
+
+		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship->to, true ) && $relationship->from !== $other_post_type ) {
+			continue;
+		}
 
 		if ( 'embed' === $context ) {
 
-			if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship->to, true ) ) {
-				continue;
-			}
-
 			$query_args = array(
-				'post_type'              => $relationship->to,
 				'relationship_query'     => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
@@ -288,6 +304,12 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			);
+
+			if ( $post->post_type === $relationship->from ) {
+				$query_args['post_type'] = $relationship->to;
+			} else {
+				$query_args['post_type'] = $relationship->from;
+			}
 
 			if ( $relationship->from_sortable ) {
 				$query_args['orderby'] = 'relationship';
@@ -324,11 +346,13 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$related_posts[] = $item_data;
 			}
 
-			$relationship_data[ $rel_key ]['related'] = $related_posts;
+			$relationship_data['related'] = $related_posts;
 		}
+
+		$relationships_data[ $rel_key ] = $relationship_data;
 	}
 
-	return $relationship_data;
+	return $relationships_data;
 }
 
 /**
@@ -368,17 +392,18 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 		return array();
 	}
 
-	$relationship_data = array();
+	$relationships_data = array();
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
-		$relationship_data[ $rel_key ] = array(
+		$relationship_data = array(
 			'rel_key'     => $rel_key,
 			'rel_type'    => 'post-to-user',
 			'rel_name'    => $relationship->name,
 			'object_type' => 'user',
 			'labels'      => $relationship->from_labels,
 			'sortable'    => $relationship->from_sortable,
+			'enable_ui'   => $relationship->enable_from_ui,
 		);
 
 		if ( 'embed' === $context ) {
@@ -425,9 +450,11 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 				$related_users[] = $item_data;
 			}
 
-			$relationship_data[ $rel_key ]['related'] = $related_users;
+			$relationship_data['related'] = $related_users;
 		}
+
+		$relationships_data[ $rel_key ] = $relationship_data;
 	}
 
-	return $relationship_data;
+	return $relationships_data;
 }
