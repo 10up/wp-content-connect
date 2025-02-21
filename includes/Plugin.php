@@ -92,10 +92,10 @@ class Plugin {
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
 			new QueryLoopIntegration(),
-			new MetaBox(),
+			new MetaBox(), // @deprecated remove in 1.7.0
 			new BlockEditor(),
 			new DeletedItems(),
-			new API\V1\Search(),
+			new API\V1\Search(), // @deprecated remove in 1.7.0
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
