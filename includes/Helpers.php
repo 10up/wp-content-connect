@@ -289,11 +289,11 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			$relationship_data['post_type'] = $relationship->from;
 		}
 
-		if ( 'embed' === $context ) {
+		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship->to, true ) && $relationship->from !== $other_post_type ) {
+			continue;
+		}
 
-			if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship->to, true ) ) {
-				continue;
-			}
+		if ( 'embed' === $context ) {
 
 			$query_args = array(
 				'relationship_query'     => array(
