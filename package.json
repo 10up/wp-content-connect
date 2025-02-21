@@ -15,21 +15,27 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
-    "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
+    "start": "10up-toolkit build --watch",
+    "build": "10up-toolkit build",
+    "format-js": "10up-toolkit format-js",
+    "lint-js": "10up-toolkit lint-js",
+    "lint-style": "10up-toolkit lint-style",
+    "test": "10up-toolkit test-unit-jest"
+  },
+  "dependencies": {
+    "10up-toolkit": "^6.4.0"
+  },
+  "10up-toolkit": {
+    "entry": {
+      "wp-content-connect": "assets/js/index.ts"
+    }
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-runtime": "^6.26.0",
-    "browserify": "^16.2.3",
-    "node-sass": "^9.0.0",
-    "vue": "^2.4.4",
-    "vue-resource": "^1.5.3",
-    "vuedraggable": "^2.14.1",
-    "vueify": "^9.4.1",
-    "watchify": "^4.0.0"
+    "@wordpress/api-fetch": "^7.18.0",
+    "@wordpress/data": "^10.18.0",
+    "@wordpress/edit-post": "^8.18.0",
+    "@wordpress/editor": "^14.18.0",
+    "@wordpress/html-entities": "^4.18.0",
+    "@wordpress/url": "^4.18.0"
   }
 }
