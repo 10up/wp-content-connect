@@ -276,9 +276,17 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			'rel_name'    => $relationship->name,
 			'object_type' => 'post',
 			'post_type'   => $relationship->to,
-			'labels'      => $relationship->from_labels,
-			'sortable'    => $relationship->from_sortable,
 		);
+
+		if ( $post->post_type === $relationship->from ) {
+			$relationship_data['labels']    = $relationship->from_labels;
+			$relationship_data['enable_ui'] = $relationship->enable_from_ui;
+			$relationship_data['sortable']  = $relationship->from_sortable;
+		} else {
+			$relationship_data['labels']    = $relationship->to_labels;
+			$relationship_data['enable_ui'] = $relationship->enable_to_ui;
+			$relationship_data['sortable']  = $relationship->to_sortable;
+		}
 
 		if ( 'embed' === $context ) {
 
