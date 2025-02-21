@@ -2,7 +2,7 @@
 
 namespace TenUp\ContentConnect\API\V2\Post\Route;
 
-use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
+use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
 
 /**
  * Class Relationships
@@ -78,7 +78,7 @@ class Relationships extends AbstractPostRoute {
 		$post_type = $request->get_param( 'post_type' );
 		$context   = $request->get_param( 'context' );
 
-		$relationships = get_post_relationship_data( $post, $rel_type, $post_type, $context );
+		$relationships = get_post_relationships_data( $post, $rel_type, $post_type, $context );
 		$response      = rest_ensure_response( $relationships );
 
 		return $response;
