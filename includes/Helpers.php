@@ -193,7 +193,7 @@ function get_post_to_user_relationships_by( $field, $value ) {
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
  */
-function get_post_relationship_data( $post, $rel_type = 'any', $other_post_type = false, $context = 'view' ) {
+function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type = false, $context = 'view' ) {
 
 	$post = get_post( $post );
 
