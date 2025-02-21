@@ -12,7 +12,7 @@ namespace TenUp\ContentConnect\API\V2;
 abstract class AbstractField {
 
 	/**
-	 * Setup actions and filters.
+	 * Setup the REST API fields module.
 	 *
 	 * @since 1.7.0
 	 */
