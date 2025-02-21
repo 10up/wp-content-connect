@@ -100,7 +100,7 @@ function get_post_to_post_relationships_by( $field, $value ) {
 
 		switch ( $field ) {
 			case 'post_type':
-				if ( $relationship->from === $value || $relationship->to === $value ) {
+				if ( $relationship->from === $value || in_array( $value, $relationship->to, true ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
