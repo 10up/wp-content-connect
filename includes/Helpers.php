@@ -397,13 +397,13 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 	foreach ( $relationships as $rel_key => $relationship ) {
 
 		$relationship_data = array(
-			'rel_key'        => $rel_key,
-			'rel_type'       => 'post-to-user',
-			'rel_name'       => $relationship->name,
-			'object_type'    => 'user',
-			'labels'         => $relationship->from_labels,
-			'sortable'       => $relationship->from_sortable,
-			'enable_from_ui' => $relationship->enable_from_ui,
+			'rel_key'     => $rel_key,
+			'rel_type'    => 'post-to-user',
+			'rel_name'    => $relationship->name,
+			'object_type' => 'user',
+			'labels'      => $relationship->from_labels,
+			'sortable'    => $relationship->from_sortable,
+			'enable_ui'   => $relationship->enable_from_ui,
 		);
 
 		if ( 'embed' === $context ) {
