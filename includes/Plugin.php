@@ -3,6 +3,7 @@
 namespace TenUp\ContentConnect;
 
 use TenUp\ContentConnect\API;
+use TenUp\ContentConnect\QueryIntegration\QueryLoopIntegration;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -11,54 +12,33 @@ use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\BlockEditor;
 use TenUp\ContentConnect\UI\MetaBox;
 
+/**
+ * Class Plugin
+ *
+ * @package TenUp\ContentConnect
+ */
 class Plugin {
 
 	/**
+	 * The tables for the plugin.
+	 *
 	 * @var array
 	 */
 	public $tables = array();
 
 	/**
+	 * The registry instance.
+	 *
 	 * @var Registry
 	 */
 	public $registry;
-
-	/**
-	 * @var WPQueryIntegration
-	 */
-	public $wp_query_integration;
-
-	/**
-	 * @var UserQueryIntegration
-	 */
-	public $user_query_integration;
-
-	/**
-	 * @var MetaBox
-	 */
-	public $meta_box;
-
-	/**
-	 * @var BlockEditor
-	 */
-	public $block_editor;
-
-	/**
-	 * @var Search
-	 */
-	public $search;
-
-	/**
-	 * @var DeletedItems
-	 */
-	public $deleted_items;
 
 	/**
 	 * The single instance of the class.
 	 *
 	 * @var Plugin
 	 */
-	private static $instance;
+	protected static $instance;
 
 	/**
 	 * Get class instance.
@@ -73,11 +53,23 @@ class Plugin {
 		return self::$instance;
 	}
 
+	/**
+	 * Retrieves the registry instance.
+	 *
+	 * @return Registry
+	 */
 	public function get_registry() {
 		return $this->registry;
 	}
 
+	/**
+	 * Retrieves a table.
+	 *
+	 * @param string $table The table to retrieve.
+	 * @return PostToPost|PostToUser|bool
+	 */
 	public function get_table( $table ) {
+
 		if ( isset( $this->tables[ $table ] ) ) {
 			return $this->tables[ $table ];
 		}
@@ -85,28 +77,24 @@ class Plugin {
 		return false;
 	}
 
+	/**
+	 * Sets up the plugin.
+	 *
+	 * @return void
+	 */
 	public function setup() {
 		$this->register_tables();
 
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query_integration = new WPQueryIntegration();
-		$this->wp_query_integration->setup();
-
-		$this->user_query_integration = new UserQueryIntegration();
-		$this->user_query_integration->setup();
-
-		$this->meta_box = new MetaBox();
-		$this->meta_box->setup();
-
-		$this->block_editor = new BlockEditor();
-		$this->block_editor->setup();
-
-		$this->deleted_items = new DeletedItems();
-		$this->deleted_items->setup();
-
-		$routes = array(
+		$modules = array(
+			new WPQueryIntegration(),
+			new UserQueryIntegration(),
+			new QueryLoopIntegration(),
+			new MetaBox(),
+			new BlockEditor(),
+			new DeletedItems(),
 			new API\V1\Search(),
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
@@ -114,8 +102,11 @@ class Plugin {
 			new API\V2\Post\Route\Search(),
 		);
 
-		foreach ( $routes as $route ) {
-			$route->setup();
+		foreach ( $modules as $module ) {
+
+			if ( method_exists( $module, 'setup' ) ) {
+				$module->setup();
+			}
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );
