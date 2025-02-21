@@ -2,7 +2,7 @@
 
 namespace TenUp\ContentConnect\QueryIntegration;
 
-class QueryLoopIntegration {
+class QueryBlockIntegration {
 
 	public function setup() {
 	}

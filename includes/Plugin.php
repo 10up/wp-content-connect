@@ -3,7 +3,7 @@
 namespace TenUp\ContentConnect;
 
 use TenUp\ContentConnect\API;
-use TenUp\ContentConnect\QueryIntegration\QueryLoopIntegration;
+use TenUp\ContentConnect\QueryIntegration\QueryBlockIntegration;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -91,8 +91,8 @@ class Plugin {
 		$modules = array(
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
-			new QueryLoopIntegration(),
 			new MetaBox(), // @deprecated remove in 1.7.0
+			new QueryBlockIntegration(),
 			new BlockEditor(),
 			new DeletedItems(),
 			new API\V1\Search(), // @deprecated remove in 1.7.0
