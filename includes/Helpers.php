@@ -266,11 +266,11 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 		return array();
 	}
 
-	$relationship_data = array();
+	$relationships_data = array();
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
-		$relationship_data[ $rel_key ] = array(
+		$relationship_data = array(
 			'rel_key'     => $rel_key,
 			'rel_type'    => 'post-to-post',
 			'rel_name'    => $relationship->name,
@@ -332,11 +332,13 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$related_posts[] = $item_data;
 			}
 
-			$relationship_data[ $rel_key ]['related'] = $related_posts;
+			$relationship_data['related'] = $related_posts;
 		}
+
+		$relationships_data[ $rel_key ] = $relationship_data;
 	}
 
-	return $relationship_data;
+	return $relationships_data;
 }
 
 /**
@@ -376,17 +378,18 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 		return array();
 	}
 
-	$relationship_data = array();
+	$relationships_data = array();
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
-		$relationship_data[ $rel_key ] = array(
-			'rel_key'     => $rel_key,
-			'rel_type'    => 'post-to-user',
-			'rel_name'    => $relationship->name,
-			'object_type' => 'user',
-			'labels'      => $relationship->from_labels,
-			'sortable'    => $relationship->from_sortable,
+		$relationship_data = array(
+			'rel_key'        => $rel_key,
+			'rel_type'       => 'post-to-user',
+			'rel_name'       => $relationship->name,
+			'object_type'    => 'user',
+			'labels'         => $relationship->from_labels,
+			'sortable'       => $relationship->from_sortable,
+			'enable_from_ui' => $relationship->enable_from_ui,
 		);
 
 		if ( 'embed' === $context ) {
@@ -433,9 +436,11 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 				$related_users[] = $item_data;
 			}
 
-			$relationship_data[ $rel_key ]['related'] = $related_users;
+			$relationship_data['related'] = $related_users;
 		}
+
+		$relationships_data[ $rel_key ] = $relationship_data;
 	}
 
-	return $relationship_data;
+	return $relationships_data;
 }
