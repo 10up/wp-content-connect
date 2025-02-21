@@ -74,20 +74,24 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  *                       - 'from': Returns all relationships originating from the specified post type.
  *                       - 'to': Returns all relationships targeting the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
- *         A single Relationship object if 'key' is specified and found,
- *         otherwise an associative array of Relationship objects indexed by relationship key.
+ * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToPost> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
 function get_post_to_post_relationships_by( $field, $value ) {
+
+	if ( 'key' === $field ) {
+		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
+
+		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
+			return [ $value => $relationship ];
+		}
+
+		return false;
+	}
 
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
 		return array();
-	}
-
-	if ( 'key' === $field ) {
-		return get_registry()->get_post_to_post_relationship_by_key( $value );
 	}
 
 	$post_to_post_relationships = array();
@@ -125,20 +129,24 @@ function get_post_to_post_relationships_by( $field, $value ) {
  *                       - 'key': Returns a single relationship by its unique key.
  *                       - 'post_type': Returns all relationships involving the specified post type.
  * @param  string $value The value to match against the specified field.
- * @return \TenUp\ContentConnect\Relationships\Relationship|array<string, \TenUp\ContentConnect\Relationships\Relationship>
- *         A single Relationship object if 'key' is specified and found,
- *         otherwise an associative array of Relationship objects indexed by relationship key.
+ * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToUser> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
 function get_post_to_user_relationships_by( $field, $value ) {
+
+	if ( 'key' === $field ) {
+		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
+
+		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
+			return [ $value => $relationship ];
+		}
+
+		return false;
+	}
 
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
 		return array();
-	}
-
-	if ( 'key' === $field ) {
-		return get_registry()->get_post_to_user_relationship_by_key( $value );
 	}
 
 	$post_to_user_relationships = array();
