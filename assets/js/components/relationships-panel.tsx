@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
+
 import { store } from '../store';
 import { RelationshipManager } from './relationship-manager';
 
@@ -22,11 +24,16 @@ export function RelationshipsPanel() {
 	return (
 		<>
 			{Object.values(relationships).map((relationship) => (
-				<RelationshipManager
-					key={relationship.rel_key}
-					postId={postId}
-					relationship={relationship}
-				/>
+				<PluginDocumentSettingPanel
+					name={`content-connect-relationship-${relationship.rel_key}`}
+					title={relationship.labels.name}
+				>
+					<RelationshipManager
+						key={relationship.rel_key}
+						postId={postId}
+						relationship={relationship}
+					/>
+				</PluginDocumentSettingPanel>
 			))}
 		</>
 	);

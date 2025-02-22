@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormTokenField } from '@wordpress/components';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { store as coreStore, Post } from '@wordpress/core-data';
@@ -77,19 +76,14 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 	};
 
 	return (
-		<PluginDocumentSettingPanel
-			name={`content-connect-relationship-${relationship.rel_key}`}
-			title={relationship.labels.name}
-		>
-			<FormTokenField
-				value={tokens}
-				suggestions={suggestions}
-				onChange={handleChange}
-				onInputChange={(input) => setSearchTerm(input)}
-				label={relationship.labels.name}
-				__next40pxDefaultSize={true}
-				__experimentalShowHowTo={false}
-			/>
-		</PluginDocumentSettingPanel>
+		<FormTokenField
+			value={tokens}
+			suggestions={suggestions}
+			onChange={handleChange}
+			onInputChange={(input) => setSearchTerm(input)}
+			label={relationship.labels.name}
+			__next40pxDefaultSize={true}
+			__experimentalShowHowTo={false}
+		/>
 	);
 }
