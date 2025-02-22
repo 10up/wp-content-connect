@@ -9,7 +9,7 @@ use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\BlockEditor;
-use TenUp\ContentConnect\UI\MetaBox;
+use TenUp\ContentConnect\UI\ClassicEditor;
 
 class Plugin {
 
@@ -91,22 +91,12 @@ class Plugin {
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query_integration = new WPQueryIntegration();
-		$this->wp_query_integration->setup();
-
-		$this->user_query_integration = new UserQueryIntegration();
-		$this->user_query_integration->setup();
-
-		$this->meta_box = new MetaBox(); // @deprecated remove in 1.7.0
-		$this->meta_box->setup();
-
-		$this->block_editor = new BlockEditor();
-		$this->block_editor->setup();
-
-		$this->deleted_items = new DeletedItems();
-		$this->deleted_items->setup();
-
-		$routes = array(
+		$modules = array(
+			new WPQueryIntegration(),
+			new UserQueryIntegration(),
+			new ClassicEditor(),
+			new BlockEditor(),
+			new DeletedItems(),
 			new API\V1\Search(), // @deprecated remove in 1.7.0
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
@@ -114,8 +104,8 @@ class Plugin {
 			new API\V2\Post\Route\Search(),
 		);
 
-		foreach ( $routes as $route ) {
-			$route->setup();
+		foreach ( $modules as $module ) {
+			$module->setup();
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );
