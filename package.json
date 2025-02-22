@@ -28,7 +28,7 @@
   "10up-toolkit": {
     "entry": {
       "block-editor": "assets/js/index.ts",
-      "classic-editor": "assets/js/classic-editor.ts"
+      "classic-editor": "assets/js/classic-editor.tsx"
     }
   },
   "devDependencies": {
