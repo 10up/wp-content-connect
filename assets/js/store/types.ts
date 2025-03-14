@@ -1,10 +1,10 @@
-export type ContentConnectRelatedPost = {
-	ID: number;
+export type ContentConnectRelatedEntity = {
+	id: number;
 	name: string;
 };
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/related?rel_key=${relKey}` endpoint returns
-export type ContentConnectRelatedPosts = ContentConnectRelatedPost[];
+export type ContentConnectRelatedEntities = ContentConnectRelatedEntity[];
 
 export type ContentConnectRelationshipLabels = {
 	name: string;
@@ -19,6 +19,7 @@ export type ContentConnectRelationship = {
 	labels: ContentConnectRelationshipLabels;
 	sortable: boolean;
 	current_post_id: number;
+	max_items: number;
 };
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/relationships` endpoint returns
@@ -35,8 +36,8 @@ export type ContentConnectState = {
 	relationships: {
 		[postId: number]: ContentConnectRelationships;
 	};
-	relatedPosts: {
-		[key: string]: ContentConnectRelatedPosts;
+	relatedEntities: {
+		[key: string]: ContentConnectRelatedEntities;
 	};
-	dirtyPostIds: Set<number>;
+	dirtyEntityIds: Set<number>;
 };
