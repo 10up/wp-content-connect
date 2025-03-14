@@ -449,7 +449,6 @@ class RelatedEntities extends AbstractPostRoute {
 		$orderby     = $request->get_param( 'orderby' );
 
 		$query_args = array(
-			'post_type'          => $this->relationship->to,
 			'post_status'        => $post_status,
 			'paged'              => $page,
 			'posts_per_page'     => $per_page,
@@ -461,6 +460,12 @@ class RelatedEntities extends AbstractPostRoute {
 			),
 			'orderby'            => $orderby,
 		);
+
+		if ( $post->post_type === $this->relationship->from ) {
+			$query_args['post_type'] = $this->relationship->to;
+		} else {
+			$query_args['post_type'] = $this->relationship->from;
+		}
 
 		if ( 'relationship' !== $orderby ) {
 			$query_args['order'] = $order;
