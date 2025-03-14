@@ -231,9 +231,8 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items( $request ) {
 
-		$post        = $this->get_post( $request['id'] );
-		$related_ids = $request->get_param( 'related_ids' );
-		$rel_type    = $request->get_param( 'rel_type' );
+		$post     = $this->get_post( $request['id'] );
+		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
