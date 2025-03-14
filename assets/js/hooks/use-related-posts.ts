@@ -1,30 +1,30 @@
 import { store } from '../store';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from 'react';
-import { GetRelatedPostsOptions } from '../store/api';
+import { GetRelatedEntitiesOptions } from '../store/api';
 
-export function useRelatedPosts(postId: number, options: GetRelatedPostsOptions) {
-		const { hasResolved, relatedPosts } = useSelect(
+export function useRelatedEntities(postId: number, options: GetRelatedEntitiesOptions) {
+		const { hasResolved, relatedEntities } = useSelect(
 			(select) => {
 				const params = [postId, options] as const;
-				const relatedPosts = select(store).getRelatedPosts(...params);
+				const relatedEntities = select(store).getRelatedEntities(...params);
 				// @ts-expect-error - The hasFinishedResolution method is a meta-method that coming
 				// from WordPress. Because of that, it's not typed correctly in our custom store.
-				const hasResolved: boolean = select(store).hasFinishedResolution('getRelatedPosts', params);
+				const hasResolved: boolean = select(store).hasFinishedResolution('getRelatedEntities', params);
 
 				return {
-					relatedPosts,
+					relatedEntities,
 					hasResolved,
 			};
 		},
 		[postId, options]
 	);
 
-	const { updateRelatedPosts } = useDispatch(store);
+	const { updateRelatedEntities } = useDispatch(store);
 
-	const _updateRelatedPosts = useCallback((relatedIds: number[]) => {
-		updateRelatedPosts(postId, options.rel_key, relatedIds);
-	}, [postId, options, updateRelatedPosts]);
+	const _updateRelatedEntities = useCallback((relatedIds: number[]) => {
+		updateRelatedEntities(postId, options.rel_key, options.rel_type, relatedIds);
+	}, [postId, options, updateRelatedEntities]);
 
-	return [hasResolved, relatedPosts, _updateRelatedPosts] as const;
+	return [hasResolved, relatedEntities, _updateRelatedEntities] as const;
 }
