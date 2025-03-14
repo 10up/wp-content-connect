@@ -10,7 +10,7 @@ use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\BlockEditor;
-use TenUp\ContentConnect\UI\MetaBox;
+use TenUp\ContentConnect\UI\ClassicEditor;
 
 /**
  * Class Plugin
@@ -91,8 +91,8 @@ class Plugin {
 		$modules = array(
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
-			new MetaBox(), // @deprecated remove in 1.7.0
 			new QueryBlockIntegration(),
+			new ClassicEditor(),
 			new BlockEditor(),
 			new DeletedItems(),
 			new API\V1\Search(), // @deprecated remove in 1.7.0
