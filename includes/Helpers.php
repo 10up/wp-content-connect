@@ -299,22 +299,17 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 		if ( 'embed' === $context ) {
 
 			$query_args = array(
+				'post_type'              => $relationship_data['post_type'],
+				'posts_per_page'         => 100,
 				'relationship_query'     => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
 				),
-				'posts_per_page'         => 100,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			);
 
-			if ( $post->post_type === $relationship->from ) {
-				$query_args['post_type'] = $relationship_to;
-			} else {
-				$query_args['post_type'] = $relationship->from;
-			}
-
-			if ( $relationship->from_sortable ) {
+			if ( ! empty( $relationship_data['sortable'] ) ) {
 				$query_args['orderby'] = 'relationship';
 			}
 
