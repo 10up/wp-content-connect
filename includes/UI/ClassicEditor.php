@@ -48,6 +48,8 @@ class ClassicEditor {
 		);
 
 		wp_enqueue_script( 'wp-content-connect-classic-editor' );
+
+		wp_enqueue_style( 'wp-components' );
 	}
 
 	/**
