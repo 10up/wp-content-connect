@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { ContentConnectRelatedPosts, ContentConnectRelationships, ContentConnectUpdateRelationshipsBody } from './types';
+import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConnectUpdateRelationshipsBody } from './types';
 
 export const CONTENT_CONNECT_ENDPOINT = '/content-connect/v2';
 
@@ -19,32 +19,34 @@ export async function getRelationships(
 	return relationships;
 }
 
-export type GetRelatedPostsOptions = {
+export type GetRelatedEntitiesOptions = {
 	rel_key: string;
+	rel_type: string;
 	order?: 'desc' | 'asc';
 	orderby?: string;
 	per_page?: number;
 	page?: number;
 }
 
-export async function getRelatedPosts(
+export async function getRelatedEntities(
 	postId: number,
-	options: GetRelatedPostsOptions
+	options: GetRelatedEntitiesOptions
 ) {
 	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, options);
-	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path });
-	return relatedPosts;
+	const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path });
+	return relatedEntities;
 }
 
-export async function updateRelatedPosts(
+export async function updateRelatedEntities(
 	postId: number,
 	relKey: string,
+	relType: string,
 	relatedIds: number[]
 ) {
 	const body: ContentConnectUpdateRelationshipsBody = {
 		related_ids: relatedIds,
 	};
-	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey });
-	const relatedPosts = await apiFetch<ContentConnectRelatedPosts>({ path, method: 'POST', data: body });
-	return relatedPosts;
+	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey, rel_type: relType });
+	const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path, method: 'POST', data: body });
+	return relatedEntities;
 }
