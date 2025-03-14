@@ -97,10 +97,11 @@ function get_post_to_post_relationships_by( $field, $value ) {
 	$post_to_post_relationships = array();
 
 	foreach ( $relationships as $key => $relationship ) {
+		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
 
 		switch ( $field ) {
 			case 'post_type':
-				if ( $relationship->from === $value || in_array( $value, $relationship->to, true ) ) {
+				if ( $relationship->from === $value || in_array( $value, $relationship_to, true ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
@@ -110,7 +111,7 @@ function get_post_to_post_relationships_by( $field, $value ) {
 				}
 				break;
 			case 'to':
-				if ( in_array( $value, $relationship->to, true ) ) {
+				if ( in_array( $value, $relationship_to, true ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
@@ -277,41 +278,38 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			'object_type' => 'post',
 		);
 
+		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
+
 		if ( $post->post_type === $relationship->from ) {
 			$relationship_data['labels']    = $relationship->from_labels;
 			$relationship_data['enable_ui'] = $relationship->enable_from_ui;
 			$relationship_data['sortable']  = $relationship->from_sortable;
-			$relationship_data['post_type'] = $relationship->to;
+			$relationship_data['post_type'] = $relationship_to;
 		} else {
 			$relationship_data['labels']    = $relationship->to_labels;
 			$relationship_data['enable_ui'] = $relationship->enable_to_ui;
 			$relationship_data['sortable']  = $relationship->to_sortable;
-			$relationship_data['post_type'] = $relationship->from;
+			$relationship_data['post_type'] = array( $relationship->from );
 		}
 
-		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship->to, true ) && $relationship->from !== $other_post_type ) {
+		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship_to, true ) && $relationship->from !== $other_post_type ) {
 			continue;
 		}
 
 		if ( 'embed' === $context ) {
 
 			$query_args = array(
+				'post_type'              => $relationship_data['post_type'],
+				'posts_per_page'         => 100,
 				'relationship_query'     => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
 				),
-				'posts_per_page'         => 100,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			);
 
-			if ( $post->post_type === $relationship->from ) {
-				$query_args['post_type'] = $relationship->to;
-			} else {
-				$query_args['post_type'] = $relationship->from;
-			}
-
-			if ( $relationship->from_sortable ) {
+			if ( ! empty( $relationship_data['sortable'] ) ) {
 				$query_args['orderby'] = 'relationship';
 			}
 
