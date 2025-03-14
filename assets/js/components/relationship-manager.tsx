@@ -10,17 +10,18 @@ type RelationshipManagerProps = {
 };
 
 export function RelationshipManager({ postId, relationship }: RelationshipManagerProps) {
-	const { updateRelatedPosts } = useDispatch(store);
+	const { updateRelatedEntities } = useDispatch(store);
 
 	const { relatedEntities } = useSelect((select) => ({
-		relatedEntities: select(store).getRelatedPosts(postId, {
+		relatedEntities: select(store).getRelatedEntities(postId, {
 			rel_key: relationship.rel_key,
+			rel_type: relationship.rel_type,
 		}),
 	}), [postId, relationship.rel_key, relationship.post_type]);
 
 	const handleChange = async (newEntities: any[]) => {
 		const newIds = newEntities.map(entity => entity.id);
-		updateRelatedPosts(postId, relationship.rel_key, newIds);
+		updateRelatedEntities(postId, relationship.rel_key, relationship.rel_type, newIds);
 	};
 
 	return (
