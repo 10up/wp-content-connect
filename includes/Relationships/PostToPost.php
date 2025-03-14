@@ -20,20 +20,6 @@ class PostToPost extends Relationship {
 	 */
 	public $to;
 
-	/**
-	 * The UI Object for the "from" portion of the relationship, if the from UI is enabled
-	 *
-	 * @var \TenUp\ContentConnect\UI\PostToPost
-	 */
-	public $from_ui;
-
-	/**
-	 * The UI Object for the "to" portion of the relationship, if the to UI is enabled
-	 *
-	 * @var \TenUp\ContentConnect\UI\PostToPost
-	 */
-	public $to_ui;
-
 	public function __construct( $from, $to, $name, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
 			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
@@ -49,26 +35,11 @@ class PostToPost extends Relationship {
 		$this->from = $from;
 		$this->to = $to;
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
-		
+
 		parent::__construct( $name, $args );
 	}
 
-	public function setup() {
-		if ( $this->enable_from_ui === true ) {
-			$this->from_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->from, $this->from_labels, $this->from_sortable );
-			$this->from_ui->setup();
-		}
-
-		// Make sure CPT is not the same as "from" so we don't get a duplicate, then register if enabled
-		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			// Currently, only support a default UI when the "to" end is a single post type
-			if ( count( $this->to ) === 1 ) {
-				$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to[0], $this->to_labels, $this->to_sortable );
-				$this->to_ui->setup();
-			}
-		}
-
-	}
+	public function setup() {}
 
 	/**
 	 * Gets the IDs that are related to the supplied post ID in the context of the current relationship
@@ -234,7 +205,7 @@ class PostToPost extends Relationship {
 				'order' => $order
 			);
 		}
-		
+
 		$fields = array(
 			'id1' => '%d',
 			'id2' => '%d',
