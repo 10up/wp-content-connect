@@ -1,2 +1,2 @@
 import './use-relationships';
-import './use-related-posts';
+import './use-related-entities';
