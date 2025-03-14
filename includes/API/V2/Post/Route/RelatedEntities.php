@@ -582,11 +582,18 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$this->relationship->replace_relationships( $post->ID, $related_ids );
 
-		if ( $this->relationship->from_sortable ) {
+		$is_sortable = false;
+		if ( $post->post_type === $this->relationship->from ) {
+			$is_sortable = $this->relationship->from_sortable;
+		} else {
+			$is_sortable = $this->relationship->to_sortable;
+		}
+
+		if ( $is_sortable ) {
 			$this->relationship->save_sort_data( $post->ID, $related_ids );
 		}
 
-		$items = $this->relationship->get_related_object_ids( $post->ID, $this->relationship->from_sortable );
+		$items = $this->relationship->get_related_object_ids( $post->ID, $is_sortable );
 
 		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 
