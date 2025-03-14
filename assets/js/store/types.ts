@@ -19,6 +19,7 @@ export type ContentConnectRelationship = {
 	labels: ContentConnectRelationshipLabels;
 	sortable: boolean;
 	current_post_id: number;
+	max_items: number;
 };
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/relationships` endpoint returns

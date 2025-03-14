@@ -1,13 +1,8 @@
 import React from 'react';
-import { FormTokenField } from '@wordpress/components';
-import { useSelect, useDispatch, select } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
-import { store as coreStore, Post } from '@wordpress/core-data';
+import { ContentPicker } from '@10up/block-components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store } from '../store';
 import { ContentConnectRelationship } from '../store/types';
-import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 
 type RelationshipManagerProps = {
 	postId: number | null;
@@ -16,74 +11,27 @@ type RelationshipManagerProps = {
 
 export function RelationshipManager({ postId, relationship }: RelationshipManagerProps) {
 	const { updateRelatedPosts } = useDispatch(store);
-	const [suggestions, setSuggestions] = useState<string[]>([]);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [currentSearch, setCurrentSearch] = useState('');
 
-	const { relatedPosts, searchResults } = useSelect((select) => ({
-		relatedPosts: select(store).getRelatedPosts(postId, {
+	const { relatedEntities } = useSelect((select) => ({
+		relatedEntities: select(store).getRelatedPosts(postId, {
 			rel_key: relationship.rel_key,
 		}),
-		searchResults: searchTerm ? select(coreStore).getEntityRecords<Post>(
-			'postType',
-			relationship.post_type[0],
-			{
-				search: searchTerm,
-				per_page: 20,
-				orderby: 'title',
-				order: 'asc',
-			}
-		) : [],
-	}), [postId, relationship.rel_key, relationship.post_type, searchTerm]);
+	}), [postId, relationship.rel_key, relationship.post_type]);
 
-	async function getPostByTitle(title: string) {
-		const result = await apiFetch<{ id: number }[]>({
-			path: addQueryArgs(`/wp/v2/${relationship.post_type[0]}`, {
-				search: title,
-				per_page: 1,
-				_fields: 'id',
-			}),
-		});
-		return result[0]?.id ?? undefined;
-	}
-
-	// Convert related posts to token format
-	const tokens = relatedPosts.map((post) => post.name);
-
-	// Update suggestions based on search
-	useEffect(() => {
-		if (!searchResults) {
-			setSuggestions([]);
-			return;
-		}
-
-		const newSuggestions = searchResults
-			.filter((post) => !relatedPosts.find((related) => related.ID === post.id))
-			.map((post) => decodeEntities(post.title.rendered));
-
-		setSuggestions(newSuggestions);
-	}, [searchResults, relatedPosts]);
-
-	const handleChange = async (newTokens: any[]) => {
-		const newRelatedIds = await Promise.all(
-			newTokens.map(async (token) => {
-				const tokenValue = typeof token === 'string' ? token : token.value;
-				return getPostByTitle(tokenValue);
-			})
-		);
-
-		updateRelatedPosts(postId, relationship.rel_key, newRelatedIds.filter((id): id is number => id !== undefined));
+	const handleChange = async (newEntities: any[]) => {
+		console.log(newEntities);
+		const newIds = newEntities.map(entity => entity.id);
+		updateRelatedPosts(postId, relationship.rel_key, newIds);
 	};
 
 	return (
-		<FormTokenField
-			value={tokens}
-			suggestions={suggestions}
-			onChange={handleChange}
-			onInputChange={(input) => setSearchTerm(input)}
-			label={relationship.labels.name}
-			__next40pxDefaultSize={true}
-			__experimentalShowHowTo={false}
+		<ContentPicker
+			onPickChange={handleChange}
+			mode={relationship?.object_type ?? 'post'}
+			content={relatedEntities}
+			contentTypes={relationship.post_type}
+			maxContentItems={relationship?.max_items ?? 100}
+			isOrderable={relationship?.sortable ?? false}
 		/>
 	);
 }
