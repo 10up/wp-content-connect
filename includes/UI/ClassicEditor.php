@@ -32,8 +32,25 @@ class ClassicEditor {
 	 * @return void
 	 */
 	public function enqueue_classic_editor_assets( $hook_suffix ) {
+		global $post;
 
 		if ( 'post-new.php' !== $hook_suffix && 'post.php' !== $hook_suffix ) {
+			return;
+		}
+
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		$use_block_editor = use_block_editor_for_post( $post );
+
+		if ( $use_block_editor ) {
+			return;
+		}
+
+		$relationships = get_post_to_post_relationships_data( $post );
+
+		if ( empty( $relationships ) ) {
 			return;
 		}
 
@@ -112,6 +129,7 @@ class ClassicEditor {
 			data-content-connect
 			data-post-id="<?php echo esc_attr( $post->ID ); ?>"
 			data-relationship="<?php echo esc_attr( wp_json_encode( $args['args']['relationship'] ) ); ?>"
+			style="margin-top: 12px;"
 		></div>
 		<?php
 	}
