@@ -2,9 +2,7 @@
 
 namespace TenUp\ContentConnect\UI;
 
-use TenUp\ContentConnect\Plugin;
-
-use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_data;
+use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
 
 /**
  * Class ClassicEditor
@@ -48,7 +46,7 @@ class ClassicEditor {
 			return;
 		}
 
-		$relationships = get_post_to_post_relationships_data( $post );
+		$relationships = get_post_relationships_data( $post );
 
 		if ( empty( $relationships ) ) {
 			return;
@@ -90,7 +88,7 @@ class ClassicEditor {
 			return;
 		}
 
-		$relationships = get_post_to_post_relationships_data( $post );
+		$relationships = get_post_relationships_data( $post );
 
 		if ( empty( $relationships ) ) {
 			return;
