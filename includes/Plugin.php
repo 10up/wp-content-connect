@@ -97,7 +97,7 @@ class Plugin {
 		$this->user_query_integration = new UserQueryIntegration();
 		$this->user_query_integration->setup();
 
-		$this->meta_box = new MetaBox();
+		$this->meta_box = new MetaBox(); // @deprecated remove in 1.7.0
 		$this->meta_box->setup();
 
 		$this->block_editor = new BlockEditor();
@@ -107,7 +107,7 @@ class Plugin {
 		$this->deleted_items->setup();
 
 		$routes = array(
-			new API\V1\Search(),
+			new API\V1\Search(), // @deprecated remove in 1.7.0
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),

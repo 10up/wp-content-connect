@@ -30,7 +30,7 @@ abstract class AbstractRoute {
 	protected $rest_base = '';
 
 	/**
-	 * Setup actions and filters.
+	 * Setup the REST API routes module.
 	 *
 	 * @since 1.7.0
 	 */
