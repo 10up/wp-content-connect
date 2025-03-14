@@ -108,8 +108,10 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		$item_data = array(
-			'ID'   => $item->ID,
+			'ID'   => $item->ID, // Kept for backwards compatibility.
+			'id'   => $item->ID,
 			'name' => $item->post_title,
+			'type' => $item->post_type,
 		);
 
 		/** This filter is documented in includes/UI/MetaBox.php */
@@ -117,6 +119,14 @@ abstract class AbstractPostRoute extends AbstractRoute {
 
 		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $item, $relationship );
+
+		if ( empty( $item_data['type'] ) ) { // This is required for the 10up Content Picker component.
+			$item_data['type'] = $item->post_type;
+		}
+
+		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
+			$item_data['uuid'] = wp_generate_uuid4();
+		}
 
 		return $item_data;
 	}
@@ -145,8 +155,10 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		$item_data = array(
-			'ID'   => $item->ID,
+			'ID'   => $item->ID, // Kept for backwards compatibility.
+			'id'   => $item->ID,
 			'name' => $item_name,
+			'type' => 'user',
 		);
 
 		/** This filter is documented in includes/UI/MetaBox.php */
@@ -154,6 +166,14 @@ abstract class AbstractPostRoute extends AbstractRoute {
 
 		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $item, $relationship );
+
+		if ( empty( $item_data['type'] ) ) { // This is required for the 10up Content Picker component.
+			$item_data['type'] = 'user';
+		}
+
+		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
+			$item_data['uuid'] = wp_generate_uuid4();
+		}
 
 		return $item_data;
 	}

@@ -4,7 +4,7 @@ namespace TenUp\ContentConnect\API\V2\Post\Field;
 
 use TenUp\ContentConnect\API\V2\AbstractField;
 
-use function TenUp\ContentConnect\Helpers\get_post_relationship_data;
+use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
 
 /**
  * Class Relationships
@@ -63,7 +63,7 @@ class Relationships extends AbstractField {
 
 		$context = $request->get_param( 'context' );
 
-		$relationships = get_post_relationship_data( $post, 'any', false, $context );
+		$relationships = get_post_relationships_data( $post, 'any', false, $context );
 
 		return $relationships;
 	}
