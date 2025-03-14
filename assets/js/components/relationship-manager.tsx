@@ -17,7 +17,7 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			rel_key: relationship.rel_key,
 			rel_type: relationship.rel_type,
 		}),
-	}), [postId, relationship.rel_key, relationship.post_type]);
+	}), [postId, relationship.rel_key]);
 
 	const handleChange = async (newEntities: any[]) => {
 		const newIds = newEntities.map(entity => entity.id);
@@ -29,7 +29,7 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			onPickChange={handleChange}
 			mode={relationship?.object_type ?? 'post'}
 			content={relatedEntities}
-			contentTypes={relationship.post_type}
+			contentTypes={relationship?.post_type}
 			maxContentItems={relationship?.max_items ?? 100}
 			isOrderable={relationship?.sortable ?? false}
 		/>
