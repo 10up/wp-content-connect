@@ -49,7 +49,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				hasPostRelationships: postTypeRelationships.length > 0,
 			};
 		},
-		[toPostType, fromPosts],
+		[toPostType, fromPosts?.length],
 	);
 
 	const postTypeSlugs = useMemo(() => (postTypes || []).map(({ slug }) => slug), [postTypes]);
@@ -68,7 +68,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						})
 					}
 					help={__(
-						'If enabled, only items related to the current post will be shown.',
+						'When enabled, only items related to the current post will be displayed.',
 						'tenup-content-connect',
 					)}
 					__nextHasNoMarginBottom
@@ -76,7 +76,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				{!hasPostRelationships && (
 					<Notice spokenMessage={null} status="warning" isDismissible={false}>
 						{__(
-							'The selected post type does not support any relationships. Please try a different post type.',
+							'No relationships exist for the selected post type. Try selecting a different post type.',
 							'tenup-content-connect',
 						)}
 					</Notice>
@@ -93,7 +93,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						/>
 						<Notice spokenMessage={null} status="warning" isDismissible={false}>
 							{__(
-								'Select a different from post from where to pull related items. If empty, the current post will be used.',
+								'Select a different post as the source for related items. If none is selected, the current post will be used.',
 								'tenup-content-connect',
 							)}
 						</Notice>
