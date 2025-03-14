@@ -231,9 +231,8 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items( $request ) {
 
-		$post        = $this->get_post( $request['id'] );
-		$related_ids = $request->get_param( 'related_ids' );
-		$rel_type    = $request->get_param( 'rel_type' );
+		$post     = $this->get_post( $request['id'] );
+		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
 		if ( 'post-to-user' === $rel_type ) {
@@ -450,7 +449,6 @@ class RelatedEntities extends AbstractPostRoute {
 		$orderby     = $request->get_param( 'orderby' );
 
 		$query_args = array(
-			'post_type'          => $this->relationship->to,
 			'post_status'        => $post_status,
 			'paged'              => $page,
 			'posts_per_page'     => $per_page,
@@ -462,6 +460,12 @@ class RelatedEntities extends AbstractPostRoute {
 			),
 			'orderby'            => $orderby,
 		);
+
+		if ( $post->post_type === $this->relationship->from ) {
+			$query_args['post_type'] = $this->relationship->to;
+		} else {
+			$query_args['post_type'] = $this->relationship->from;
+		}
 
 		if ( 'relationship' !== $orderby ) {
 			$query_args['order'] = $order;
@@ -578,11 +582,18 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$this->relationship->replace_relationships( $post->ID, $related_ids );
 
-		if ( $this->relationship->from_sortable ) {
+		$is_sortable = false;
+		if ( $post->post_type === $this->relationship->from ) {
+			$is_sortable = $this->relationship->from_sortable;
+		} else {
+			$is_sortable = $this->relationship->to_sortable;
+		}
+
+		if ( $is_sortable ) {
 			$this->relationship->save_sort_data( $post->ID, $related_ids );
 		}
 
-		$items = $this->relationship->get_related_object_ids( $post->ID, $this->relationship->from_sortable );
+		$items = $this->relationship->get_related_object_ids( $post->ID, $is_sortable );
 
 		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 
