@@ -19,7 +19,6 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 	}), [postId, relationship.rel_key, relationship.post_type]);
 
 	const handleChange = async (newEntities: any[]) => {
-		console.log(newEntities);
 		const newIds = newEntities.map(entity => entity.id);
 		updateRelatedPosts(postId, relationship.rel_key, newIds);
 	};
