@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { store as editorStore, PluginDocumentSettingPanel } from '@wordpress/editor';
 import { store } from '../store';
 import { RelationshipManager } from './relationship-manager';
 
