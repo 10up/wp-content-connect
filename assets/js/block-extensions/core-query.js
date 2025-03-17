@@ -31,9 +31,10 @@ import { store } from '../store';
 const BlockEdit = ({ setAttributes, attributes }) => {
 	const {
 		query: { postType: queriedPostType },
-		showRelated,
-		relationshipName,
-		sourcePosts,
+		relationshipQuery,
+		relationshipKey,
+		relationshipPost,
+		relationshipOrderBy,
 	} = attributes;
 
 	const {
@@ -53,7 +54,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 			const currentPostId = select(editorStore).getCurrentPostId();
 			const currentPostType = select(editorStore).getCurrentPostType();
 			const postRelationships = select(store).getRelationships(
-				sourcePosts?.[0]?.id || currentPostId,
+				relationshipPost?.[0]?.id || currentPostId,
 			);
 			const postTypeRelationships = Object.values(postRelationships).filter(
 				(relationship) =>
@@ -69,7 +70,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				currentPostType,
 			};
 		},
-		[queriedPostType, sourcePosts?.length],
+		[queriedPostType, relationshipPost?.length],
 	);
 
 	const postTypesSlugs = useMemo(() => (postTypes || []).map(({ slug }) => slug), [postTypes]);
@@ -77,10 +78,26 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 	const postTypeRelationshipsOptions = useMemo(
 		() =>
 			postTypeRelationships.map((relationship) => ({
-				value: relationship.rel_name,
+				value: relationship.rel_key,
 				label: relationship.labels.name,
 			})),
 		[postTypeRelationships],
+	);
+
+	const selectedRelationshipKey = useMemo(
+		() =>
+			relationshipKey && postTypeRelationships.some((rel) => rel.rel_key === relationshipKey)
+				? relationshipKey
+				: postTypeRelationships[0]?.rel_key,
+		[relationshipKey, postTypeRelationships],
+	);
+
+	const selectedRelationship = useMemo(
+		() =>
+			postTypeRelationships.find(
+				(relationship) => relationship.rel_key === selectedRelationshipKey,
+			),
+		[postTypeRelationships, selectedRelationshipKey],
 	);
 
 	const postTypeRelationshipsControlLabel = __('Relationship', 'tenup-content-connect');
@@ -88,36 +105,40 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 		'Select a relationship to determine how related items are retrieved.',
 		'tenup-content-connect',
 	);
-	const sourcePostsControlHelp = __(
+	const relationshipPostControlHelp = __(
 		'Choose the post from which related items will be pulled. Defaults to the current post.',
 		'tenup-content-connect',
 	);
 
 	const onPostTypeRelationshipChange = (value) => {
-		setAttributes({ relationshipName: value });
+		setAttributes({ relationshipKey: value });
 	};
 
 	const resetAll = () => {
 		setAttributes({
-			showRelated: false,
-			sourcePosts: undefined,
-			relationshipName: undefined,
+			relationshipQuery: false,
+			relationshipPost: undefined,
+			relationshipKey: undefined,
+			relationshipOrderBy: true,
 		});
 	};
 
 	return (
 		<InspectorControls>
-			<PanelBody title={__('Related', 'tenup-content-connect')} initialOpen={false}>
+			<PanelBody
+				title={__('Related', 'tenup-content-connect')}
+				initialOpen={!!relationshipQuery}
+			>
 				<ToggleControl
 					label={__('Only show related items', 'tenup-content-connect')}
-					checked={showRelated}
+					checked={relationshipQuery}
 					onChange={(value) => {
 						if (!value) {
 							resetAll();
 						} else {
 							setAttributes({
-								showRelated: value,
-								sourcePosts: [
+								relationshipQuery: value,
+								relationshipPost: [
 									{
 										id: currentPostId,
 										type: currentPostType,
@@ -128,38 +149,49 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						}
 					}}
 				/>
-				{showRelated && (
-					<BaseControl help={sourcePostsControlHelp}>
+				{relationshipQuery && (
+					<BaseControl help={relationshipPostControlHelp}>
 						<ContentPicker
 							onPickChange={(ids) =>
-								setAttributes({ sourcePosts: ids.length ? ids : undefined })
+								setAttributes({ relationshipPost: ids.length ? ids : undefined })
 							}
 							mode="post"
-							content={sourcePosts}
+							content={relationshipPost}
 							contentTypes={postTypesSlugs}
 							singlePickedLabel={__('Selected post:', 'tenup-content-connect')}
 							multiPickedLabel={__('Selected posts:', 'tenup-content-connect')}
 						/>
 					</BaseControl>
 				)}
-				{showRelated && postTypeRelationshipsOptions.length > 1 && (
+				{relationshipQuery && postTypeRelationshipsOptions.length > 1 && (
 					<SelectControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						options={postTypeRelationshipsOptions}
-						value={relationshipName}
+						value={relationshipKey}
 						label={postTypeRelationshipsControlLabel}
 						onChange={onPostTypeRelationshipChange}
 						help={postTypeRelationshipsControlHelp}
 					/>
 				)}
-				{showRelated && !hasPostRelationships && (
+				{relationshipQuery && !hasPostRelationships && (
 					<Notice spokenMessage={null} status="warning" isDismissible={false}>
 						{__(
 							'No relationships exist for the selected post type or post. Try selecting a different post or post type.',
 							'tenup-content-connect',
 						)}
 					</Notice>
+				)}
+				{relationshipQuery && selectedRelationship?.sortable && (
+					<ToggleControl
+						label={__('Order by relationship', 'tenup-content-connect')}
+						checked={relationshipOrderBy}
+						onChange={(value) => setAttributes({ relationshipOrderBy: value })}
+						help={__(
+							'If enabled, the order of the related items will be determined by the relationship.',
+							'tenup-content-connect',
+						)}
+					/>
 				)}
 			</PanelBody>
 		</InspectorControls>
@@ -169,15 +201,19 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 registerBlockExtension('core/query', {
 	extensionName: 'content-connect',
 	attributes: {
-		showRelated: {
+		relationshipQuery: {
 			type: 'boolean',
 			default: false,
 		},
-		sourcePosts: {
+		relationshipPost: {
 			type: 'array',
 		},
-		relationshipName: {
+		relationshipKey: {
 			type: 'string',
+		},
+		relationshipOrderBy: {
+			type: 'boolean',
+			default: true,
 		},
 	},
 	classNameGenerator: () => '',
