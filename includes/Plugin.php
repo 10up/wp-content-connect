@@ -80,6 +80,7 @@ class Plugin {
 	}
 
 	public function setup() {
+		$this->define_constants();
 		$this->register_tables();
 
 		$this->registry = new Registry();
@@ -119,6 +120,26 @@ class Plugin {
 	 */
 	public function init() {
 		do_action( 'tenup-content-connect-init', $this->registry ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+	}
+
+	/**
+	 * Define plugin constants.
+	 *
+	 * @return void
+	 */
+	public function define_constants() {
+
+		if ( ! defined( 'CONTENT_CONNECT_VERSION' ) ) {
+			define( 'CONTENT_CONNECT_VERSION', '1.7.0' );
+		}
+
+		if ( ! defined( 'CONTENT_CONNECT_URL' ) ) {
+			define( 'CONTENT_CONNECT_URL', plugin_dir_url( dirname( __FILE__ ) ) );
+		}
+
+		if ( ! defined( 'CONTENT_CONNECT_PATH' ) ) {
+			define( 'CONTENT_CONNECT_PATH', plugin_dir_path( dirname( __FILE__ ) ) );
+		}
 	}
 
 	/**
