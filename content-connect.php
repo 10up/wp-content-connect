@@ -15,10 +15,6 @@
  * @package           TenUp\ContentConnect
  */
 
-define( 'CONTENT_CONNECT_VERSION', '1.7.0' );
-define( 'CONTENT_CONNECT_URL', plugin_dir_url( __FILE__ ) );
-define( 'CONTENT_CONNECT_PATH', plugin_dir_path( __FILE__ ) );
-
 require_once __DIR__ . '/autoload.php';
 
 wp_content_connect_autoloader();
