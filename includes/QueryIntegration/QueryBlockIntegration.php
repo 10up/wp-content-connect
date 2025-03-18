@@ -19,11 +19,60 @@ class QueryBlockIntegration {
 	 * @since 1.7.0
 	 */
 	public function setup() {
-		add_action( 'pre_render_block', [ $this, 'modify_query_loop_query' ], 10, 2 );
+		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+		add_action( 'pre_render_block', array( $this, 'modify_query_loop_query' ), 10, 2 );
 	}
 
 	/**
-	 * Modifies the query loop to include the post picker posts.
+	 * Registers the necessary REST API modifications for supported post types.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return void
+	 */
+	public function rest_api_init() {
+
+		$post_types          = get_post_types( array( 'public' => true ) );
+		$excluded_post_types = array( 'attachment' );
+
+		foreach ( $post_types as $post_type ) {
+
+			if ( in_array( $post_type, $excluded_post_types, true ) ) {
+				continue;
+			}
+
+			add_filter( "rest_{$post_type}_query", array( $this, 'rest_post_query' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Modifies the REST API query to support relationship-based filtering and ordering.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  array $args    Array of arguments for \WP_Query.
+	 * @param  array $request The REST API request.
+	 * @return array Modified query arguments.
+	 */
+	public function rest_post_query( $args, $request ) {
+
+		if ( isset( $request['relationshipQuery'] ) ) {
+			$args['relationship_query'] = $request['relationshipQuery'];
+		}
+
+		$order_by_relationship = rest_sanitize_boolean( $request['orderByRelationship'] ?? false );
+
+		if ( ! empty( $order_by_relationship ) ) {
+			$args['orderby'] = 'relationship';
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Modifies the query loop arguments when the block is rendered on the front end.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  string $block_content The block content.
 	 * @param  array  $block         The block object.
@@ -37,24 +86,31 @@ class QueryBlockIntegration {
 
 		$this->parsed_block = $block;
 
-		add_filter( 'query_loop_block_query_vars', [ $this, 'get_query_by_attributes_once' ] );
+		add_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) );
 
 		return $block_content;
 	}
 
 	/**
-	 * Remove the query block filter and parse the custom query.
+	 * Applies custom query modifications based on block attributes, then removes itself.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  array $query_args Array containing parameters for `WP_Query`.
 	 * @return array
 	 */
 	public function get_query_by_attributes_once( $query_args ) {
-		remove_filter( 'query_loop_block_query_vars', [ $this, 'get_query_by_attributes_once' ] );
+		if ( has_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) ) ) {
+			remove_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) );
+		}
+
 		return $this->get_query_by_attributes( $query_args, $this->parsed_block );
 	}
 
 	/**
-	 * Returns a custom query based on block attributes.
+	 * Generates a modified query based on the block attributes.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  array $query_args Array containing parameters for `WP_Query`.
 	 * @param  array $block      The block being rendered.
@@ -66,53 +122,13 @@ class QueryBlockIntegration {
 			return $query_args;
 		}
 
-		if ( empty( $block['attrs']['relationshipQuery'] ) ) {
-			return $query_args;
+		$query_attrs = $block['attrs']['query'] ?? [];
+
+		if ( ! empty( $query_attrs['relationshipQuery'] ) ) {
+			$query_args['relationship_query'] = $query_attrs['relationshipQuery'];
 		}
 
-		if ( empty( $block['attrs']['relationshipPost'] ) ) {
-			return $query_args;
-		}
-
-		$post_id = wp_list_pluck( $block['attrs']['relationshipPost'], 'id' );
-
-		if ( empty( $post_id ) ) {
-			return $query_args;
-		}
-
-		$post_id         = reset( $post_id );
-		$other_post_type = $block['attrs']['query']['postType'];
-
-		$post_relationships = get_post_to_post_relationships_data( $post_id, $other_post_type );
-
-		if ( empty( $post_relationships ) ) {
-			return $query_args;
-		}
-
-		$relationship_key = '';
-		if ( ! empty( $block['attrs']['relationshipKey'] ) ) {
-			$relationship_key = $block['attrs']['relationshipKey'];
-		}
-
-		$relationship_query = array();
-
-		foreach ( $post_relationships as $post_relationship ) {
-
-			if ( ! empty( $relationship_key ) && $relationship_key !== $post_relationship['rel_key'] ) {
-				continue;
-			}
-
-			$relationship_query[] = array(
-				'name'            => $post_relationship['rel_name'],
-				'related_to_post' => $post_id,
-			);
-		}
-
-		if ( ! empty( $relationship_query ) ) {
-			$query_args['relationship_query'] = $relationship_query;
-		}
-
-		if ( ! isset( $block['attrs']['relationshipOrderBy'] ) || ! empty( $block['attrs']['relationshipOrderBy'] ) ) {
+		if ( ! empty( $query_attrs['orderByRelationship'] ) ) {
 			$query_args['orderby'] = 'relationship';
 		}
 
@@ -120,7 +136,9 @@ class QueryBlockIntegration {
 	}
 
 	/**
-	 * Check if the block is a Query block.
+	 * Determines if a given block is a Query Loop block.
+	 *
+	 * @since 1.7.0
 	 *
 	 * @param  array $block The block object.
 	 * @return bool
