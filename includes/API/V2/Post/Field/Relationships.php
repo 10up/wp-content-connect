@@ -23,6 +23,10 @@ class Relationships extends AbstractField {
 
 		foreach ( $post_types as $post_type ) {
 
+			if ( 'attachment' === $post_type ) {
+				continue;
+			}
+
 			register_rest_field(
 				$post_type,
 				'relationships',
