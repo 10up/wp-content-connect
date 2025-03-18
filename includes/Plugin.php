@@ -134,11 +134,11 @@ class Plugin {
 		}
 
 		if ( ! defined( 'CONTENT_CONNECT_URL' ) ) {
-			define( 'CONTENT_CONNECT_URL', plugin_dir_url( dirname( __FILE__ ) ) );
+			define( 'CONTENT_CONNECT_URL', plugin_dir_url( __DIR__ ) );
 		}
 
 		if ( ! defined( 'CONTENT_CONNECT_PATH' ) ) {
-			define( 'CONTENT_CONNECT_PATH', plugin_dir_path( dirname( __FILE__ ) ) );
+			define( 'CONTENT_CONNECT_PATH', plugin_dir_path( __DIR__ ) );
 		}
 	}
 
