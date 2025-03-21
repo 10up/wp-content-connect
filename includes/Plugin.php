@@ -3,6 +3,7 @@
 namespace TenUp\ContentConnect;
 
 use TenUp\ContentConnect\API;
+use TenUp\ContentConnect\QueryIntegration\QueryBlockIntegration;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -11,54 +12,33 @@ use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\BlockEditor;
 use TenUp\ContentConnect\UI\ClassicEditor;
 
+/**
+ * Class Plugin
+ *
+ * @package TenUp\ContentConnect
+ */
 class Plugin {
 
 	/**
+	 * The tables for the plugin.
+	 *
 	 * @var array
 	 */
 	public $tables = array();
 
 	/**
+	 * The registry instance.
+	 *
 	 * @var Registry
 	 */
 	public $registry;
-
-	/**
-	 * @var WPQueryIntegration
-	 */
-	public $wp_query_integration;
-
-	/**
-	 * @var UserQueryIntegration
-	 */
-	public $user_query_integration;
-
-	/**
-	 * @var MetaBox
-	 */
-	public $meta_box;
-
-	/**
-	 * @var BlockEditor
-	 */
-	public $block_editor;
-
-	/**
-	 * @var Search
-	 */
-	public $search;
-
-	/**
-	 * @var DeletedItems
-	 */
-	public $deleted_items;
 
 	/**
 	 * The single instance of the class.
 	 *
 	 * @var Plugin
 	 */
-	private static $instance;
+	protected static $instance;
 
 	/**
 	 * Get class instance.
@@ -73,11 +53,23 @@ class Plugin {
 		return self::$instance;
 	}
 
+	/**
+	 * Retrieves the registry instance.
+	 *
+	 * @return Registry
+	 */
 	public function get_registry() {
 		return $this->registry;
 	}
 
+	/**
+	 * Retrieves a table.
+	 *
+	 * @param string $table The table to retrieve.
+	 * @return PostToPost|PostToUser|bool
+	 */
 	public function get_table( $table ) {
+
 		if ( isset( $this->tables[ $table ] ) ) {
 			return $this->tables[ $table ];
 		}
@@ -85,6 +77,11 @@ class Plugin {
 		return false;
 	}
 
+	/**
+	 * Sets up the plugin.
+	 *
+	 * @return void
+	 */
 	public function setup() {
 		$this->define_constants();
 		$this->register_tables();
@@ -95,6 +92,7 @@ class Plugin {
 		$modules = array(
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
+			new QueryBlockIntegration(),
 			new ClassicEditor(),
 			new BlockEditor(),
 			new DeletedItems(),
@@ -106,7 +104,10 @@ class Plugin {
 		);
 
 		foreach ( $modules as $module ) {
-			$module->setup();
+
+			if ( method_exists( $module, 'setup' ) ) {
+				$module->setup();
+			}
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );

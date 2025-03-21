@@ -23,8 +23,9 @@
     "test": "10up-toolkit test-unit-jest"
   },
   "dependencies": {
-    "@10up/block-components": "dev-develop",
-    "10up-toolkit": "^6.4.0"
+    "@10up/block-components": "^1.20.0",
+    "10up-toolkit": "^6.4.0",
+    "uuid": "^11.1.0"
   },
   "10up-toolkit": {
     "entry": {
