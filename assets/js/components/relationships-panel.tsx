@@ -19,9 +19,17 @@ export function RelationshipsPanel() {
 		return null;
 	}
 
+	const enabledRelationships = Object.values(relationships).filter(
+		(relationship) => relationship.enable_ui === true
+	);
+
+	if (enabledRelationships.length === 0) {
+		return null;
+	}
+
 	return (
 		<>
-			{Object.values(relationships).map((relationship) => (
+			{enabledRelationships.map((relationship) => (
 				<PluginDocumentSettingPanel
 					name={`content-connect-relationship-${relationship.rel_key}`}
 					title={relationship.labels.name}
