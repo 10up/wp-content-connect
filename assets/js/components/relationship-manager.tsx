@@ -21,7 +21,13 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 
 	const handleChange = async (newEntities: any[]) => {
 		const newIds = newEntities.map(entity => entity.id);
-		updateRelatedEntities(postId, relationship.rel_key, relationship.rel_type, newIds);
+
+		await updateRelatedEntities(
+			postId,
+			relationship.rel_key,
+			relationship.rel_type,
+			newIds
+		);
 	};
 
 	return (
