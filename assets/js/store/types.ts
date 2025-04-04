@@ -20,6 +20,7 @@ export type ContentConnectRelationship = {
 	sortable: boolean;
 	current_post_id: number;
 	max_items: number;
+	enable_ui: boolean;
 };
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/relationships` endpoint returns
