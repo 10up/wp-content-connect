@@ -179,7 +179,7 @@ async function persistContentConnectionChanges() {
 						postId,
 						relKey,
 						relType as string,
-						relatedEntities.map(post => post.ID),
+						relatedEntities.map(post => post.id),
 					);
 				})
 			);
