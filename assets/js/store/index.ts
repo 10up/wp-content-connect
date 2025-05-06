@@ -6,6 +6,17 @@ import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConn
 export const STORE_NAME = 'wp-content-connect';
 
 /**
+ * Generates a unique key for related entities based on post ID and relationship key.
+ *
+ * @param postId The ID of the post.
+ * @param relKey The key of the relationship.
+ * @returns A unique key for the related entities.
+ */
+function getRelatedEntitiesKey(postId: number, relKey: string): string {
+	return `related-${postId}-${relKey}`;
+}
+
+/**
  * Store defaults
  */
 const DEFAULT_STATE: ContentConnectState = {
@@ -106,7 +117,7 @@ const actions = {
 				return;
 			}
 
-			const key = `related-${postId}-${relKey}`;
+			const key = getRelatedEntitiesKey(postId, relKey);
 			const currentEntities = select.getRelatedEntities(postId, { rel_key: relKey, rel_type: relType });
 
 			const idToEntityMap = new Map();
@@ -183,7 +194,7 @@ export const store = createReduxStore(STORE_NAME, {
 			if (postId === null) {
 				return [];
 			}
-			const key = `related-${postId}-${options.rel_key}`;
+			const key = getRelatedEntitiesKey(postId, options.rel_key);
 			return state.relatedEntities[key] || [];
 		},
 		getDirtyEntityIds(state: ContentConnectState) {
@@ -196,7 +207,7 @@ export const store = createReduxStore(STORE_NAME, {
 			dispatch.setRelationships(postId, relationships);
 		},
 		getRelatedEntities: (postId: number, options: api.GetRelatedEntitiesOptions) => async function thunk({dispatch}) {
-			const key = `related-${postId}-${options.rel_key}`;
+			const key = getRelatedEntitiesKey(postId, options.rel_key);
 			const relatedEntities = await api.getRelatedEntities(postId, options);
 			dispatch.setRelatedEntities(key, relatedEntities);
 		},
