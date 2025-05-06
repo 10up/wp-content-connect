@@ -2,6 +2,7 @@ import { store } from '../store';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from 'react';
 import { GetRelatedEntitiesOptions } from '../store/api';
+import { ContentConnectRelatedEntities } from '../store/types';
 
 export function useRelatedEntities(postId: number, options: GetRelatedEntitiesOptions) {
 		const { hasResolved, relatedEntities } = useSelect(
@@ -22,8 +23,8 @@ export function useRelatedEntities(postId: number, options: GetRelatedEntitiesOp
 
 	const { updateRelatedEntities } = useDispatch(store);
 
-	const _updateRelatedEntities = useCallback((relatedIds: number[]) => {
-		updateRelatedEntities(postId, options.rel_key, options.rel_type, relatedIds);
+	const _updateRelatedEntities = useCallback((entities: ContentConnectRelatedEntities) => {
+		updateRelatedEntities(postId, options.rel_key, options.rel_type, entities);
 	}, [postId, options, updateRelatedEntities]);
 
 	return [hasResolved, relatedEntities, _updateRelatedEntities] as const;
