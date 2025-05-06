@@ -1,9 +1,20 @@
-import { createReduxStore, register, select, dispatch } from '@wordpress/data';
+import { createReduxStore, register, select, dispatch, createSelector } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import * as api from './api';
 import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConnectState } from './types';
 
 export const STORE_NAME = 'wp-content-connect';
+
+/**
+ * Generates a unique key for related entities based on post ID and relationship key.
+ *
+ * @param postId The ID of the post.
+ * @param relKey The key of the relationship.
+ * @returns A unique key for the related entities.
+ */
+function getRelatedEntitiesKey(postId: number, relKey: string): string {
+	return `related-${postId}-${relKey}`;
+}
 
 /**
  * Store defaults
@@ -42,6 +53,13 @@ type Action =
 	| ClearDirtyEntitiesAction;
 
 const actions = {
+	/**
+	 * Sets the relationships for a given post ID.
+	 *
+	 * @param postId The ID of the post to set relationships for.
+	 * @param relationships The relationships to set.
+	 * @returns The action to set the relationships.
+	 */
 	setRelationships(postId: number, relationships: ContentConnectRelationships): SetRelationshipsAction {
 		return {
 			type: 'SET_RELATIONSHIPS',
@@ -49,6 +67,13 @@ const actions = {
 			relationships,
 		};
 	},
+	/**
+	 * Sets the related entities for a given key.
+	 *
+	 * @param key The key for the related entities.
+	 * @param relatedEntities The related entities to set.
+	 * @returns The action to set the related entities.
+	 */
 	setRelatedEntities(key: string, relatedEntities: ContentConnectRelatedEntities): SetRelatedEntitiesAction {
 		return {
 			type: 'SET_RELATED_ENTITIES',
@@ -56,22 +81,54 @@ const actions = {
 			relatedEntities,
 		};
 	},
+	/**
+	 * Marks a post as dirty, indicating that it has unsaved changes.
+	 *
+	 * @param postId The ID of the post to mark as dirty.
+	 * @returns The action to mark the post as dirty.
+	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
 		return {
 			type: 'MARK_POST_AS_DIRTY',
 			postId,
 		};
 	},
+	/**
+	 * Clears the dirty entities in the store.
+	 *
+	 * @returns The action to clear dirty entities.
+	 */
 	clearDirtyEntities(): ClearDirtyEntitiesAction {
 		return {
 			type: 'CLEAR_DIRTY_ENTITIES',
 		};
 	},
-	updateRelatedEntities(postId: number | null, relKey: string, relType: string, relatedIds: number[]) {
-		return async function thunk({dispatch}) {
+	/**
+	 * Updates the related entities for a given post and relationship.
+	 *
+	 * @param postId The ID of the post to update.
+	 * @param relKey The key of the relationship.
+	 * @param relType The type of the relationship.
+	 * @param relatedIds The IDs of the related entities.
+	 */
+	updateRelatedEntities(
+		postId: number | null,
+		relKey: string,
+		relType: string,
+		entities: ContentConnectRelatedEntities
+	) {
+		return async function thunk({dispatch, select}) {
 			if (postId === null) {
 				return;
 			}
+
+			const key = getRelatedEntitiesKey(postId, relKey);
+
+			const relatedIds = entities.map(entity => {
+				return typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id;
+			});
+
+			dispatch.setRelatedEntities(key, entities);
 
 			await api.updateRelatedEntities(
 				postId,
@@ -80,7 +137,6 @@ const actions = {
 				relatedIds
 			);
 
-			dispatch.invalidateResolutionForStoreSelector('getRelatedEntities');
 			dispatch.markPostAsDirty(postId);
 		};
 	},
@@ -133,13 +189,22 @@ export const store = createReduxStore(STORE_NAME, {
 			}
 			return state.relationships[postId] || {};
 		},
-		getRelatedEntities(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions) {
-			if (postId === null) {
-				return [];
+		getRelatedEntities: createSelector(
+			(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions): ContentConnectRelatedEntities => {
+				if (postId === null || !options?.rel_key) {
+					return [];
+				}
+				const key = getRelatedEntitiesKey(postId, options.rel_key);
+				return state.relatedEntities[key] || [];
+			},
+			(state, postId, options) => {
+				if (postId === null || !options?.rel_key) {
+					return ['empty'];
+				}
+				const key = getRelatedEntitiesKey(postId, options.rel_key);
+				return [state.relatedEntities[key]];
 			}
-			const key = `related-${postId}-${options.rel_key}`;
-			return state.relatedEntities[key] || [];
-		},
+		),
 		getDirtyEntityIds(state: ContentConnectState) {
 			return Array.from(state.dirtyEntityIds);
 		},
@@ -150,7 +215,7 @@ export const store = createReduxStore(STORE_NAME, {
 			dispatch.setRelationships(postId, relationships);
 		},
 		getRelatedEntities: (postId: number, options: api.GetRelatedEntitiesOptions) => async function thunk({dispatch}) {
-			const key = `related-${postId}-${options.rel_key}`;
+			const key = getRelatedEntitiesKey(postId, options.rel_key);
 			const relatedEntities = await api.getRelatedEntities(postId, options);
 			dispatch.setRelatedEntities(key, relatedEntities);
 		},
@@ -179,7 +244,7 @@ async function persistContentConnectionChanges() {
 						postId,
 						relKey,
 						relType as string,
-						relatedEntities.map(post => post.ID),
+						relatedEntities.map(post => post.id),
 					);
 				})
 			);
