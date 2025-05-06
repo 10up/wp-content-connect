@@ -1,4 +1,4 @@
-import { createReduxStore, register, select, dispatch } from '@wordpress/data';
+import { createReduxStore, register, select, dispatch, createSelector } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import * as api from './api';
 import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConnectState } from './types';
@@ -189,13 +189,22 @@ export const store = createReduxStore(STORE_NAME, {
 			}
 			return state.relationships[postId] || {};
 		},
-		getRelatedEntities(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions) {
-			if (postId === null) {
-				return [];
+		getRelatedEntities: createSelector(
+			(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions): ContentConnectRelatedEntities => {
+				if (postId === null || !options?.rel_key) {
+					return [];
+				}
+				const key = getRelatedEntitiesKey(postId, options.rel_key);
+				return state.relatedEntities[key] || [];
+			},
+			(state, postId, options) => {
+				if (postId === null || !options?.rel_key) {
+					return ['empty'];
+				}
+				const key = getRelatedEntitiesKey(postId, options.rel_key);
+				return [state.relatedEntities[key]];
 			}
-			const key = getRelatedEntitiesKey(postId, options.rel_key);
-			return state.relatedEntities[key] || [];
-		},
+		),
 		getDirtyEntityIds(state: ContentConnectState) {
 			return Array.from(state.dirtyEntityIds);
 		},
