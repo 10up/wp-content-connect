@@ -7,7 +7,7 @@ use function TenUp\ContentConnect\Helpers\get_registry;
 /**
  * Class Search
  *
- * REST API endpoint for searching for entities (posts or users).
+ * REST API endpoint for searching for post related entities (posts or users).
  *
  * @package TenUp\ContentConnect\API\V2\Post\Route
  */
