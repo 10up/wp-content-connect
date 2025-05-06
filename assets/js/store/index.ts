@@ -68,10 +68,23 @@ const actions = {
 		};
 	},
 	updateRelatedEntities(postId: number | null, relKey: string, relType: string, relatedIds: number[]) {
-		return async function thunk({dispatch}) {
+		return async function thunk({dispatch, select}) {
 			if (postId === null) {
 				return;
 			}
+
+			const key = `related-${postId}-${relKey}`;
+			const currentEntities = select.getRelatedEntities(postId, { rel_key: relKey, rel_type: relType });
+
+			const idToEntityMap = new Map();
+			currentEntities.forEach(entity => {
+				const entityId = typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id;
+				idToEntityMap.set(entityId, entity);
+			});
+
+			const reorderedEntities = relatedIds.map(id => idToEntityMap.get(id)).filter(Boolean);
+
+			dispatch.setRelatedEntities(key, reorderedEntities);
 
 			await api.updateRelatedEntities(
 				postId,
