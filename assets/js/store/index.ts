@@ -169,7 +169,7 @@ async function persistContentConnectionChanges() {
 
 			// Update each relationship for the post
 			await Promise.all(
-				Object.entries(relationships).map(async ([relKey, relType, relationship]) => {
+				Object.entries(relationships).map(async ([relKey, relType]) => {
 					const relatedEntities = select(STORE_NAME).getRelatedEntities(postId, {
 						rel_key: relKey,
 						rel_type: relType,
@@ -178,7 +178,7 @@ async function persistContentConnectionChanges() {
 					await api.updateRelatedEntities(
 						postId,
 						relKey,
-						relType,
+						relType as string,
 						relatedEntities.map(post => post.ID),
 					);
 				})

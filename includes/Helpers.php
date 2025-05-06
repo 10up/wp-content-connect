@@ -68,21 +68,22 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  *
  * @since 1.7.0
  *
- * @param  string $field The field to query against. Accepts 'key', 'post_type', 'from', or 'to'.
+ * @param  string $field The field to query against. Accepts 'any', 'key', 'post_type', 'from', or 'to'.
  *                       - 'key': Returns a single relationship by its unique key.
  *                       - 'post_type': Returns all relationships involving the specified post type.
  *                       - 'from': Returns all relationships originating from the specified post type.
  *                       - 'to': Returns all relationships targeting the specified post type.
+ *                       - 'any': Returns all relationships.
  * @param  string $value The value to match against the specified field.
  * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToPost> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
-function get_post_to_post_relationships_by( $field, $value ) {
+function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return [ $value => $relationship ];
+			return array( $value => $relationship );
 		}
 
 		return false;
@@ -101,19 +102,22 @@ function get_post_to_post_relationships_by( $field, $value ) {
 
 		switch ( $field ) {
 			case 'post_type':
-				if ( $relationship->from === $value || in_array( $value, $relationship_to, true ) ) {
+				if ( ! empty( $value ) && ( $relationship->from === $value || in_array( $value, $relationship_to, true ) ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
 			case 'from':
-				if ( $relationship->from === $value ) {
+				if ( ! empty( $value ) && $relationship->from === $value ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
 				break;
 			case 'to':
-				if ( in_array( $value, $relationship_to, true ) ) {
+				if ( ! empty( $value ) && in_array( $value, $relationship_to, true ) ) {
 					$post_to_post_relationships[ $key ] = $relationship;
 				}
+				break;
+			case 'any':
+				$post_to_post_relationships[ $key ] = $relationship;
 				break;
 		}
 	}
@@ -126,19 +130,20 @@ function get_post_to_post_relationships_by( $field, $value ) {
  *
  * @since 1.7.0
  *
- * @param  string $field The field to query against. Accepts 'key' or 'post_type'.
+ * @param  string $field The field to query against. Accepts 'any', 'key' or 'post_type'.
  *                       - 'key': Returns a single relationship by its unique key.
  *                       - 'post_type': Returns all relationships involving the specified post type.
+ *                       - 'any': Returns all relationships.
  * @param  string $value The value to match against the specified field.
  * @return false|array<string, \TenUp\ContentConnect\Relationships\PostToUser> Associative array of Relationship objects indexed by relationship key, otherwise false.
  */
-function get_post_to_user_relationships_by( $field, $value ) {
+function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return [ $value => $relationship ];
+			return array( $value => $relationship );
 		}
 
 		return false;
@@ -159,6 +164,9 @@ function get_post_to_user_relationships_by( $field, $value ) {
 				if ( $relationship->post_type === $value ) {
 					$post_to_user_relationships[ $key ] = $relationship;
 				}
+				break;
+			case 'any':
+				$post_to_user_relationships[ $key ] = $relationship;
 				break;
 		}
 	}
