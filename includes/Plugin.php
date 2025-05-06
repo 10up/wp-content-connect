@@ -109,6 +109,7 @@ class Plugin {
 
 		$routes = array(
 			new API\V1\Search(), // @deprecated remove in 1.7.0
+			new API\V2\Route\Relationships(),
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
