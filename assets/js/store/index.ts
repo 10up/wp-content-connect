@@ -42,6 +42,13 @@ type Action =
 	| ClearDirtyEntitiesAction;
 
 const actions = {
+	/**
+	 * Sets the relationships for a given post ID.
+	 *
+	 * @param postId The ID of the post to set relationships for.
+	 * @param relationships The relationships to set.
+	 * @returns The action to set the relationships.
+	 */
 	setRelationships(postId: number, relationships: ContentConnectRelationships): SetRelationshipsAction {
 		return {
 			type: 'SET_RELATIONSHIPS',
@@ -49,6 +56,13 @@ const actions = {
 			relationships,
 		};
 	},
+	/**
+	 * Sets the related entities for a given key.
+	 *
+	 * @param key The key for the related entities.
+	 * @param relatedEntities The related entities to set.
+	 * @returns The action to set the related entities.
+	 */
 	setRelatedEntities(key: string, relatedEntities: ContentConnectRelatedEntities): SetRelatedEntitiesAction {
 		return {
 			type: 'SET_RELATED_ENTITIES',
@@ -56,17 +70,36 @@ const actions = {
 			relatedEntities,
 		};
 	},
+	/**
+	 * Marks a post as dirty, indicating that it has unsaved changes.
+	 *
+	 * @param postId The ID of the post to mark as dirty.
+	 * @returns The action to mark the post as dirty.
+	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
 		return {
 			type: 'MARK_POST_AS_DIRTY',
 			postId,
 		};
 	},
+	/**
+	 * Clears the dirty entities in the store.
+	 *
+	 * @returns The action to clear dirty entities.
+	 */
 	clearDirtyEntities(): ClearDirtyEntitiesAction {
 		return {
 			type: 'CLEAR_DIRTY_ENTITIES',
 		};
 	},
+	/**
+	 * Updates the related entities for a given post and relationship.
+	 *
+	 * @param postId The ID of the post to update.
+	 * @param relKey The key of the relationship.
+	 * @param relType The type of the relationship.
+	 * @param relatedIds The IDs of the related entities.
+	 */
 	updateRelatedEntities(postId: number | null, relKey: string, relType: string, relatedIds: number[]) {
 		return async function thunk({dispatch, select}) {
 			if (postId === null) {
