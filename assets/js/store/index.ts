@@ -111,24 +111,24 @@ const actions = {
 	 * @param relType The type of the relationship.
 	 * @param relatedIds The IDs of the related entities.
 	 */
-	updateRelatedEntities(postId: number | null, relKey: string, relType: string, relatedIds: number[]) {
+	updateRelatedEntities(
+		postId: number | null,
+		relKey: string,
+		relType: string,
+		entities: ContentConnectRelatedEntities
+	) {
 		return async function thunk({dispatch, select}) {
 			if (postId === null) {
 				return;
 			}
 
 			const key = getRelatedEntitiesKey(postId, relKey);
-			const currentEntities = select.getRelatedEntities(postId, { rel_key: relKey, rel_type: relType });
 
-			const idToEntityMap = new Map();
-			currentEntities.forEach(entity => {
-				const entityId = typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id;
-				idToEntityMap.set(entityId, entity);
+			const relatedIds = entities.map(entity => {
+				return typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id;
 			});
 
-			const reorderedEntities = relatedIds.map(id => idToEntityMap.get(id)).filter(Boolean);
-
-			dispatch.setRelatedEntities(key, reorderedEntities);
+			dispatch.setRelatedEntities(key, entities);
 
 			await api.updateRelatedEntities(
 				postId,
