@@ -137,7 +137,6 @@ const actions = {
 				relatedIds
 			);
 
-			dispatch.invalidateResolutionForStoreSelector('getRelatedEntities');
 			dispatch.markPostAsDirty(postId);
 		};
 	},
