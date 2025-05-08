@@ -1,6 +1,7 @@
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 import { store } from '../store';
 import { ContentConnectRelationship } from '../store/types';
 
@@ -36,6 +37,14 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			contentTypes={relationship?.post_type}
 			maxContentItems={relationship?.max_items ?? 100}
 			isOrderable={relationship?.sortable ?? false}
+			queryFilter={(query) => {
+				if (relationship?.rel_key) {
+					return addQueryArgs(query, {
+						content_connect: relationship.rel_key
+					});
+				}
+				return query;
+			}}
 		/>
 	);
 }
