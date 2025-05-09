@@ -100,7 +100,6 @@ class Plugin {
 			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
-			new API\V2\Post\Route\Search(),
 		);
 
 		foreach ( $modules as $module ) {
