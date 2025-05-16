@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { safeDecodeURI } from '@wordpress/url';
+import { addQueryArgs, safeDecodeURI } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { store } from '../store';
@@ -54,8 +54,12 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 	}), [postId, relationship.rel_key]);
 
 	const handleChange = async (newEntities: any[]) => {
-		const newIds = newEntities.map(entity => entity.id);
-		updateRelatedEntities(postId, relationship.rel_key, relationship.rel_type, newIds);
+		await updateRelatedEntities(
+			postId,
+			relationship.rel_key,
+			relationship.rel_type,
+			newEntities
+		);
 	};
 
 	return (
@@ -66,6 +70,14 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			contentTypes={relationship?.post_type}
 			maxContentItems={relationship?.max_items ?? 100}
 			isOrderable={relationship?.sortable ?? false}
+			queryFilter={(query) => {
+				if (relationship?.rel_key) {
+					return addQueryArgs(query, {
+						content_connect: relationship.rel_key
+					});
+				}
+				return query;
+			}}
 			PickedItemPreviewComponent={PickedRelationshipPreview}
 		/>
 	);
