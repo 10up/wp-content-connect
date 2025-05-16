@@ -1,9 +1,10 @@
+/* global contentConnect */
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { addQueryArgs, safeDecodeURI } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __experimentalTruncate as Truncate } from '@wordpress/components';
+import { __experimentalText as Text  } from '@wordpress/components';
 import { store } from '../store';
 import { ContentConnectRelationship } from '../store/types';
 
@@ -29,17 +30,19 @@ type PickedRelationshipType = {
  * @returns {*} React JSX
  */
 const PickedRelationshipPreview: React.FC<{ item: PickedRelationshipType }> = ({ item }) => {
-	const { title, type, url = '' } = item;
+	const { title } = item;
+	const decodedTitle = decodeEntities(title);
+
+	const {
+		pickedItem: {
+			truncate = true,
+			ellipsizeMode = 'auto',
+			numberOfLines = 1
+		}
+	} = contentConnect;
+
 	return (
-		<>
-			{type !== 'user' ? (
-				<a href={safeDecodeURI(url) || ''} target="_blank" rel="noopener noreferrer">
-					<Truncate>{decodeEntities(title)}</Truncate>
-				</a>
-			) : (
-				<Truncate>{decodeEntities(title)}</Truncate>
-			)}
-		</>
+		<Text truncate={truncate} ellipsizeMode={ellipsizeMode} numberOfLines={numberOfLines} title={decodedTitle} aria-label={decodedTitle}>{decodedTitle}</Text>
 	);
 };
 
