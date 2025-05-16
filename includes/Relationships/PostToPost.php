@@ -61,13 +61,9 @@ class PostToPost extends Relationship {
 
 		// Make sure CPT is not the same as "from" so we don't get a duplicate, then register if enabled
 		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			// Currently, only support a default UI when the "to" end is a single post type
-			if ( count( $this->to ) === 1 ) {
-				$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to[0], $this->to_labels, $this->to_sortable );
-				$this->to_ui->setup();
-			}
+			$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to, $this->to_labels, $this->to_sortable );
+			$this->to_ui->setup();
 		}
-
 	}
 
 	/**
