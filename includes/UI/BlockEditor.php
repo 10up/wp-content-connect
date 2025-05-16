@@ -31,6 +31,21 @@ class BlockEditor {
 			);
 
 			wp_enqueue_script( 'wp-content-connect' );
+
+			wp_localize_script(
+				'wp-content-connect',
+				'contentConnect',
+				apply_filters(
+					'tenup_content_connect_ui_settings',
+					[
+						'pickedItem' => [
+							'truncate'      => true,
+							'ellipsizeMode' => 'auto',
+							'numberOfLines' => 1,
+						],
+					]
+				)
+			);
 		}
 	}
 }
