@@ -17,4 +17,5 @@ jobs:
       - name: Spell Check
         uses: crate-ci/typos@7bc041cbb7ca9167c9e0e4ccbb26f48eb0f9d4e0 # v1.30.2
         with:
+          config: ./.github/_typos.toml
           files: ./
