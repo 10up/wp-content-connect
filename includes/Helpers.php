@@ -292,11 +292,13 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			$relationship_data['labels']    = $relationship->from_labels;
 			$relationship_data['enable_ui'] = $relationship->enable_from_ui;
 			$relationship_data['sortable']  = $relationship->from_sortable;
+			$relationship_data['max_items'] = $relationship->from_max_items;
 			$relationship_data['post_type'] = $relationship_to;
 		} else {
 			$relationship_data['labels']    = $relationship->to_labels;
 			$relationship_data['enable_ui'] = $relationship->enable_to_ui;
 			$relationship_data['sortable']  = $relationship->to_sortable;
+			$relationship_data['max_items'] = $relationship->to_max_items;
 			$relationship_data['post_type'] = array( $relationship->from );
 		}
 
