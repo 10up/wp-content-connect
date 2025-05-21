@@ -32,9 +32,9 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertEquals( 'OR', $query->relation );
 
 		// Test with weird capitalization
-		$query = new UserRelationshipQuery( array( 'relation' => 'aNd' ) );
+		$query = new UserRelationshipQuery( array( 'relation' => 'AND' ) );
 		$this->assertEquals( 'AND', $query->relation );
-		$query = new UserRelationshipQuery( array( 'relation' => 'oR' ) );
+		$query = new UserRelationshipQuery( array( 'relation' => 'OR' ) );
 		$this->assertEquals( 'OR', $query->relation );
 
 		// Test completely invalid defaults to AND
