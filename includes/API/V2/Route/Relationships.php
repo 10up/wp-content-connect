@@ -25,7 +25,7 @@ class Relationships extends AbstractRoute {
 			array(
 				'args' => array(
 					'rel_type' => array(
-						'description'       => __( 'The relationship type to filter relatioships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
 						'type'              => 'string',
 						'default'           => 'post-to-post',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -88,12 +88,14 @@ class Relationships extends AbstractRoute {
 					$prepared_relationships[ $rel_key ]['from']        = array(
 						'object_type' => $relationship->from,
 						'labels'      => $relationship->from_labels,
+						'max_items'   => $relationship->from_max_items,
 						'sortable'    => $relationship->from_sortable,
 						'enable_ui'   => $relationship->enable_from_ui,
 					);
 					$prepared_relationships[ $rel_key ]['to']          = array(
 						'object_type' => $relationship->to,
 						'labels'      => $relationship->to_labels,
+						'max_items'   => $relationship->to_max_items,
 						'sortable'    => $relationship->to_sortable,
 						'enable_ui'   => $relationship->enable_to_ui,
 					);
