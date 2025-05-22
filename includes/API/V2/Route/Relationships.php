@@ -80,6 +80,7 @@ class Relationships extends AbstractRoute {
 					$prepared_relationships[ $rel_key ]['object_type'] = 'user';
 					$prepared_relationships[ $rel_key ]['labels']      = $relationship->from_labels;
 					$prepared_relationships[ $rel_key ]['sortable']    = $relationship->from_sortable;
+					$prepared_relationships[ $rel_key ]['max_items']   = $relationship->from_max_items;
 					$prepared_relationships[ $rel_key ]['enable_ui']   = $relationship->enable_from_ui;
 					break;
 

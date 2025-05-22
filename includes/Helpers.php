@@ -411,6 +411,7 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 			'object_type' => 'user',
 			'labels'      => $relationship->from_labels,
 			'sortable'    => $relationship->from_sortable,
+			'max_items'   => $relationship->from_max_items,
 			'enable_ui'   => $relationship->enable_from_ui,
 		);
 
