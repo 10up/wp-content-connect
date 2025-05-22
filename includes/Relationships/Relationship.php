@@ -82,7 +82,7 @@ abstract class Relationship {
 		$defaults = array(
 			'from' => array(
 				'enable_ui' => true,
-				'max_items' => 99,
+				'max_items' => 100,
 				'sortable' => false,
 				'labels' => array(
 					'name' => $name,
@@ -90,7 +90,7 @@ abstract class Relationship {
 			),
 			'to' => array(
 				'enable_ui' => false,
-				'max_items' => 99,
+				'max_items' => 100,
 				'sortable' => false,
 				'labels' => array(
 					'name' => $name,
