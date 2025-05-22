@@ -96,8 +96,8 @@ class Plugin {
 			new ClassicEditor(),
 			new BlockEditor(),
 			new DeletedItems(),
+			new API\V1\Search(),
 			new API\V2\Route\Relationships(),
-			new API\V2\Post\Field\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
 		);
