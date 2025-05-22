@@ -32,7 +32,7 @@ class Relationships extends AbstractPostRoute {
 						'minLength'         => 1,
 					),
 					'rel_type'  => array(
-						'description'       => __( 'The relationship type to filter relatioships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
 						'type'              => 'string',
 						'default'           => 'any',
 						'sanitize_callback' => 'sanitize_text_field',
