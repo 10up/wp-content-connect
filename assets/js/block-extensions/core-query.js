@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/no-unsafe-wp-apis */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/extensions */
 /**
@@ -11,10 +12,11 @@ import { registerBlockExtension, ContentPicker } from '@10up/block-components';
  */
 import {
 	ToggleControl,
-	PanelBody,
 	Notice,
 	SelectControl,
 	BaseControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -118,17 +120,13 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 
 	const relationshipsControlLabel = __('Relationship', 'tenup-content-connect');
 	const relationshipsControlHelp = __(
-		'Select a relationship to determine how related items are retrieved.',
+		'Select a relationship to determine how related entities are retrieved.',
 		'tenup-content-connect',
 	);
 	const sourcePostControlHelp = __(
-		'Choose the post from which related items will be pulled. Defaults to the current post.',
+		'Choose the post from which related entities will be pulled. Defaults to the current post.',
 		'tenup-content-connect',
 	);
-
-	const onRelationshipChange = (value) => {
-		setAttributes({ relationshipKey: value });
-	};
 
 	const resetAll = () => {
 		setAttributes({
@@ -139,74 +137,115 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 		});
 	};
 
+	const onShowRelatedChange = (value) => {
+		if (!value) {
+			resetAll();
+		} else {
+			setAttributes({
+				showRelated: value,
+				sourcePost: [
+					{
+						id: currentPostId,
+						type: currentPostType,
+						uuid: uuidv4(),
+					},
+				],
+			});
+		}
+	};
+
+	const onSourcePostChange = (ids) => {
+		setAttributes({ sourcePost: ids.length ? ids : undefined });
+	};
+
+	const onRelationshipChange = (value) => {
+		setAttributes({ relationshipKey: value });
+	};
+
+	const onOrderByRelationshipChange = (value) => {
+		setAttributes({ orderByRelationship: value });
+	};
+
 	return (
 		<InspectorControls>
-			<PanelBody title={__('Related', 'tenup-content-connect')} initialOpen={!!showRelated}>
-				<ToggleControl
-					label={__('Only show related items', 'tenup-content-connect')}
-					checked={showRelated}
-					onChange={(value) => {
-						if (!value) {
-							resetAll();
-						} else {
-							setAttributes({
-								showRelated: value,
-								sourcePost: [
-									{
-										id: currentPostId,
-										type: currentPostType,
-										uuid: uuidv4(),
-									},
-								],
-							});
-						}
-					}}
-				/>
-				{showRelated && (
-					<BaseControl help={sourcePostControlHelp}>
-						<ContentPicker
-							onPickChange={(ids) =>
-								setAttributes({ sourcePost: ids.length ? ids : undefined })
-							}
-							mode="post"
-							content={sourcePost}
-							contentTypes={postTypesSlugs}
-							singlePickedLabel={__('Selected post:', 'tenup-content-connect')}
-							multiPickedLabel={__('Selected posts:', 'tenup-content-connect')}
-						/>
-					</BaseControl>
-				)}
-				{showRelated && relationshipsOptions.length > 1 && (
-					<SelectControl
-						options={relationshipsOptions}
-						value={relationshipKey}
-						label={relationshipsControlLabel}
-						onChange={onRelationshipChange}
-						help={relationshipsControlHelp}
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+			<ToolsPanel label={__('Related', 'tenup-content-connect')} resetAll={resetAll}>
+				<ToolsPanelItem
+					hasValue={() => !!showRelated}
+					label={__('Related entities', 'tenup-content-connect')}
+					onDeselect={() => resetAll()}
+					isShownByDefault
+				>
+					<ToggleControl
+						label={__('Only show related entities', 'tenup-content-connect')}
+						checked={showRelated}
+						onChange={onShowRelatedChange}
 					/>
+				</ToolsPanelItem>
+				{showRelated && (
+					<ToolsPanelItem
+						hasValue={() => !!sourcePost}
+						label={__('Selected post', 'tenup-content-connect')}
+						onDeselect={() => setAttributes({ sourcePost: undefined })}
+						isShownByDefault
+					>
+						<BaseControl help={sourcePostControlHelp}>
+							<ContentPicker
+								onPickChange={onSourcePostChange}
+								mode="post"
+								content={sourcePost}
+								contentTypes={postTypesSlugs}
+								maxContentItems={1}
+								singlePickedLabel={__('Selected post:', 'tenup-content-connect')}
+							/>
+						</BaseControl>
+					</ToolsPanelItem>
 				)}
-				{showRelated && !hasRelationships && (
-					<Notice spokenMessage={null} status="warning" isDismissible={false}>
-						{__(
-							'No relationships exist for the selected post type or post. Try selecting a different post or post type.',
-							'tenup-content-connect',
+				{showRelated && (
+					<ToolsPanelItem
+						hasValue={() => !!relationshipKey}
+						label={__('Relationship', 'tenup-content-connect')}
+						onDeselect={() => setAttributes({ relationshipKey: undefined })}
+						isShownByDefault
+					>
+						{hasRelationships && (
+							<SelectControl
+								options={relationshipsOptions}
+								value={relationshipKey}
+								label={relationshipsControlLabel}
+								onChange={onRelationshipChange}
+								help={relationshipsControlHelp}
+								__nextHasNoMarginBottom
+							/>
 						)}
-					</Notice>
+						{!hasRelationships && (
+							<Notice spokenMessage={null} status="warning" isDismissible={false}>
+								{__(
+									'No relationships exist for the selected post type or post. Try selecting a different post or post type.',
+									'tenup-content-connect',
+								)}
+							</Notice>
+						)}
+					</ToolsPanelItem>
 				)}
 				{showRelated && selectedRelationship?.sortable && (
-					<ToggleControl
+					<ToolsPanelItem
+						hasValue={() => !!orderByRelationship}
 						label={__('Order by relationship', 'tenup-content-connect')}
-						checked={orderByRelationship}
-						onChange={(value) => setAttributes({ orderByRelationship: value })}
-						help={__(
-							'If enabled, the order of the related items will be determined by the relationship.',
-							'tenup-content-connect',
-						)}
-					/>
+						onDeselect={() => setAttributes({ orderByRelationship: undefined })}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__('Order by relationship', 'tenup-content-connect')}
+							checked={orderByRelationship}
+							onChange={onOrderByRelationshipChange}
+							help={__(
+								'If enabled, the order of the posts will be determined by the selected relationship. This supersedes any other ordering.',
+								'tenup-content-connect',
+							)}
+						/>
+					</ToolsPanelItem>
 				)}
-			</PanelBody>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 };
