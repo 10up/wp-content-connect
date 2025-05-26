@@ -96,6 +96,7 @@ class Plugin {
 			new ClassicEditor(),
 			new BlockEditor(),
 			new DeletedItems(),
+			new REST(),
 			new API\V1\Search(),
 			new API\V2\Route\Relationships(),
 			new API\V2\Post\Route\Relationships(),
