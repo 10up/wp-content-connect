@@ -68,7 +68,7 @@ class MetaBox {
 					break;
 			}
 
-			// Deteremine save direction and call proper save function
+			// Determine save direction and call proper save function
 			$post_type = get_post_type( $post_id );
 			if ( $relationship->from_ui->render_post_type === $post_type ) {
 				$relationship->from_ui->handle_save( $relationship_data, $post_id );
