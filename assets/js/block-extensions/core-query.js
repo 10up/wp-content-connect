@@ -184,7 +184,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				{showRelated && (
 					<ToolsPanelItem
 						hasValue={() => !!sourcePost}
-						label={__('Selected post', 'tenup-content-connect')}
+						label={__('Source post', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ sourcePost: undefined })}
 						isShownByDefault
 					>
