@@ -5,6 +5,6 @@ import './block-extensions';
 import { registerPlugin } from '@wordpress/plugins';
 import { RelationshipsPanel } from './components/relationships-panel';
 
-registerPlugin('content-connect', {
+registerPlugin('wp-content-connect', {
 	render: RelationshipsPanel,
 });
