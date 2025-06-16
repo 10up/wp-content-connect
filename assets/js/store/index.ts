@@ -88,6 +88,13 @@ const actions = {
 	 * @returns The action to mark the post as dirty.
 	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
+		// Trigger the block editor to mark the post as dirty.
+		(dispatch('core/editor') as any).editPost({
+			meta: {
+				_content_connect_edit_lock: Date.now()
+			}
+		});
+
 		return {
 			type: 'MARK_POST_AS_DIRTY',
 			postId,
@@ -124,19 +131,7 @@ const actions = {
 
 			const key = getRelatedEntitiesKey(postId, relKey);
 
-			const relatedIds = entities.map(entity => {
-				return typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id;
-			});
-
 			dispatch.setRelatedEntities(key, entities);
-
-			await api.updateRelatedEntities(
-				postId,
-				relKey,
-				relType,
-				relatedIds
-			);
-
 			dispatch.markPostAsDirty(postId);
 		};
 	},
@@ -183,7 +178,7 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	actions,
 	selectors: {
-		getRelationships(state: ContentConnectState, postId: number | null, options?: api.GetRelationshipsOptions) {
+		getRelationships(state: ContentConnectState, postId: number | null, options?: api.GetRelationshipsOptions): Record<string, { rel_key: string; rel_type: string }> {
 			if (postId === null) {
 				return {};
 			}
@@ -234,17 +229,21 @@ async function persistContentConnectionChanges() {
 
 			// Update each relationship for the post
 			await Promise.all(
-				Object.entries(relationships).map(async ([relKey, relType]) => {
+				(Object.values(relationships) as Array<{ rel_key: string; rel_type: string }>).map(async (relationship) => {
 					const relatedEntities = select(STORE_NAME).getRelatedEntities(postId, {
-						rel_key: relKey,
-						rel_type: relType,
+						rel_key: relationship.rel_key,
+						rel_type: relationship.rel_type,
 					});
+
+					const relatedIds = relatedEntities.map(entity =>
+						typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id
+					);
 
 					await api.updateRelatedEntities(
 						postId,
-						relKey,
-						relType as string,
-						relatedEntities.map(post => post.id),
+						relationship.rel_key,
+						relationship.rel_type,
+						relatedIds
 					);
 				})
 			);
@@ -252,7 +251,7 @@ async function persistContentConnectionChanges() {
 	);
 
 	// Clear dirty entities after successful save
-	dispatch(STORE_NAME).clearDirtyEntities();
+	(dispatch(STORE_NAME) as any).clearDirtyEntities();
 }
 
 // Add the pre-save hook to persist changes
