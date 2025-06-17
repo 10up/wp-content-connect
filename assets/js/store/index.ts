@@ -1,4 +1,5 @@
 import { createReduxStore, register, select, dispatch, createSelector } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { addFilter } from '@wordpress/hooks';
 import * as api from './api';
 import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConnectState } from './types';
@@ -89,7 +90,7 @@ const actions = {
 	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
 		// Trigger the block editor to mark the post as dirty.
-		(dispatch('core/editor') as any).editPost({
+		dispatch(editorStore).editPost({
 			meta: {
 				_content_connect_edit_lock: Date.now()
 			}
