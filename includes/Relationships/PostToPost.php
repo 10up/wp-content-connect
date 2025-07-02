@@ -245,6 +245,16 @@ class PostToPost extends Relationship {
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 		$table->replace_bulk( $fields, $data );
+
+		/**
+		 * Fires after a relationship order has been updated
+		 * @since 1.7.0
+		 *
+		 * @param int $object_id ID of the post we're ordering on.
+		 * @param int[] $ordered_ids IDs of the posts being ordered
+		 * @param string $type relationship type (post-to-post|post-to-user)
+		 */
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, 'post-to-post' );
 	}
 
 }
