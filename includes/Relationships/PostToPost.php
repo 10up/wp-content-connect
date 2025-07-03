@@ -49,7 +49,7 @@ class PostToPost extends Relationship {
 		$this->from = $from;
 		$this->to = $to;
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
-		
+
 		parent::__construct( $name, $args );
 	}
 
@@ -234,7 +234,7 @@ class PostToPost extends Relationship {
 				'order' => $order
 			);
 		}
-		
+
 		$fields = array(
 			'id1' => '%d',
 			'id2' => '%d',
@@ -252,9 +252,10 @@ class PostToPost extends Relationship {
 		 *
 		 * @param int $object_id ID of the post we're ordering on.
 		 * @param int[] $ordered_ids IDs of the posts being ordered
-		 * @param string $type relationship type (post-to-post|post-to-user)
+		 * @param string $name relationship name
+		 * @param string $type relationship type (post-to-post|post-to-user|user-to-post)
 		 */
-		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, 'post-to-post' );
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, $this->name, 'post-to-post' );
 	}
 
 }

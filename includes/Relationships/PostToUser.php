@@ -230,7 +230,7 @@ class PostToUser extends Relationship {
 		/**
 		 * This action is documented in PostToPost.php
 		 */
-		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, 'post-to-user' );
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, $this->name, 'post-to-user' );
 	}
 
 	/**
@@ -275,7 +275,7 @@ class PostToUser extends Relationship {
 		/**
 		 * This action is documented in PostToPost.php
 		 */
-		do_action( 'tenup-content-connect-update-relationships-order', $user_id, $ordered_post_ids, 'user-to-post' );
+		do_action( 'tenup-content-connect-update-relationships-order', $user_id, $ordered_post_ids, $this->name, 'user-to-post' );
 	}
 
 }
