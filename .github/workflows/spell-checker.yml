@@ -1,4 +1,6 @@
 name: 'Spell Checker'
+permissions:
+  contents: read
 on:
   push:
     branches:
