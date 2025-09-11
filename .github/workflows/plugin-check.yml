@@ -1,5 +1,8 @@
 name: WordPress Plugin Checks
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
