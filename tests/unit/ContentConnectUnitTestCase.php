@@ -2,9 +2,9 @@
 
 namespace TenUp\ContentConnect\Tests\Unit;
 
-class ContentConnectUnitTestCase extends \PHPUnit_Framework_TestCase {
+class ContentConnectUnitTestCase extends \PHPUnit\Framework\TestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		\WP_Mock::setUp();
 
 		\WP_Mock::userFunction( 'plugin_dir_url', array( 'return' => 'https://contentconnect.test/wp-content/plugins/content-connect/' ) );
@@ -13,7 +13,7 @@ class ContentConnectUnitTestCase extends \PHPUnit_Framework_TestCase {
 		parent::setUp();
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		// Add assertions from Mockery to the total count
 		if ( $container = \Mockery::getContainer() ) {
 			$this->addToAssertionCount( $container->mockery_getExpectationCount() );
