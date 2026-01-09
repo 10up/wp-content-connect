@@ -1,10 +1,25 @@
 <?php
+/**
+ * Tests for PostToUser table creation.
+ *
+ * @package TenUp\ContentConnect\Tests\Integration\Tables
+ */
 
 namespace TenUp\ContentConnect\Tests\Integration\Tables;
 
-class PostToUserTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public function test_table_is_created() {
+/**
+ * Test cases for the PostToUser table.
+ */
+class PostToUserTest extends TestCase {
+
+	/**
+	 * Tests that the post_to_user table is created.
+	 *
+	 * @return void
+	 */
+	public function test_table_is_created(): void {
 		global $wpdb;
 
 		// @ suppresses headers already sent errors
@@ -12,7 +27,7 @@ class PostToUserTest extends \PHPUnit_Framework_TestCase {
 
 		$result = $wpdb->query( "SHOW TABLES LIKE '{$wpdb->prefix}post_to_user'" );
 
-		$this->assertEquals( 1, $result );
+		$this->assertSame( 1, $result );
 	}
 
 }
