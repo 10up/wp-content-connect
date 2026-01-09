@@ -1,4 +1,9 @@
 <?php
+/**
+ * Tests for WP_Query integration with Content Connect relationships.
+ *
+ * @package TenUp\ContentConnect\Tests\Integration\QueryIntegration
+ */
 
 namespace TenUp\ContentConnect\Tests\Integration\QueryIntegration;
 
@@ -10,9 +15,17 @@ use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
+/**
+ * Test cases for WP_Query integration.
+ */
 class WP_Query_IntegrationTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	/**
+	 * Sets up the test environment.
+	 *
+	 * @return void
+	 */
+	public function setUp(): void {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
@@ -25,7 +38,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		parent::setUp();
 	}
 
-	public function define_relationships() {
+	/**
+	 * Defines test relationships in the registry.
+	 *
+	 * @return void
+	 */
+	public function define_relationships(): void {
 		$registry = Plugin::instance()->get_registry();
 		$registry->define_post_to_post( 'post', 'post', 'basic' );
 		$registry->define_post_to_post( 'post', 'post', 'complex' );
@@ -36,11 +54,21 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$registry->define_post_to_user( 'post', 'contrib' );
 	}
 
-	public function tearDown() {
+	/**
+	 * Cleans up after each test.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
 		parent::tearDown();
 	}
 
-	public function test_that_nothing_happens_without_relationship_defined() {
+	/**
+	 * Tests that nothing happens when no relationship is defined.
+	 *
+	 * @return void
+	 */
+	public function test_that_nothing_happens_without_relationship_defined(): void {
 		$args = array(
 			'post_type' => 'post',
 			'fields' => 'ids',
@@ -87,7 +115,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_that_nothing_happens_without_required_params() {
+	/**
+	 * Tests that nothing happens when required parameters are missing.
+	 *
+	 * @return void
+	 */
+	public function test_that_nothing_happens_without_required_params(): void {
 		$this->define_relationships();
 
 		$args = array(
@@ -107,7 +140,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_that_nothing_happens_without_related_to_post() {
+	/**
+	 * Tests that nothing happens when related_to_post parameter is missing.
+	 *
+	 * @return void
+	 */
+	public function test_that_nothing_happens_without_related_to_post(): void {
 		$this->define_relationships();
 
 		$args = array(
@@ -132,7 +170,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_that_nothing_happens_without_related_to_user() {
+	/**
+	 * Tests that nothing happens when related_to_user parameter is missing.
+	 *
+	 * @return void
+	 */
+	public function test_that_nothing_happens_without_related_to_user(): void {
 		$this->define_relationships();
 
 		$args = array(
@@ -157,7 +200,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_that_nothing_happens_without_relationship_name() {
+	/**
+	 * Tests that nothing happens when relationship name parameter is missing.
+	 *
+	 * @return void
+	 */
+	public function test_that_nothing_happens_without_relationship_name(): void {
 		$this->define_relationships();
 
 		$args = array(
@@ -204,7 +252,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4 ), $query->posts );
 	}
 
-	public function test_basic_post_to_post_query_integration() {
+	/**
+	 * Tests basic post-to-post query integration.
+	 *
+	 * @return void
+	 */
+	public function test_basic_post_to_post_query_integration(): void {
 		$this->add_post_relations();
 		$this->define_relationships();
 
@@ -255,7 +308,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 46, 50 ), $query->posts );
 	}
 
-	public function test_compound_post_to_post_queries() {
+	/**
+	 * Tests compound post-to-post queries with OR and AND relations.
+	 *
+	 * @return void
+	 */
+	public function test_compound_post_to_post_queries(): void {
 		$this->add_post_relations();
 		$this->define_relationships();
 
@@ -289,7 +347,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3 ), $query->posts );
 	}
 
-	public function add_small_relationship_set() {
+	/**
+	 * Adds a small set of relationships for testing.
+	 *
+	 * @return void
+	 */
+	public function add_small_relationship_set(): void {
 		$p2p = new PostToPost( 'post', 'post', 'basic' );
 		$postowner = new PostToUser( 'post', 'owner' );
 
@@ -306,7 +369,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$p2p->add_relationship( 3, 4 );
 	}
 
-	public function test_basic_post_to_user_query_integration() {
+	/**
+	 * Tests basic post-to-user query integration.
+	 *
+	 * @return void
+	 */
+	public function test_basic_post_to_user_query_integration(): void {
 		$this->define_relationships();
 		$this->add_small_relationship_set();
 
@@ -333,7 +401,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 3, 4, 5 ), $query->posts );
 	}
 
-	public function test_compound_post_to_user_queries() {
+	/**
+	 * Tests compound post-to-user queries with OR and AND relations.
+	 *
+	 * @return void
+	 */
+	public function test_compound_post_to_user_queries(): void {
 		$this->define_relationships();
 		$this->add_small_relationship_set();
 
@@ -365,7 +438,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 5 ), $query->posts );
 	}
 
-	public function test_mixed_post_to_post_and_post_to_user_queries() {
+	/**
+	 * Tests mixed post-to-post and post-to-user queries.
+	 *
+	 * @return void
+	 */
+	public function test_mixed_post_to_post_and_post_to_user_queries(): void {
 		$this->define_relationships();
 		$this->add_small_relationship_set();
 
@@ -397,7 +475,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2, 4, 5 ), $query->posts );
 	}
 
-	public function test_orderby_only_works_with_one_segment() {
+	/**
+	 * Tests that orderby only works with one relationship query segment.
+	 *
+	 * @return void
+	 */
+	public function test_orderby_only_works_with_one_segment(): void {
 		$this->define_relationships();
 
 		$query = new \stdClass();
@@ -440,7 +523,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( 'default', $integration->posts_orderby( $orderby, $query ) );
 	}
 
-	public function test_post_to_post_sorting_queries() {
+	/**
+	 * Tests post-to-post sorting queries.
+	 *
+	 * @return void
+	 */
+	public function test_post_to_post_sorting_queries(): void {
 		$this->add_post_relations();
 		$this->define_relationships();
 
@@ -470,7 +558,12 @@ class WP_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 44, 36 ), $query->posts );
 	}
 
-	public function test_post_to_user_sorting_queries() {
+	/**
+	 * Tests post-to-user sorting queries.
+	 *
+	 * @return void
+	 */
+	public function test_post_to_user_sorting_queries(): void {
 		$this->add_post_relations();
 		$this->define_relationships();
 

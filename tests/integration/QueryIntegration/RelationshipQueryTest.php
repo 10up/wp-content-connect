@@ -1,4 +1,9 @@
 <?php
+/**
+ * Tests for RelationshipQuery class.
+ *
+ * @package TenUp\ContentConnect\Tests\Integration\QueryIntegration
+ */
 
 namespace TenUp\ContentConnect\Tests\Integration\QueryIntegration;
 
@@ -7,9 +12,17 @@ use TenUp\ContentConnect\QueryIntegration\RelationshipQuery;
 use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
+/**
+ * Test cases for RelationshipQuery.
+ */
 class RelationshipQueryTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	/**
+	 * Sets up the test environment.
+	 *
+	 * @return void
+	 */
+	public function setUp(): void {
 		parent::setUp();
 
 		// Force a clear registry for each test
@@ -18,7 +31,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$plugin->registry->setup();
 	}
 
-	public function test_relation_parsing() {
+	/**
+	 * Tests relation parsing (AND/OR).
+	 *
+	 * @return void
+	 */
+	public function test_relation_parsing(): void {
 		// With nothing, relation should default to and
 		$query = new RelationshipQuery( array() );
 		$this->assertEquals( 'AND', $query->relation );
@@ -40,7 +58,7 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		// Test completely invalid defaults to AND
 		$query = new RelationshipQuery( array( 'relationship' => 'any' ) );
 		$this->assertEquals( 'AND', $query->relation );
-		
+
 		// Test empty defaults to AND
 		$query = new RelationshipQuery( array( 'relationship' => '' ) );
 		$this->assertEquals( 'AND', $query->relation );
@@ -51,7 +69,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertEquals( 'OR', $query->relation );
 	}
 
-	public function test_top_level_segments_are_reformatted_into_nested_arrays_correctly() {
+	/**
+	 * Tests that top-level segments are reformatted into nested arrays correctly.
+	 *
+	 * @return void
+	 */
+	public function test_top_level_segments_are_reformatted_into_nested_arrays_correctly(): void {
 		$query = new RelationshipQuery( array(
 			'related_to_post' => '25',
 			'name' => 'basic',
@@ -100,7 +123,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertEquals( $expected, $query->segments );
 	}
 
-	public function test_invalid_segments_are_recognized_as_invalid() {
+	/**
+	 * Tests that invalid segments are recognized as invalid.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_segments_are_recognized_as_invalid(): void {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array() ) );
@@ -109,7 +137,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertFalse( $query->is_valid_segment( array( 'related_to_user' ) ) );
 	}
 
-	public function test_valid_segments_are_recognized_as_valid() {
+	/**
+	 * Tests that valid segments are recognized as valid.
+	 *
+	 * @return void
+	 */
+	public function test_valid_segments_are_recognized_as_valid(): void {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertTrue( $query->is_valid_segment( array(
@@ -123,7 +156,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		) ) );
 	}
 
-	public function test_combined_segments_are_invalid() {
+	/**
+	 * Tests that combined segments (both related_to_post and related_to_user) are invalid.
+	 *
+	 * @return void
+	 */
+	public function test_combined_segments_are_invalid(): void {
 		$query = new RelationshipQuery( array() );
 
 		$this->assertFalse( $query->is_valid_segment( array(
@@ -133,7 +171,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		) ) );
 	}
 
-	public function test_valid_segments_are_tracked() {
+	/**
+	 * Tests that valid segments are tracked correctly.
+	 *
+	 * @return void
+	 */
+	public function test_valid_segments_are_tracked(): void {
 		$query = new RelationshipQuery( array() );
 		$this->assertFalse( $query->has_valid_segments() );
 
@@ -160,7 +203,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertTrue( $query->has_valid_segments() );
 	}
 
-	public function test_generate_where_clause() {
+	/**
+	 * Tests WHERE clause generation.
+	 *
+	 * @return void
+	 */
+	public function test_generate_where_clause(): void {
 		// Should return nothing, since the relationship isn't defined yet
 		$query = new RelationshipQuery(array(
 			'name' => 'basic',
@@ -307,7 +355,12 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertEquals( $expected, $query->where );
 	}
 
-	public function test_generate_join_clause() {
+	/**
+	 * Tests JOIN clause generation.
+	 *
+	 * @return void
+	 */
+	public function test_generate_join_clause(): void {
 		global $wpdb;
 
 		// Should return nothing, since the relationship isn't defined yet

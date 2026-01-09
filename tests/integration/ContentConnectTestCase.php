@@ -65,15 +65,16 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 	/**
-	 * Adds known relationships that we can then test against
+	 * Adds known post-to-post relationships that can be used for testing.
 	 *
 	 * Post Type to Post ID Mapping:
+	 * - Post Type Post: 1-10
+	 * - Post Type Car:  11-20
+	 * - Post Type Tire: 21-30
 	 *
-	 * Post Type Post: 1-10
-	 * Post Type Car:  11-20
-	 * Post Type Tire: 21-30
+	 * @return void
 	 */
-	public function add_post_relations() {
+	public function add_post_relations(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post;" );
@@ -109,7 +110,7 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$p2 = new PostToPost( 'post', 'post', 'page2' );
 
 		for ( $i = 35; $i <= 90; $i++ ) {
-			switch( $i % 4 ) {
+			switch ( $i % 4 ) {
 				case 0:
 					$p1->add_relationship( 31, $i );
 					break;
