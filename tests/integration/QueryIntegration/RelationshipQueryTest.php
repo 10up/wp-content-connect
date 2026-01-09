@@ -50,9 +50,9 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$this->assertEquals( 'OR', $query->relation );
 
 		// Test with weird capitalization
-		$query = new RelationshipQuery( array( 'relation' => 'aNd' ) );
+		$query = new RelationshipQuery( array( 'relation' => 'aNd' ) ); // @spellchecker:disable-line
 		$this->assertEquals( 'AND', $query->relation );
-		$query = new RelationshipQuery( array( 'relation' => 'oR' ) );
+		$query = new RelationshipQuery( array( 'relation' => 'oR' ) ); // @spellchecker:disable-line
 		$this->assertEquals( 'OR', $query->relation );
 
 		// Test completely invalid defaults to AND
