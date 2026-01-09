@@ -17,7 +17,7 @@ use TenUp\ContentConnect\Relationships\PostToUser;
  *
  * Provides common setup methods and test data helpers.
  */
-class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
+class ContentConnectTestCase extends \WP_UnitTestCase {
 
 	/**
 	 * Sets up the test suite before any tests run.
