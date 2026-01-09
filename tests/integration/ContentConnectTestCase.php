@@ -1,12 +1,29 @@
 <?php
+/**
+ * Base test case for Content Connect integration tests.
+ *
+ * @package TenUp\ContentConnect\Tests\Integration
+ */
 
 namespace TenUp\ContentConnect\Tests\Integration;
 
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 
+/**
+ * Base test case class for Content Connect integration tests.
+ *
+ * Provides common setup methods and test data helpers.
+ */
 class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 
+	/**
+	 * Sets up the test suite before any tests run.
+	 *
+	 * @return void
+	 */
 	public static function setUpBeforeClass(): void {
 		self::insert_dummy_data();
 		self::register_post_types();
@@ -14,7 +31,12 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		parent::setUpBeforeClass();
 	}
 
-	public static function insert_dummy_data() {
+	/**
+	 * Inserts dummy post and user data for testing.
+	 *
+	 * @return void
+	 */
+	public static function insert_dummy_data(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->posts}" );
@@ -24,10 +46,15 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$wpdb->query( "INSERT INTO `{$wpdb->users}` " . file_get_contents( __DIR__ . '/data/users.sql' ) );
 	}
 
-	public static function register_post_types() {
+	/**
+	 * Registers custom post types needed for testing.
+	 *
+	 * @return void
+	 */
+	public static function register_post_types(): void {
 		$post_types = array(
 			'car',
-			'tire'
+			'tire',
 		);
 
 		foreach ( $post_types as $post_type ) {
@@ -99,7 +126,12 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		}
 	}
 
-	public function add_user_relations() {
+	/**
+	 * Adds known post-to-user relationships that can be used for testing.
+	 *
+	 * @return void
+	 */
+	public function add_user_relations(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_user;" );
@@ -174,5 +206,19 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$carcontrib->add_relationship( 15, 3 );
 	}
 
-}
+	/**
+	 * Cleans up after each test.
+	 *
+	 * Resets the registry to ensure test isolation.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		$plugin = Plugin::instance();
+		$plugin->registry = new Registry();
+		$plugin->registry->setup();
 
+		parent::tearDown();
+	}
+
+}
