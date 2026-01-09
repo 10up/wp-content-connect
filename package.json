@@ -24,7 +24,7 @@
     "test:setup": "npm run wp-env:start",
     "test": "npm run test:unit",
     "test:unit": "vendor/bin/phpunit -c phpunit.unit.xml",
-    "test:integration": "wp-env run tests-cli bash -c 'PLUGIN_DIR=\"/var/www/html/wp-content/plugins/wp-content-connect\" && if [ ! -f \"$PLUGIN_DIR/vendor/bin/phpunit\" ]; then cd \"$PLUGIN_DIR\" && composer install --no-interaction --quiet; fi && cd \"$PLUGIN_DIR\" && vendor/bin/phpunit -c phpunit.integration.xml'",
+    "test:integration": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.integration.xml'",
     "test:all": "npm run test:unit && npm run test:integration"
   },
   "devDependencies": {
