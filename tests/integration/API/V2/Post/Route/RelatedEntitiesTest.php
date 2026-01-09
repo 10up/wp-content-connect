@@ -155,8 +155,9 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertIsArray( $data );
 		$this->assertLessThanOrEqual( 10, count( $data ) );
-		$this->assertSame( '14', $response->get_header( 'X-WP-Total' ) );
-		$this->assertSame( '2', $response->get_header( 'X-WP-TotalPages' ) );
+		$headers = $response->get_headers();
+		$this->assertSame( '14', $headers['X-WP-Total'] );
+		$this->assertSame( '2', $headers['X-WP-TotalPages'] );
 	}
 
 	/**
