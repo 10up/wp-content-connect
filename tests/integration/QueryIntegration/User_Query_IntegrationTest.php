@@ -11,7 +11,7 @@ use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class User_Query_IntegrationTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
@@ -31,7 +31,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$registry->define_post_to_user( 'post', 'contrib' );
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 	}
 

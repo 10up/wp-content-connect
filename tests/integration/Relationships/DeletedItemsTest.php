@@ -8,7 +8,7 @@ use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class DeletedItemsTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		global $wpdb;
 
 		// Start out with known empty slate

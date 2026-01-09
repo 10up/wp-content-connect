@@ -5,9 +5,9 @@ namespace TenUp\ContentConnect\Tests\Integration;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 
-class ContentConnectTestCase extends \PHPUnit_Framework_TestCase {
+class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 
-	public static function setupBeforeClass() {
+	public static function setUpBeforeClass(): void {
 		self::insert_dummy_data();
 		self::register_post_types();
 

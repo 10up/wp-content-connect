@@ -7,7 +7,7 @@ use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class PostToPostTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
@@ -15,7 +15,7 @@ class PostToPostTest extends ContentConnectTestCase {
 		parent::setUp();
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 	}
 
