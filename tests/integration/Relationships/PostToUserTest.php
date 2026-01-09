@@ -359,7 +359,9 @@ class PostToUserTest extends ContentConnectTestCase {
 
 		$this->assertEquals( array( 3, 4, 5 ), $ordered_posts, 'Posts with explicit order should come first' );
 		$this->assertCount( 2, $unordered_posts, 'Should have 2 posts with order = 0' );
-		$this->assertEquals( array( 1, 2 ), array_values( array_intersect( $unordered_posts, array( 1, 2 ) ) ), 'Unordered posts should be 1 and 2' );
+		// Unordered posts (1, 2) have non-deterministic order, just verify both are present
+		$this->assertContains( 1, $unordered_posts, 'Unordered posts should include 1' );
+		$this->assertContains( 2, $unordered_posts, 'Unordered posts should include 2' );
 	}
 
 	/**
