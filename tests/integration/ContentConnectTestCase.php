@@ -25,10 +25,33 @@ class ContentConnectTestCase extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-		self::insert_dummy_data();
 		self::register_post_types();
-
 		parent::setUpBeforeClass();
+	}
+
+	/**
+	 * Sets up the test environment.
+	 *
+	 * @return void
+	 */
+	public function setUp(): void {
+		parent::setUp();
+
+		// Ensure the plugin and registry are initialized
+		$plugin = Plugin::instance();
+		if ( empty( $plugin->registry ) ) {
+			$plugin->registry = new Registry();
+			$plugin->registry->setup();
+		}
+
+		// Ensure custom tables are created/upgraded
+		if ( ! empty( $plugin->tables ) ) {
+			foreach ( $plugin->tables as $table ) {
+				$table->upgrade( true );
+			}
+		}
+
+		self::insert_dummy_data();
 	}
 
 	/**
