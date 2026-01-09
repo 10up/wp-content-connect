@@ -49,7 +49,7 @@ class PostToPost extends Relationship {
 		$this->from = $from;
 		$this->to = $to;
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
-		
+
 		parent::__construct( $name, $args );
 	}
 
@@ -106,7 +106,9 @@ class PostToPost extends Relationship {
 
 		$objects = $db->get_results( $query );
 
-		return wp_list_pluck( $objects, 'ID' );
+		$ids = wp_list_pluck( $objects, 'ID' );
+
+		return array_map( 'intval', $ids );
 	}
 
 	/**
@@ -234,7 +236,7 @@ class PostToPost extends Relationship {
 				'order' => $order
 			);
 		}
-		
+
 		$fields = array(
 			'id1' => '%d',
 			'id2' => '%d',
