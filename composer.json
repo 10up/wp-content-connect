@@ -32,7 +32,8 @@
     },
     "require-dev": {
         "10up/wp_mock": "^0.3.0",
-        "phpunit/phpunit": "^9.6"
+        "phpunit/phpunit": "^9.6",
+        "yoast/phpunit-polyfills": "^1.1"
     },
     "config": {
         "sort-packages": true,
