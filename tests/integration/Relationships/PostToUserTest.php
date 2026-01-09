@@ -21,11 +21,11 @@ class PostToUserTest extends ContentConnectTestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
+		parent::setUp();
+
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_user" );
-
-		parent::setUp();
 	}
 
 	/**
