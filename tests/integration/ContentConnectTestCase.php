@@ -137,10 +137,10 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_user;" );
 
-		$postowner = new PostToUser( 'post', 'owner' );
+		$postowner   = new PostToUser( 'post', 'owner' );
 		$postcontrib = new PostToUser( 'post', 'contrib' );
-		$carowner = new PostToUser( 'car', 'owner' );
-		$carcontrib = new PostToUser( 'car', 'contrib' );
+		$carowner    = new PostToUser( 'car', 'owner' );
+		$carcontrib  = new PostToUser( 'car', 'contrib' );
 
 		$postowner->add_relationship( 1, 1 );
 		$postowner->add_relationship( 2, 1 );
@@ -215,11 +215,10 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 	 * @return void
 	 */
 	public function tearDown(): void {
-		$plugin = Plugin::instance();
+		$plugin           = Plugin::instance();
 		$plugin->registry = new Registry();
 		$plugin->registry->setup();
 
 		parent::tearDown();
 	}
-
 }
