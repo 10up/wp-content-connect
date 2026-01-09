@@ -9,7 +9,7 @@ use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class UserRelationshipQueryTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		// Force a clear registry for each test
@@ -40,7 +40,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		// Test completely invalid defaults to AND
 		$query = new UserRelationshipQuery( array( 'relationship' => 'any' ) );
 		$this->assertEquals( 'AND', $query->relation );
-		
+
 		// Test empty defaults to AND
 		$query = new UserRelationshipQuery( array( 'relationship' => '' ) );
 		$this->assertEquals( 'AND', $query->relation );
