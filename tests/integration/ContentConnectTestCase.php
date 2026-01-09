@@ -7,7 +7,7 @@ use TenUp\ContentConnect\Relationships\PostToUser;
 
 class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 
-	public static function setUpBeforeClass() {
+	public static function setUpBeforeClass(): void {
 		self::insert_dummy_data();
 		self::register_post_types();
 
