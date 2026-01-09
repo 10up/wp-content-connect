@@ -223,5 +223,4 @@ class RegistryTest extends ContentConnectTestCase {
 		$this->assertSame( $pct, $registry->get_post_to_post_relationship( 'post', array( 'car', 'tire' ), 'basic' ) );
 		$this->assertSame( $pct, $registry->get_post_to_post_relationship( 'post', array( 'tire', 'car' ), 'basic' ) );
 	}
-
 }
