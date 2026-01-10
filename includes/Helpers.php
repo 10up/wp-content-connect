@@ -60,7 +60,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 
 	$related_ids = wp_list_pluck( $objects, 'ID' );
 
-	return $related_ids;
+	return array_map( 'intval', $related_ids );
 }
 
 /**

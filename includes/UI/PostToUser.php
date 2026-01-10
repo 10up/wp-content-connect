@@ -79,5 +79,4 @@ class PostToUser extends PostUI {
 			$this->relationship->save_post_to_user_sort_data( $post_id, $relationship_data['add_items'] );
 		}
 	}
-
 }

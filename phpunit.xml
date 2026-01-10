@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<phpunit
+		bootstrap="tests/php/bootstrap.php"
+		backupGlobals="false"
+		colors="true"
+		convertErrorsToExceptions="true"
+		convertNoticesToExceptions="true"
+		convertWarningsToExceptions="true"
+>
+	<php>
+		<const name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="vendor/yoast/phpunit-polyfills"/>
+	</php>
+
+	<testsuites>
+		<testsuite name="php">
+			<directory>tests/php</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
