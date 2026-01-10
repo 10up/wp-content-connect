@@ -30,7 +30,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_user" );
 
-		$plugin = Plugin::instance();
+		$plugin           = Plugin::instance();
 		$plugin->registry = new Registry();
 		$plugin->registry->setup();
 
@@ -65,15 +65,15 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 	 */
 	public function test_that_nothing_happens_without_relationship_defined(): void {
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 2,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'ID',
+			'order'              => 'ASC',
+			'number'             => 2,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'related_to_post' => '20',
-					'name' => 'owner',
+					'name'            => 'owner',
 				),
 			),
 		);
@@ -82,7 +82,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2 ), $query->get_results() );
 
 		$args['paged'] = 2;
-		$query = new \WP_User_Query( $args );
+		$query         = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->get_results() );
 	}
 
@@ -95,18 +95,18 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->define_relationships();
 
 		$args = array(
-			'fields' => 'ids',
+			'fields'  => 'ids',
 			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 2,
-			'paged' => 1,
+			'order'   => 'ASC',
+			'number'  => 2,
+			'paged'   => 1,
 		);
 
 		$query = new \WP_User_Query( $args );
 		$this->assertEquals( array( 1, 2 ), $query->get_results() );
 
 		$args['paged'] = 2;
-		$query = new \WP_User_Query( $args );
+		$query         = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->get_results() );
 	}
 
@@ -119,11 +119,11 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->define_relationships();
 
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 2,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'ID',
+			'order'              => 'ASC',
+			'number'             => 2,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'name' => 'owner',
@@ -135,7 +135,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2 ), $query->get_results() );
 
 		$args['paged'] = 2;
-		$query = new \WP_User_Query( $args );
+		$query         = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->get_results() );
 	}
 
@@ -148,11 +148,11 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->define_relationships();
 
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 2,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'ID',
+			'order'              => 'ASC',
+			'number'             => 2,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'related_to_post' => '31',
@@ -164,7 +164,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 1, 2 ), $query->get_results() );
 
 		$args['paged'] = 2;
-		$query = new \WP_User_Query( $args );
+		$query         = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 4 ), $query->get_results() );
 	}
 
@@ -194,15 +194,15 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->add_small_relationship_set();
 
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 10,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'ID',
+			'order'              => 'ASC',
+			'number'             => 10,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'related_to_post' => 1,
-					'name' => 'owner',
+					'name'            => 'owner',
 				),
 			),
 		);
@@ -229,19 +229,19 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->add_small_relationship_set();
 
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'number' => 10,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'ID',
+			'order'              => 'ASC',
+			'number'             => 10,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'related_to_post' => 2,
-					'name' => 'owner',
+					'name'            => 'owner',
 				),
 				array(
 					'related_to_post' => 5,
-					'name' => 'owner',
+					'name'            => 'owner',
 				),
 				'relation' => 'OR',
 			),
@@ -251,7 +251,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 2, 3 ), $query->get_results() );
 
 		$args['relationship_query']['relation'] = 'AND';
-		$query = new \WP_User_Query( $args );
+		$query                                  = new \WP_User_Query( $args );
 		$this->assertEquals( array( 2 ), $query->get_results() );
 	}
 
@@ -269,12 +269,14 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 			'orderby' => 'relationship',
 		);
 
-		$relationship_query = new UserRelationshipQuery( array(
+		$relationship_query = new UserRelationshipQuery(
 			array(
-				'related_to_post' => 1,
-				'name' => 'owner',
-			),
-		) );
+				array(
+					'related_to_post' => 1,
+					'name'            => 'owner',
+				),
+			)
+		);
 
 		$query->query_orderby = 'default';
 
@@ -283,17 +285,18 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 
 		$this->assertEquals( 'ORDER BY p2u1.user_order = 0, p2u1.user_order ASC', $query->query_orderby );
 
-
-		$relationship_query = new UserRelationshipQuery( array(
+		$relationship_query = new UserRelationshipQuery(
 			array(
-				'related_to_post' => 1,
-				'name' => 'owner',
-			),
-			array(
-				'related_to_post' => 2,
-				'name' => 'owner',
+				array(
+					'related_to_post' => 1,
+					'name'            => 'owner',
+				),
+				array(
+					'related_to_post' => 2,
+					'name'            => 'owner',
+				),
 			)
-		) );
+		);
 
 		$query->query_orderby = 'default';
 
@@ -314,24 +317,24 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$rel->save_post_to_user_sort_data( 5, array( 2, 3 ) );
 
 		$args = array(
-			'fields' => 'ids',
-			'orderby' => 'relationship',
-			'number' => 10,
-			'paged' => 1,
+			'fields'             => 'ids',
+			'orderby'            => 'relationship',
+			'number'             => 10,
+			'paged'              => 1,
 			'relationship_query' => array(
 				array(
 					'related_to_post' => 5,
-					'name' => 'owner',
+					'name'            => 'owner',
 				),
 			),
 		);
 
-		$query = new \WP_User_Query( $args );
+		$query   = new \WP_User_Query( $args );
 		$results = array_map( 'intval', $query->get_results() );
 		$this->assertEquals( array( 2, 3 ), $results );
 
 		$rel->save_post_to_user_sort_data( 5, array( 3, 2 ) );
-		$query = new \WP_User_Query( $args );
+		$query   = new \WP_User_Query( $args );
 		$results = array_map( 'intval', $query->get_results() );
 		// Both users have explicit order, so order should be deterministic: [3, 2]
 		// Verify both users are present (order may be non-deterministic due to SQL ordering behavior)
@@ -339,5 +342,4 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertContains( 2, $results );
 		$this->assertContains( 3, $results );
 	}
-
 }
