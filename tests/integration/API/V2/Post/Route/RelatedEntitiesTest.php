@@ -139,7 +139,11 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-pagination' );
 
 		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
-		for ( $i = 2; $i <= 15; $i++ ) {
+
+		for ( $i = 2; $i <= 10; $i++ ) {
+			$relationship->add_relationship( 1, $i );
+		}
+		for ( $i = 31; $i <= 35; $i++ ) {
 			$relationship->add_relationship( 1, $i );
 		}
 
@@ -156,8 +160,8 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$this->assertIsArray( $data );
 		$this->assertLessThanOrEqual( 10, count( $data ) );
 		$headers = $response->get_headers();
-		$this->assertSame( '14', $headers['X-WP-Total'] );
-		$this->assertSame( '2', $headers['X-WP-TotalPages'] );
+		$this->assertSame( 14, $headers['X-WP-Total'] );
+		$this->assertSame( 2, $headers['X-WP-TotalPages'] );
 	}
 
 	/**
