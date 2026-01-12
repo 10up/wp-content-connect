@@ -1,3 +1,6 @@
+.phpunit.result.cache
+test-results/
+
 # Version Control
 .svn
 
@@ -27,5 +30,3 @@ npm-debug.log
 sassdoc
 scss-lint-report.xml
 config.codekit
-
-/dist/

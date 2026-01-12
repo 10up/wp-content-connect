@@ -9,7 +9,7 @@ class PostToPost extends BaseTable {
 	}
 
 	function get_table_name() {
-		return $this->generate_table_name( 'post_to_post');
+		return $this->generate_table_name( 'post_to_post' );
 	}
 
 	/**
@@ -37,5 +37,4 @@ class PostToPost extends BaseTable {
 
 		return $sql;
 	}
-
 }

@@ -2,6 +2,7 @@
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalText as Text  } from '@wordpress/components';

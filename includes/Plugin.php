@@ -92,30 +92,21 @@ class Plugin {
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query_integration = new WPQueryIntegration();
-		$this->wp_query_integration->setup();
-
-		$this->user_query_integration = new UserQueryIntegration();
-		$this->user_query_integration->setup();
-
-		$this->meta_box = new MetaBox(); // @deprecated remove in 1.7.0
-		$this->meta_box->setup();
-
-		$this->block_editor = new BlockEditor();
-		$this->block_editor->setup();
-
-		$this->deleted_items = new DeletedItems();
-		$this->deleted_items->setup();
-
-		$routes = array(
+		$modules = array(
+			new WPQueryIntegration(),
+			new UserQueryIntegration(),
+			new MetaBox(), // @deprecated remove in 1.7.0
+			new BlockEditor(),
+			new DeletedItems(),
+			new REST(),
 			new API\V1\Search(),
 			new API\V2\Route\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
 		);
 
-		foreach ( $routes as $route ) {
-			$route->setup();
+		foreach ( $modules as $module ) {
+			$module->setup();
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );

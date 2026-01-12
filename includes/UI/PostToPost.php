@@ -84,5 +84,4 @@ class PostToPost extends PostUI {
 			$this->relationship->save_sort_data( $post_id, $relationship_data['add_items'] );
 		}
 	}
-
 }
