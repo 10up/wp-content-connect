@@ -12,3 +12,9 @@ extend-ignore-re = [
     # spellchecker:<on|off>:
     "//\\s*@spellchecker:off\\s*\\n.*\\n\\s*//\\s*@spellchecker:on"
 ]
+
+[files]
+extend-exclude = [
+	"build,
+    "dist"
+]
