@@ -39,8 +39,6 @@ class PostToPost extends Relationship {
 		parent::__construct( $name, $args );
 	}
 
-	public function setup() {}
-
 	/**
 	 * Gets the IDs that are related to the supplied post ID in the context of the current relationship
 	 *
