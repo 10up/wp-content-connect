@@ -30,14 +30,6 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 		);
 	};
 
-	const searchResultFilter = useCallback((item, result) => {
-		return {...item, url: '' };
-	}, []);
-
-	const pickedItemFilter = useCallback((item) => {
-		return {...item, url: '' };
-	}, []);
-
 	return (
 		<ContentPicker
 			onPickChange={handleChange}
@@ -54,8 +46,6 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 				}
 				return query;
 			}}
-			searchResultFilter={searchResultFilter}
-			pickedItemFilter={pickedItemFilter}
 		/>
 	);
 }
