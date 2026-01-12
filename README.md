@@ -505,7 +505,6 @@ addFilter(
   rel_type: string; // 'post-to-post' or 'post-to-user'
   postId: number | null; // Current post ID
   mode: 'post' | 'user'; // Content search mode
-  relationship: ContentConnectRelationship; // Full relationship object
 }
 ```
 
@@ -521,6 +520,22 @@ addFilter(
   'your-plugin/namespace',
   (defaultFilter, context) => {
     // Return a custom filter function
+  }
+);
+```
+
+#### `contentConnect.pickedItemPreviewComponent`
+
+Customizes the React component used to render picked items in the ContentPicker component list. This filter receives the default filter and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.pickedItemPreviewComponent',
+  'your-plugin/namespace',
+  (defaultComponent, context) => {
+    // Return a custom React component
   }
 );
 ```
@@ -658,11 +673,40 @@ addFilter(
 );
 ```
 
+#### Custom Preview Component
+
+Customize the React component used to render picked items:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+import { __experimentalText as Text } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
+
+addFilter(
+  'contentConnect.pickedItemPreviewComponent',
+  'my-project/custom-preview',
+  (defaultComponent, context) => {
+    return ({ item }) => {
+      const decodedTitle = decodeEntities(item.title);
+      return (
+        <Text
+          truncate={false}
+          title={decodedTitle}
+          aria-label={decodedTitle}
+        >
+          {decodedTitle}
+        </Text>
+      );
+    };
+  }
+);
+```
+
 ### Best Practices
 
-1. **Return Plain Functions**: Filter callbacks should return plain functions, not React hooks. The component handles memoization internally.
+1. **Return Plain Functions**: Filter callbacks should return plain functions, not React hooks. The component handles memoization internally. For `pickedItemPreviewComponent`, return a React component function.
 2. **Check Context**: Use the context object to conditionally apply customizations based on relationship key, type, or post ID
-3. **Return Default When Appropriate**: If your filter doesn't apply to a specific context, return the `defaultFilter` to maintain default behavior
+3. **Return Default When Appropriate**: If your filter doesn't apply to a specific context, return the `defaultFilter` or `defaultComponent` to maintain default behavior
 4. **Type Safety**: Use TypeScript types when available to ensure type safety
 
 ## Support Level

@@ -50,8 +50,6 @@ type SearchResultFilter = (
 	originalResult: WP_REST_API_Search_Result | WP_REST_API_User
 ) => NormalizedSuggestion;
 
-
-
 /**
  * Picked item filter function type.
  */
@@ -59,6 +57,11 @@ type PickedItemFilter = (
 	item: Partial<PickedItemType>,
 	originalResult: Post | Term | User
 ) => Partial<PickedItemType>;
+
+/**
+ * Picked item preview component type.
+ */
+type PickedItemPreviewComponent = React.ComponentType<{ item: PickedItemType }>;
 
 type RelationshipManagerProps = {
 	postId: number | null;
@@ -133,6 +136,14 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 		) as PickedItemFilter;
 	}, [filterContext]);
 
+	const pickedItemPreviewComponent = useMemo(() => {
+		return applyFilters(
+			'contentConnect.pickedItemPreviewComponent',
+			undefined,
+			filterContext
+		) as PickedItemPreviewComponent | undefined;
+	}, [filterContext]);
+
 	return (
 		<div className={`content-connect-relationship-manager content-connect-relationship-manager-${relationship.rel_name} content-connect-relationship-manager-${relationship.rel_key}`}>
 			<ContentPicker
@@ -152,6 +163,7 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 				}}
 				searchResultFilter={searchResultFilter}
 				pickedItemFilter={pickedItemFilter}
+				PickedItemPreviewComponent={pickedItemPreviewComponent}
 			/>
 		</div>
 	);
