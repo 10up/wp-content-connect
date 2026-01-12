@@ -24,8 +24,6 @@ class PostToUser extends Relationship {
 		parent::__construct( $name, $args );
 	}
 
-	public function setup() {}
-
 	/**
 	 * Gets the post IDs that are related to the supplied user ID in the context of the current relationship
 	 *

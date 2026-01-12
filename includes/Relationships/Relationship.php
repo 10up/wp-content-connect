@@ -110,7 +110,4 @@ abstract class Relationship {
 		$this->to_labels = $args['to']['labels'];
 		$this->to_max_items = $args['to']['max_items'];
 	}
-
-	abstract function setup();
-
 }
