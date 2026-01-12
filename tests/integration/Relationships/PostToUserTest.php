@@ -21,11 +21,11 @@ class PostToUserTest extends ContentConnectTestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
+		parent::setUp();
+
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_user" );
-
-		parent::setUp();
 	}
 
 	/**
@@ -349,11 +349,14 @@ class PostToUserTest extends ContentConnectTestCase {
 		$rel = new PostToUser( 'post', 'owner' );
 		$rel->save_user_to_post_sort_data( 1, array( 3, 4, 5 ) );
 
-		$this->assertEquals( array( 1, 2, 3, 4, 5 ), $rel->get_related_post_ids( 1, false ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertEquals( array( 1, 2, 3, 4, 5 ), array_map( 'intval', $rel->get_related_post_ids( 1, false ) ) );
 
 		// When ordering by relationship, posts with explicit order (3, 4, 5) come first
 		// Posts with order = 0 (1, 2) come last, but their relative order is non-deterministic
 		$result = $rel->get_related_post_ids( 1, true );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$result = array_map( 'intval', $result );
 		$ordered_posts = array_slice( $result, 0, 3 );
 		$unordered_posts = array_slice( $result, 3 );
 
