@@ -2,6 +2,7 @@
 # Add words that should be ignored (define them as themselves)
 Tung = "Tung"  # Example: Don't correct the surname "Tung"
 curent = "curent"  # Intentionally preserving misspelling to avoid breaking changes
+stati = "stati" # Plural for statuses
 
 [type.php]
 extend-ignore-re = [
