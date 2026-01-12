@@ -134,23 +134,25 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 	}, [filterContext]);
 
 	return (
-		<ContentPicker
-			onPickChange={handleChange}
-			mode={relationship?.object_type ?? 'post'}
-			content={relatedEntities}
-			contentTypes={relationship?.post_type}
-			maxContentItems={relationship?.max_items ?? 100}
-			isOrderable={relationship?.sortable ?? false}
-			queryFilter={(query) => {
-				if (relationship?.rel_key) {
-					return addQueryArgs(query, {
-						content_connect: relationship.rel_key
-					});
-				}
-				return query;
-			}}
-			searchResultFilter={searchResultFilter}
-			pickedItemFilter={pickedItemFilter}
-		/>
+		<div className={`content-connect-relationship-manager content-connect-relationship-manager-${relationship.rel_name} content-connect-relationship-manager-${relationship.rel_key}`}>
+			<ContentPicker
+				onPickChange={handleChange}
+				mode={relationship?.object_type ?? 'post'}
+				content={relatedEntities}
+				contentTypes={relationship?.post_type}
+				maxContentItems={relationship?.max_items ?? 100}
+				isOrderable={relationship?.sortable ?? false}
+				queryFilter={(query) => {
+					if (relationship?.rel_key) {
+						return addQueryArgs(query, {
+							content_connect: relationship.rel_key
+						});
+					}
+					return query;
+				}}
+				searchResultFilter={searchResultFilter}
+				pickedItemFilter={pickedItemFilter}
+			/>
+		</div>
 	);
 }
