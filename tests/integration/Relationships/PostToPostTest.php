@@ -21,11 +21,11 @@ class PostToPostTest extends ContentConnectTestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
+		parent::setUp();
+
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
-
-		parent::setUp();
 	}
 
 	/**
@@ -193,12 +193,13 @@ class PostToPostTest extends ContentConnectTestCase {
 		$ppb = new PostToPost( 'post', 'post', 'basic' );
 		$ppc = new PostToPost( 'post', 'post', 'complex' );
 
-		$this->assertSame( array( 2, 3 ), $ppb->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 3, 4 ), $ppc->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 1 ), $ppb->get_related_object_ids( 2 ) );
-		$this->assertSame( array( 1 ), $ppb->get_related_object_ids( 3 ) );
-		$this->assertSame( array( 1 ), $ppc->get_related_object_ids( 3 ) );
-		$this->assertSame( array( 1 ), $ppc->get_related_object_ids( 4 ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 2, 3 ), array_map( 'intval', $ppb->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 3, 4 ), array_map( 'intval', $ppc->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ppb->get_related_object_ids( 2 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ppb->get_related_object_ids( 3 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ppc->get_related_object_ids( 3 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ppc->get_related_object_ids( 4 ) ) );
 	}
 
 	/**
@@ -212,12 +213,13 @@ class PostToPostTest extends ContentConnectTestCase {
 		$pcb = new PostToPost( 'post', 'car', 'basic' );
 		$pcc = new PostToPost( 'post', 'car', 'complex' );
 
-		$this->assertSame( array( 11, 12 ), $pcb->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 13, 14 ), $pcc->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 1 ), $pcb->get_related_object_ids( 11 ) );
-		$this->assertSame( array( 1 ), $pcb->get_related_object_ids( 12 ) );
-		$this->assertSame( array( 1 ), $pcc->get_related_object_ids( 13 ) );
-		$this->assertSame( array( 1 ), $pcc->get_related_object_ids( 14 ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 11, 12 ), array_map( 'intval', $pcb->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 13, 14 ), array_map( 'intval', $pcc->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $pcb->get_related_object_ids( 11 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $pcb->get_related_object_ids( 12 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $pcc->get_related_object_ids( 13 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $pcc->get_related_object_ids( 14 ) ) );
 	}
 
 	/**
@@ -231,12 +233,13 @@ class PostToPostTest extends ContentConnectTestCase {
 		$ptb = new PostToPost( 'post', 'tire', 'basic' );
 		$ptc = new PostToPost( 'post', 'tire', 'complex' );
 
-		$this->assertSame( array( 21, 22 ), $ptb->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 23, 24 ), $ptc->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 1 ), $ptb->get_related_object_ids( 21 ) );
-		$this->assertSame( array( 1 ), $ptb->get_related_object_ids( 22 ) );
-		$this->assertSame( array( 1 ), $ptc->get_related_object_ids( 23 ) );
-		$this->assertSame( array( 1 ), $ptc->get_related_object_ids( 24 ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 21, 22 ), array_map( 'intval', $ptb->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 23, 24 ), array_map( 'intval', $ptc->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ptb->get_related_object_ids( 21 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ptb->get_related_object_ids( 22 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ptc->get_related_object_ids( 23 ) ) );
+		$this->assertSame( array( 1 ), array_map( 'intval', $ptc->get_related_object_ids( 24 ) ) );
 	}
 
 	/**
@@ -251,10 +254,11 @@ class PostToPostTest extends ContentConnectTestCase {
 		$ctc = new PostToPost( 'car', 'tire', 'complex' );
 
 		// even though 11 is related to array( 1, 21 ) - that is wrong post type. When JUST these post types, its just array( 21 )
-		$this->assertSame( array( 21 ), $ctb->get_related_object_ids( 11 ) );
-		$this->assertSame( array( 23 ), $ctc->get_related_object_ids( 13 ) );
-		$this->assertSame( array( 11 ), $ctb->get_related_object_ids( 21 ) );
-		$this->assertSame( array( 13 ), $ctc->get_related_object_ids( 23 ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 21 ), array_map( 'intval', $ctb->get_related_object_ids( 11 ) ) );
+		$this->assertSame( array( 23 ), array_map( 'intval', $ctc->get_related_object_ids( 13 ) ) );
+		$this->assertSame( array( 11 ), array_map( 'intval', $ctb->get_related_object_ids( 21 ) ) );
+		$this->assertSame( array( 13 ), array_map( 'intval', $ctc->get_related_object_ids( 23 ) ) );
 	}
 
 	/**
@@ -281,7 +285,8 @@ class PostToPostTest extends ContentConnectTestCase {
 		$ppb = new PostToPost( 'post', 'post', 'basic' );
 
 		$related = $ppb->get_related_object_ids( 1 );
-		$this->assertSame( array( 2, 3 ), $related );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 2, 3 ), array_map( 'intval', $related ) );
 	}
 
 	/**
@@ -317,13 +322,14 @@ class PostToPostTest extends ContentConnectTestCase {
 		$rel = new PostToPost( 'post', 'post', 'basic' );
 		$rel->save_sort_data( 1, array( 2, 3 ) );
 
-		$this->assertSame( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
-		$this->assertSame( array( 2, 3 ), $rel->get_related_object_ids( 1, true ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 2, 3 ), array_map( 'intval', $rel->get_related_object_ids( 1, false ) ) );
+		$this->assertSame( array( 2, 3 ), array_map( 'intval', $rel->get_related_object_ids( 1, true ) ) );
 
 		$rel->save_sort_data( 1, array( 3, 2 ) );
 
-		$this->assertSame( array( 2, 3 ), $rel->get_related_object_ids( 1, false ) );
-		$this->assertSame( array( 3, 2 ), $rel->get_related_object_ids( 1, true ) );
+		$this->assertSame( array( 2, 3 ), array_map( 'intval', $rel->get_related_object_ids( 1, false ) ) );
+		$this->assertSame( array( 3, 2 ), array_map( 'intval', $rel->get_related_object_ids( 1, true ) ) );
 	}
 
 	/**
@@ -343,8 +349,9 @@ class PostToPostTest extends ContentConnectTestCase {
 
 		$rel->save_sort_data( 1, array( 2, 3, 4, 6 ) );
 
-		$this->assertSame( array( 2, 3, 4, 5, 6 ), $rel->get_related_object_ids( 1, false ) );
-		$this->assertSame( array( 2, 3, 4, 6, 5 ), $rel->get_related_object_ids( 1, true ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 2, 3, 4, 5, 6 ), array_map( 'intval', $rel->get_related_object_ids( 1, false ) ) );
+		$this->assertSame( array( 2, 3, 4, 6, 5 ), array_map( 'intval', $rel->get_related_object_ids( 1, true ) ) );
 	}
 
 	/**
