@@ -31,8 +31,9 @@ class GetRelatedIdsByNameTest extends ContentConnectTestCase {
 		$post_tire->add_relationship( 1, 21 );
 
 		// Sanity check (restrict by specific relationship first)
-		$this->assertSame( array( 11 ), $post_car->get_related_object_ids( 1 ) );
-		$this->assertSame( array( 21 ), $post_tire->get_related_object_ids( 1 ) );
+		// Normalize to int for comparison (IDs may be returned as strings from DB)
+		$this->assertSame( array( 11 ), array_map( 'intval', $post_car->get_related_object_ids( 1 ) ) );
+		$this->assertSame( array( 21 ), array_map( 'intval', $post_tire->get_related_object_ids( 1 ) ) );
 
 		$this->assertSame( array( 11, 21 ), get_related_ids_by_name( 1, 'same-name' ) );
 	}
