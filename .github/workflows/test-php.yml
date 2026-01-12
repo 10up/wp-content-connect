@@ -1,0 +1,55 @@
+name: Test PHP
+
+env:
+  COMPOSER_VERSION: "2"
+  COMPOSER_CACHE: "${{ github.workspace }}/.composer-cache"
+
+on:
+  push:
+    branches:
+      - develop
+      - trunk
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  test-php:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out our repo source code
+        uses: actions/checkout@v3
+
+      - name: Set standard 10up cache directories
+        run: |
+          composer config -g cache-dir "${{ env.COMPOSER_CACHE }}"
+
+      - name: Prepare composer cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.COMPOSER_CACHE }}
+          key: composer-${{ env.COMPOSER_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ env.COMPOSER_VERSION }}-
+
+      - name: Set PHP version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: :php-psr
+          coverage: none
+
+      - name: Install Node dependencies
+        run: npm ci --no-optional
+
+      - name: Install dependencies
+        run: composer install --ignore-platform-reqs
+
+      - name: Setup Tests
+        run: npm run test:setup
+
+      - name: Run Tests
+        run: npm run test:all

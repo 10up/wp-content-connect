@@ -1,0 +1,20 @@
+[default.extend-words]
+# Add words that should be ignored (define them as themselves)
+Tung = "Tung"  # Example: Don't correct the surname "Tung"
+curent = "curent"  # Intentionally preserving misspelling to avoid breaking changes
+stati = "stati" # Plural for statuses
+
+[type.php]
+extend-ignore-re = [
+    # spellchecker:disable-line:
+    "(?Rm)^.*//\\s*@spellchecker:disable-line(\\b.*)?$",
+
+    # spellchecker:<on|off>:
+    "//\\s*@spellchecker:off\\s*\\n.*\\n\\s*//\\s*@spellchecker:on"
+]
+
+[files]
+extend-exclude = [
+    "build",
+    "dist"
+]
