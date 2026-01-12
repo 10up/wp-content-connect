@@ -1,6 +1,7 @@
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { store } from '../store';
 import { ContentConnectRelationship } from '../store/types';
@@ -29,6 +30,14 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 		);
 	};
 
+	const searchResultFilter = useCallback((item, result) => {
+		return {...item, url: '' };
+	}, []);
+
+	const pickedItemFilter = useCallback((item) => {
+		return {...item, url: '' };
+	}, []);
+
 	return (
 		<ContentPicker
 			onPickChange={handleChange}
@@ -45,6 +54,8 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 				}
 				return query;
 			}}
+			searchResultFilter={searchResultFilter}
+			pickedItemFilter={pickedItemFilter}
 		/>
 	);
 }
