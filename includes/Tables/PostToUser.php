@@ -9,7 +9,7 @@ class PostToUser extends BaseTable {
 	}
 
 	function get_table_name() {
-		return $this->generate_table_name( 'post_to_user');
+		return $this->generate_table_name( 'post_to_user' );
 	}
 
 	/**
@@ -42,5 +42,4 @@ class PostToUser extends BaseTable {
 
 		return $sql;
 	}
-
 }

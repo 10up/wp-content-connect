@@ -1,0 +1,15 @@
+{
+	"core": "WordPress/WordPress#master",
+	"phpVersion": "8.2",
+	"plugins": [
+		"."
+	],
+	"mappings": {
+		"wp-content/plugins/wp-content-connect": "."
+	},
+	"config": {
+		"WP_DEBUG": true,
+		"SCRIPT_DEBUG": true
+	}
+}
+
