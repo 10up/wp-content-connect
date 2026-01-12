@@ -1,50 +1,89 @@
-/* global contentConnect */
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { ContentPicker } from '@10up/block-components';
+import type { WP_REST_API_Search_Result, WP_REST_API_User } from 'wp-types';
+
+/**
+ * WordPress dependencies
+ */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { addQueryArgs } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
-import { __experimentalText as Text  } from '@wordpress/components';
+import type { Post, User } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
 import { store } from '../store';
-import { ContentConnectRelationship } from '../store/types';
+import { ContentConnectRelationship, Term } from '../store/types';
+
+/**
+ * Normalized suggestion type for search results.
+ */
+type NormalizedSuggestion = {
+	id: number;
+	subtype: string;
+	title: string;
+	type: string;
+	url: string;
+};
+
+/**
+ * Picked item type.
+ */
+type PickedItemType = {
+	id: number;
+	type: string;
+	uuid: string;
+	title: string;
+	url?: string;
+};
+
+/**
+ * Search result filter function type.
+ */
+type SearchResultFilter = (
+	item: NormalizedSuggestion,
+	originalResult: WP_REST_API_Search_Result | WP_REST_API_User
+) => NormalizedSuggestion;
+
+
+
+/**
+ * Picked item filter function type.
+ */
+type PickedItemFilter = (
+	item: Partial<PickedItemType>,
+	originalResult: Post | Term | User
+) => Partial<PickedItemType>;
 
 type RelationshipManagerProps = {
 	postId: number | null;
 	relationship: ContentConnectRelationship;
 };
 
-type PickedRelationshipType = {
-	id: number;
-	type: string;
-	uuid: string;
-	title: string;
-	url: string;
+type FilterContext = {
+	rel_key: string;
+	rel_type: string;
+	postId: number | null;
+	mode: 'post' | 'user' | 'term';
 };
 
 /**
- * Component to render a preview of a picked relationship.
- *
- * @component
- * @param {object} props - The component props.
- * @param {PickedRelationshipType} props.item - The picked relationship to display.
- * @returns {*} React JSX
+ * Default search result filter.
  */
-const PickedRelationshipPreview: React.FC<{ item: PickedRelationshipType }> = ({ item }) => {
-	const { title } = item;
-	const decodedTitle = decodeEntities(title);
+const defaultSearchResultFilter: SearchResultFilter = (item: NormalizedSuggestion) => {
+	return item;
+};
 
-	const {
-		pickedItem: {
-			truncate = true,
-			ellipsizeMode = 'auto',
-			numberOfLines = 1
-		}
-	} = contentConnect;
-
-	return (
-		<Text truncate={truncate} ellipsizeMode={ellipsizeMode} numberOfLines={numberOfLines} title={decodedTitle} aria-label={decodedTitle}>{decodedTitle}</Text>
-	);
+/**
+ * Default picked item filter.
+ */
+const defaultPickedItemFilter: PickedItemFilter = (item: Partial<PickedItemType>) => {
+	return item;
 };
 
 export function RelationshipManager({ postId, relationship }: RelationshipManagerProps) {
@@ -66,6 +105,34 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 		);
 	};
 
+	const mode = (relationship?.object_type ?? 'post') as 'post' | 'user' | 'term';
+
+	const filterContext: FilterContext = useMemo(
+		() => ({
+			rel_key: relationship.rel_key,
+			rel_type: relationship.rel_type,
+			postId,
+			mode,
+		}),
+		[relationship.rel_key, relationship.rel_type, postId, mode, relationship]
+	);
+
+	const searchResultFilter = useMemo(() => {
+		return applyFilters(
+			'contentConnect.searchResultFilter',
+			defaultSearchResultFilter,
+			filterContext
+		) as SearchResultFilter;
+	}, [filterContext]);
+
+	const pickedItemFilter = useMemo(() => {
+		return applyFilters(
+			'contentConnect.pickedItemFilter',
+			defaultPickedItemFilter,
+			filterContext
+		) as PickedItemFilter;
+	}, [filterContext]);
+
 	return (
 		<ContentPicker
 			onPickChange={handleChange}
@@ -82,7 +149,8 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 				}
 				return query;
 			}}
-			PickedItemPreviewComponent={PickedRelationshipPreview}
+			searchResultFilter={searchResultFilter}
+			pickedItemFilter={pickedItemFilter}
 		/>
 	);
 }

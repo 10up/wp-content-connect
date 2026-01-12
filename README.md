@@ -229,6 +229,7 @@ For example, this is fine:
 ```
 
 while this will not work (orderby will be ignored):
+
 ```php
 'relationship_query' => array(
     array(
@@ -236,9 +237,9 @@ while this will not work (orderby will be ignored):
         'name' => 'related',
     ),
     array(
-		'related_to_post' => 15,
-		'name' => 'related',
-	),
+  'related_to_post' => 15,
+  'name' => 'related',
+ ),
 ),
 'orderby' => 'relationship',
 ```
@@ -474,6 +475,196 @@ User ID 1 has 5 posts that need to be stored in the following order: 4, 2, 7, 9,
 $relationship->save_user_to_post_sort_data( 1, array( 4, 2, 7, 9, 8 ) );
 ```
 
+## Customizing the Block Editor UI
+
+Content Connect provides WordPress JavaScript filters that allow you to customize the search results and picked items display in the Block Editor. These filters are context-aware and receive relationship information, enabling both global and per-relationship customization.
+
+### Available Filters
+
+#### `contentConnect.searchResultFilter`
+
+Customizes how search results are displayed in the ContentPicker component. This filter receives the default filter function and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.searchResultFilter',
+  'your-plugin/namespace',
+  (defaultFilter, context) => {
+    // Return a custom filter function
+  }
+);
+```
+
+**Context Object:**
+
+```typescript
+{
+  rel_key: string; // The relationship key
+  rel_type: string; // 'post-to-post' or 'post-to-user'
+  postId: number | null; // Current post ID
+  mode: 'post' | 'user'; // Content search mode
+  relationship: ContentConnectRelationship; // Full relationship object
+}
+```
+
+#### `contentConnect.pickedItemFilter`
+
+Customizes how picked items are displayed in the ContentPicker component list. This filter receives the default filter function and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'your-plugin/namespace',
+  (defaultFilter, context) => {
+    // Return a custom filter function
+  }
+);
+```
+
+### Usage Examples
+
+#### Global Customization
+
+Apply the same customization to all relationships:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/customize-search-results',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}`,
+      };
+    };
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/customize-picked-items',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}`,
+      };
+    };
+  }
+);
+```
+
+#### Per-Relationship Customization
+
+Customize behavior based on the relationship key or type:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/customize-specific-relationship',
+  (defaultFilter, context) => {
+    // Only customize for a specific relationship
+    if (context.rel_key === 'my-specific-relationship') {
+      return (item, result) => {
+        return {
+          ...item,
+          url: '',
+          info: `<strong>Special:</strong> ${result.id}`,
+        };
+      };
+    }
+    // Return default for other relationships
+    return defaultFilter;
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/customize-picked-items-by-type',
+  (defaultFilter, context) => {
+    // Customize based on relationship type
+    if (context.rel_type === 'post-to-user') {
+      return (item, result) => {
+        return {
+          ...item,
+          url: '',
+          info: `User: ${result.name || result.username}`,
+        };
+      };
+    }
+    return defaultFilter;
+  }
+);
+```
+
+#### Accessing Additional REST API Fields
+
+To display additional fields from the REST API, you may need to register them first in PHP:
+
+```php
+add_action('rest_api_init', function() {
+    register_rest_field('search-result', 'excerpt', array(
+        'get_callback' => function($post) {
+            return get_the_excerpt($post['id']);
+        },
+        'update_callback' => null,
+        'schema' => null,
+    ));
+});
+```
+
+Then use them in your filter:
+
+```javascript
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/add-excerpt',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      // result.excerpt is a string from the REST API search endpoint
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}<br>${result.excerpt || ''}`,
+      };
+    };
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/add-excerpt-to-picked',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      // result.excerpt.rendered is from getEntityRecord (core WordPress entity)
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}<br>${result.excerpt?.rendered || ''}`,
+      };
+    };
+  }
+);
+```
+
+### Best Practices
+
+1. **Return Plain Functions**: Filter callbacks should return plain functions, not React hooks. The component handles memoization internally.
+2. **Check Context**: Use the context object to conditionally apply customizations based on relationship key, type, or post ID
+3. **Return Default When Appropriate**: If your filter doesn't apply to a specific context, return the `defaultFilter` to maintain default behavior
+4. **Type Safety**: Use TypeScript types when available to ensure type safety
+
 ## Support Level
 
 **Stable:** 10up is not planning to develop any new features for this, but will still respond to bug reports and security concerns. We welcome PRs, but any that include new features should be small and easy to integrate and should not include breaking changes. We otherwise intend to keep this tested up to the most recent version of WordPress.
@@ -485,7 +676,6 @@ A complete listing of all notable changes to WP Content Connect are documented i
 ## Contributing
 
 Please read [CODE_OF_CONDUCT.md](https://github.com/10up/wp-content-connect/blob/develop/CODE_OF_CONDUCT.md) for details on our code of conduct, [CONTRIBUTING.md](https://github.com/10up/wp-content-connect/blob/develop/CONTRIBUTING.md) for details on the process for submitting pull requests to us, and [CREDITS.md](https://github.com/10up/wp-content-connect/blob/develop/CREDITS.md) for a listing of maintainers of, contributors to, and libraries used by WP Content Connect.
-
 
 ## Like what you see?
 
