@@ -75,9 +75,7 @@ class PostToPost extends Relationship {
 
 		$objects = $db->get_results( $query );
 
-		$ids = wp_list_pluck( $objects, 'ID' );
-
-		return array_map( 'intval', $ids );
+		return wp_list_pluck( $objects, 'ID' );
 	}
 
 	/**
