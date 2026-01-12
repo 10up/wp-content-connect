@@ -22,7 +22,13 @@
     "lint-style": "10up-toolkit lint-style",
     "test": "10up-toolkit test-unit-jest",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "composer archive --file=$npm_package_name --format=zip"
+    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "wp-env:start": "wp-env start",
+    "wp-env:stop": "wp-env stop",
+    "wp-env:clean": "wp-env clean all",
+    "wp-env:destroy": "wp-env destroy",
+    "test:setup": "npm run wp-env:start",
+    "test:unit": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'"
   },
   "dependencies": {
     "@10up/block-components": "^1.20.1",
@@ -39,6 +45,7 @@
     "@wordpress/data": "^10.18.0",
     "@wordpress/edit-post": "^8.18.0",
     "@wordpress/editor": "^14.18.0",
+    "@wordpress/env": "^9.0.0",
     "@wordpress/html-entities": "^4.18.0",
     "@wordpress/url": "^4.18.0",
     "node-wp-i18n": "^1.2.7"

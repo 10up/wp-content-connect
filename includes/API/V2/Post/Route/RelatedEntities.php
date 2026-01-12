@@ -154,6 +154,9 @@ class RelatedEntities extends AbstractPostRoute {
 		$total    = $prepared_items['total'];
 
 		$max_pages = (int) ceil( $total / (int) $per_page );
+		if ( $max_pages < 1 && $total > 0 ) {
+			$max_pages = 1;
+		}
 
 		if ( $page > $max_pages && $total > 0 ) {
 			return new \WP_Error(
@@ -385,11 +388,27 @@ class RelatedEntities extends AbstractPostRoute {
 	public function validate_orderby_request_arg( $value, \WP_REST_Request $request ) {
 		$rel_type = $request->get_param( 'rel_type' );
 
+		$valid_values = array( 'relationship', 'date', 'id' );
+
 		if ( 'post-to-post' === $rel_type ) {
-			return array( 'relationship', 'date', 'id', 'title' );
+			$valid_values[] = 'title';
+		} else {
+			$valid_values[] = 'name';
 		}
 
-		return array( 'relationship', 'date', 'id', 'name' );
+		if ( ! in_array( $value, $valid_values, true ) ) {
+			return new \WP_Error(
+				'rest_invalid_param',
+				sprintf(
+					/* translators: %s: valid values */
+					__( 'Invalid orderby value. Must be one of: %s', 'tenup-content-connect' ),
+					implode( ', ', $valid_values )
+				),
+				array( 'status' => 400 )
+			);
+		}
+
+		return true;
 	}
 
 	/**
@@ -473,17 +492,7 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$query = new \WP_Query( $query_args );
 
-		$items = $query->get_posts();
-
-		if ( empty( $items ) ) {
-			return array(
-				'items' => array(),
-				'total' => 0,
-			);
-		}
-
-		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
-
+		$items       = $query->get_posts();
 		$total_items = $query->found_posts;
 
 		if ( $total_items < 1 && $page > 1 ) {
@@ -494,6 +503,15 @@ class RelatedEntities extends AbstractPostRoute {
 			$count_query->query( $query_args );
 			$total_items = $count_query->found_posts;
 		}
+
+		if ( empty( $items ) ) {
+			return array(
+				'items' => array(),
+				'total' => $total_items,
+			);
+		}
+
+		$prepared_items = $this->prepare_post_items( $items, $this->relationship );
 
 		return array(
 			'items' => $prepared_items,

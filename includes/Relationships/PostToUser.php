@@ -47,7 +47,9 @@ class PostToUser extends Relationship {
 
 		$objects = $db->get_results( $query );
 
-		return wp_list_pluck( $objects, 'post_id' );
+		$ids = wp_list_pluck( $objects, 'post_id' );
+
+		return array_map( 'intval', $ids );
 	}
 
 	/**
@@ -77,7 +79,9 @@ class PostToUser extends Relationship {
 
 		$objects = $db->get_results( $query );
 
-		return wp_list_pluck( $objects, 'user_id' );
+		$ids = wp_list_pluck( $objects, 'user_id' );
+
+		return array_map( 'intval', $ids );
 	}
 
 	/**
