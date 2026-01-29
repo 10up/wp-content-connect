@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.7.0] - TBD
+### Added
+- New helper functions for programmatic access to relationship data: `get_post_to_post_relationships_by()`, `get_post_to_user_relationships_by()`, `get_post_relationships_data()`, `get_post_to_post_relationships_data()`, `get_post_to_user_relationships_data()` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#96](https://github.com/10up/wp-content-connect/pull/96)).
+- New V2 REST API endpoints for managing relationships: `GET/POST/PUT/DELETE /content-connect/v2/post/{id}/related`, `GET /content-connect/v2/post/{id}/relationships`, `GET /content-connect/v2/relationships` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#95](https://github.com/10up/wp-content-connect/pull/95)).
+- WordPress data API store (`wp-content-connect`) for state management in the Block Editor (props [@fabiankaegy](https://github.com/fabiankaegy) [@s3rgiosan](https://github.com/s3rgiosan) via [#94](https://github.com/10up/wp-content-connect/pull/94)).
+- React hooks for accessing relationship data: `useRelationships()`, `useRelatedEntities()` (props [@fabiankaegy](https://github.com/fabiankaegy) [@s3rgiosan](https://github.com/s3rgiosan) via [#94](https://github.com/10up/wp-content-connect/pull/94)).
+- Block Editor integration (props [@fabiankaegy](https://github.com/fabiankaegy) [@s3rgiosan](https://github.com/s3rgiosan) via [#94](https://github.com/10up/wp-content-connect/pull/94)).
+- JavaScript filter hooks for customizing the UI: `contentConnect.searchResultFilter`, `contentConnect.pickedItemFilter`, `contentConnect.pickedItemPreviewComponent` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#104](https://github.com/10up/wp-content-connect/pull/104)).
+- Integration tests for all new helper functions and REST API endpoints (props [@s3rgiosan](https://github.com/s3rgiosan)).
+
+### Changed
+- Migrated Classic Editor UI from Vue.js to React, using the same components as Block Editor (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Replaced Vue.js MetaBox with new ClassicEditor and BlockEditor PHP classes (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Build system updated from Browserify/Vueify to 10up-toolkit with TypeScript support (props [@fabiankaegy](https://github.com/fabiankaegy) [@s3rgiosan](https://github.com/s3rgiosan) via [#94](https://github.com/10up/wp-content-connect/pull/94)).
+- JavaScript bundle now split into `block-editor.js` and `classic-editor.js` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+
+### Removed
+- Vue.js dependencies: `vue`, `vue-resource`, `vuedraggable` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Browserify build dependencies: `browserify`, `vueify`, `watchify` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Vue.js UI classes: `MetaBox`, `PostUI`, `PostToPost`, `PostToUser` from `includes/UI/` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Vue.js source files from `assets/js/src/` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+
+### Deprecated
+- REST API V1 Search endpoint (`/content-connect/v1/search`) - use V2 endpoints instead (props [@s3rgiosan](https://github.com/s3rgiosan) via [#95](https://github.com/10up/wp-content-connect/pull/95)).
+
 ## [1.6.0] - 2025-02-14
 ### Added
 - Filters for the Post UI `WP_Query` and `WP_User_Query` args (props [@s3rgiosan](https://github.com/s3rgiosan), [@rickalee](https://github.com/rickalee) via [#67](https://github.com/10up/wp-content-connect/pull/67)).
@@ -69,6 +94,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Initial plugin release.
 
 [Unreleased]: https://github.com/10up/wp-content-connect/compare/master...develop
+[1.7.0]: https://github.com/10up/wp-content-connect/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/10up/wp-content-connect/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/10up/wp-content-connect/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/10up/wp-content-connect/compare/1.3.0...1.4.0
