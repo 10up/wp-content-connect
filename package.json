@@ -15,6 +15,7 @@
     "test": "tests"
   },
   "scripts": {
+    "build": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "wp-env:start": "wp-env start",
