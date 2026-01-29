@@ -38,6 +38,7 @@
     "babel-runtime": "^6.26.0",
     "browserify": "^16.2.3",
     "node-sass": "^9.0.0",
+    "node-wp-i18n": "^1.2.8",
     "vue": "^2.4.4",
     "vue-resource": "^1.5.3",
     "vuedraggable": "^2.14.1",
