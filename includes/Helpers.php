@@ -60,6 +60,11 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 
 	$objects = $db->get_results( $query );
 
+	// Check for database errors.
+	if ( ! empty( $db->last_error ) ) {
+		return array();
+	}
+
 	if ( empty( $objects ) ) {
 		return array();
 	}
