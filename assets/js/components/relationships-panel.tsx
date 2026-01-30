@@ -32,6 +32,7 @@ export function RelationshipsPanel() {
 		<>
 			{enabledRelationships.map((relationship) => (
 				<PluginDocumentSettingPanel
+					key={relationship.rel_key}
 					name={`content-connect-relationship-${relationship.rel_key}`}
 					title={relationship.labels.name}
 				>

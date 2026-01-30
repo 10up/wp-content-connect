@@ -5,6 +5,9 @@
  * @package TenUp\ContentConnect\Tests
  */
 
+// Define constant to disable caching in helpers during tests.
+define( 'CONTENT_CONNECT_DOING_TESTS', true );
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 // Load Composer autoloader.
