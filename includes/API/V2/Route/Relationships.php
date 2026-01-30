@@ -135,11 +135,11 @@ class Relationships extends AbstractRoute {
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to view relationships for this type.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
