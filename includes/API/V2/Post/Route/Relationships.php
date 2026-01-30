@@ -94,15 +94,17 @@ class Relationships extends AbstractPostRoute {
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		$post_id = $request->get_param( 'id' );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to view relationships for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
-		$post = $this->get_post( $request['id'] );
+		$post = $this->get_post( $post_id );
 
 		if ( is_wp_error( $post ) ) {
 			return $post;

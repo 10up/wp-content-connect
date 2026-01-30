@@ -218,11 +218,13 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		$post_id = $request->get_param( 'id' );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to retrieve related entities for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
@@ -264,19 +266,13 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items_permissions_check( $request ) {
 
-		if ( ! is_user_logged_in() ) {
-			return new \WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to update related entities for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
-			);
-		}
+		$post_id = $request->get_param( 'id' );
 
-		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_cannot_edit',
 				__( 'Sorry, you are not allowed to update this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
