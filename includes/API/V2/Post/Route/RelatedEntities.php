@@ -241,7 +241,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items( $request ) {
 
-		$post     = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
@@ -289,7 +294,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function add_item( $request ) {
 
-		$post       = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
@@ -311,7 +321,7 @@ class RelatedEntities extends AbstractPostRoute {
 			$prepared_items = $this->get_related_posts( $post, $request );
 		}
 
-		$response = rest_ensure_response( $prepared_items['items'] );
+		$response = new \WP_REST_Response( $prepared_items['items'], 201 );
 
 		return $response;
 	}
@@ -338,7 +348,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function delete_item( $request ) {
 
-		$post       = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
