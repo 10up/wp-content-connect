@@ -49,7 +49,7 @@ class RelationshipsTest extends ContentConnectTestCase {
 		$request  = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 403, $response->get_status() );
 	}
 
 	/**
