@@ -18,6 +18,8 @@ function get_plugin() {
 /**
  * Returns the instance of the relationship registry.
  *
+ * @since 2.0.0
+ *
  * @return \TenUp\ContentConnect\Registry
  */
 function get_registry() {
@@ -37,6 +39,14 @@ function get_registry() {
  * @return int[]                      An array of related post IDs.
  */
 function get_related_ids_by_name( $post_id, $relationship_name ) {
+
+	if ( ! is_numeric( $post_id ) || $post_id <= 0 ) {
+		return array();
+	}
+
+	if ( empty( $relationship_name ) || ! is_string( $relationship_name ) ) {
+		return array();
+	}
 
 	$table = get_plugin()->get_table( 'p2p' );
 
