@@ -47,11 +47,11 @@ class REST {
 			return $response;
 		}
 
-		$links['content-connect:relationships'] = [
+		$links['content-connect:relationships'] = array(
 			'relationships' => array(
 				'href' => rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) ),
 			),
-		];
+		);
 
 		foreach ( $relationships_data as $relationship ) {
 			$links['content-connect:related'][] = array(
