@@ -1,0 +1,45 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "WP Content Connect",
+    "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
+    "author": "10up"
+  },
+  "landingPage": "/wp-admin/",
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "login": true,
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://github.com/10up/wp-content-connect/archive/refs/tags/2.0.0-beta.2.zip"
+      },
+      "options": {
+        "activate": true,
+        "targetFolderName": "wp-content-connect"
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/fabiankaegy/wp-content-connect-example-data",
+        "ref": "main"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp content-connect-example generate --universities=10 --cities=20 --people=100"
+    }
+  ]
+}
