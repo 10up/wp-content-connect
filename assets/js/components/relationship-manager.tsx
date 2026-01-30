@@ -97,9 +97,9 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			rel_key: relationship.rel_key,
 			rel_type: relationship.rel_type,
 		}),
-	}), [postId, relationship.rel_key]);
+	}), [postId, relationship.rel_key, relationship.rel_type]);
 
-	const handleChange = async (newEntities: any[]) => {
+	const handleChange = async (newEntities: PickedItemType[]) => {
 		await updateRelatedEntities(
 			postId,
 			relationship.rel_key,
@@ -117,7 +117,7 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 			postId,
 			mode,
 		}),
-		[relationship.rel_key, relationship.rel_type, postId, mode, relationship]
+		[relationship.rel_key, relationship.rel_type, postId, mode]
 	);
 
 	const searchResultFilter = useMemo(() => {
