@@ -47,6 +47,50 @@ export async function getRelatedEntities(
 	}
 }
 
+/**
+ * Fetches all related entities for a post by paginating through all pages.
+ *
+ * @param postId  The ID of the post.
+ * @param options The options for the request.
+ * @returns All related entities across all pages.
+ */
+export async function getAllRelatedEntities(
+	postId: number,
+	options: GetRelatedEntitiesOptions
+): Promise<ContentConnectRelatedEntities> {
+	const perPage = options.per_page ?? 100;
+	let allEntities: ContentConnectRelatedEntities = [];
+	let page = options.page ?? 1;
+	let totalPages = 1;
+
+	try {
+		do {
+			const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, {
+				...options,
+				per_page: perPage,
+				page,
+			});
+
+			const response = await apiFetch({
+				path,
+				parse: false,
+			}) as Response;
+
+			const data = await response.json() as ContentConnectRelatedEntities;
+			allEntities = [...allEntities, ...data];
+
+			const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+			totalPages = totalPagesHeader ? parseInt(totalPagesHeader, 10) : 1;
+			page++;
+		} while (page <= totalPages);
+
+		return allEntities;
+	} catch (error) {
+		console.error('Failed to fetch all related entities:', error);
+		throw error;
+	}
+}
+
 export async function updateRelatedEntities(
 	postId: number,
 	relKey: string,
