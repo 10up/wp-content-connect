@@ -39,6 +39,10 @@ class REST {
 	 */
 	public function prepare_links( $response, $post ) {
 
+		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+			return $response;
+		}
+
 		$links = $response->get_links();
 
 		$relationships_data = get_post_relationships_data( $post->ID );
@@ -47,11 +51,11 @@ class REST {
 			return $response;
 		}
 
-		$links['content-connect:relationships'] = [
+		$links['content-connect:relationships'] = array(
 			'relationships' => array(
 				'href' => rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) ),
 			),
-		];
+		);
 
 		foreach ( $relationships_data as $relationship ) {
 			$links['content-connect:related'][] = array(
