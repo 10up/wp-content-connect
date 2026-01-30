@@ -28,15 +28,13 @@ class BlockEditor {
 		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php' ) ) {
 			$asset_info = require CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php';
 
-			wp_register_script(
+			wp_enqueue_script(
 				'wp-content-connect-block-editor',
 				CONTENT_CONNECT_URL . 'dist/js/block-editor.js',
 				$asset_info['dependencies'],
 				$asset_info['version'],
 				true
 			);
-
-			wp_enqueue_script( 'wp-content-connect-block-editor' );
 		}
 	}
 }
