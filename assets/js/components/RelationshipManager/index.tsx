@@ -11,8 +11,6 @@ type RelationshipManagerProps = {
 	relationship: ContentConnectRelationship;
 };
 
-import './style.css';
-
 export function RelationshipManager({ postId, relationship }: RelationshipManagerProps) {
 	const { updateRelatedEntities } = useDispatch(store);
 

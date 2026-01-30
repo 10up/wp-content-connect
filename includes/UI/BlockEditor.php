@@ -36,5 +36,16 @@ class BlockEditor {
 				true
 			);
 		}
+
+		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php' ) ) {
+			$asset_info = require CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php';
+
+			wp_enqueue_style(
+				'wp-content-connect-admin-styles',
+				CONTENT_CONNECT_URL . 'dist/css/admin-styles.css',
+				$asset_info['dependencies'],
+				$asset_info['version']
+			);
+		}
 	}
 }
