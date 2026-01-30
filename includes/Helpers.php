@@ -18,6 +18,8 @@ function get_plugin() {
 /**
  * Returns the instance of the relationship registry.
  *
+ * @since 2.0.0
+ *
  * @return \TenUp\ContentConnect\Registry
  */
 function get_registry() {
@@ -38,6 +40,14 @@ function get_registry() {
  */
 function get_related_ids_by_name( $post_id, $relationship_name ) {
 
+	if ( ! is_numeric( $post_id ) || $post_id <= 0 ) {
+		return array();
+	}
+
+	if ( empty( $relationship_name ) || ! is_string( $relationship_name ) ) {
+		return array();
+	}
+
 	$table = get_plugin()->get_table( 'p2p' );
 
 	if ( empty( $table ) ) {
@@ -49,6 +59,11 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 	$query      = $db->prepare( "SELECT p2p.id1 as ID FROM {$table_name} AS p2p WHERE p2p.id2 = %d and p2p.name = %s", $post_id, $relationship_name );
 
 	$objects = $db->get_results( $query );
+
+	// Check for database errors.
+	if ( ! empty( $db->last_error ) ) {
+		return array();
+	}
 
 	if ( empty( $objects ) ) {
 		return array();
@@ -79,19 +94,32 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  */
 function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
+	// Use static cache for repeated calls within the same request.
+	static $cache = array();
+
+	$cache_key = $field . '_' . $value;
+
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return array( $value => $relationship );
+			$result              = array( $value => $relationship );
+			$cache[ $cache_key ] = $result;
+			return $result;
 		}
 
+		$cache[ $cache_key ] = false;
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
+		$cache[ $cache_key ] = array();
 		return array();
 	}
 
@@ -122,6 +150,8 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 		}
 	}
 
+	$cache[ $cache_key ] = $post_to_post_relationships;
+
 	return $post_to_post_relationships;
 }
 
@@ -139,19 +169,32 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
  */
 function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
+	// Use static cache for repeated calls within the same request.
+	static $cache = array();
+
+	$cache_key = $field . '_' . $value;
+
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return array( $value => $relationship );
+			$result              = array( $value => $relationship );
+			$cache[ $cache_key ] = $result;
+			return $result;
 		}
 
+		$cache[ $cache_key ] = false;
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
+		$cache[ $cache_key ] = array();
 		return array();
 	}
 
@@ -170,6 +213,8 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 				break;
 		}
 	}
+
+	$cache[ $cache_key ] = $post_to_user_relationships;
 
 	return $post_to_user_relationships;
 }
@@ -306,9 +351,20 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 		if ( 'embed' === $context ) {
 
+			/**
+			 * Filters the default posts per page limit for relationship queries.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param int    $posts_per_page Default number of posts to retrieve. Default 100.
+			 * @param string $rel_key        The relationship key.
+			 * @param int    $post_id        The post ID being queried.
+			 */
+			$posts_per_page = apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
+
 			$query_args = array(
 				'post_type'              => $relationship_data['post_type'],
-				'posts_per_page'         => 100,
+				'posts_per_page'         => $posts_per_page,
 				'relationship_query'     => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
