@@ -1,10 +1,8 @@
 # WP Content Connect
 
-[![WordPress Playground Demo](https://img.shields.io/badge/Playground_Demo-8A2BE2?logo=wordpress&logoColor=FFFFFF&labelColor=3858E9&color=3858E9)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/10up/wp-content-connect/refs/heads/release/1.7.0/.github/blueprints/blueprint.json)
+[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v6.7%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md) [![WordPress Playground Demo](https://img.shields.io/badge/Playground_Demo-8A2BE2?logo=wordpress&logoColor=FFFFFF&labelColor=3858E9&color=3858E9)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/10up/wp-content-connect/refs/heads/release/1.7.0/.github/blueprints/blueprint.json)
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
-
-[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v6.7%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
 
 ## Installation and Usage
 
@@ -20,7 +18,7 @@ First, require this repository using the command line:
 
 or directly in `composer.json`:
 
-```
+```json
   "require": {
     "10up/wp-content-connect": "^1.6.0"
   }
@@ -32,7 +30,7 @@ This will install WP Content Connect to your `vendor` folder and allow you to to
 
 Alternatively, if you prefer to have composer install it as a plugin, you may redeclare this package in your `composer.json` using the following example:
 
-```
+```json
 {
   "name": "your project name",
   "repositories": [
