@@ -14,9 +14,14 @@ export async function getRelationships(
 	postId: number,
 	options?: GetRelationshipsOptions
 ) {
-	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/relationships`, options);
-	const relationships = await apiFetch<ContentConnectRelationships>({ path });
-	return relationships;
+	try {
+		const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/relationships`, options);
+		const relationships = await apiFetch<ContentConnectRelationships>({ path });
+		return relationships;
+	} catch (error) {
+		console.error('Failed to fetch relationships:', error);
+		throw error;
+	}
 }
 
 export type GetRelatedEntitiesOptions = {
@@ -32,9 +37,14 @@ export async function getRelatedEntities(
 	postId: number,
 	options: GetRelatedEntitiesOptions
 ) {
-	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, options);
-	const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path });
-	return relatedEntities;
+	try {
+		const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, options);
+		const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path });
+		return relatedEntities;
+	} catch (error) {
+		console.error('Failed to fetch related entities:', error);
+		throw error;
+	}
 }
 
 export async function updateRelatedEntities(
@@ -43,10 +53,15 @@ export async function updateRelatedEntities(
 	relType: string,
 	relatedIds: number[]
 ) {
-	const body: ContentConnectUpdateRelationshipsBody = {
-		related_ids: relatedIds,
-	};
-	const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey, rel_type: relType });
-	const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path, method: 'POST', data: body });
-	return relatedEntities;
+	try {
+		const body: ContentConnectUpdateRelationshipsBody = {
+			related_ids: relatedIds,
+		};
+		const path = addQueryArgs(`${CONTENT_CONNECT_ENDPOINT}/post/${postId}/related`, { rel_key: relKey, rel_type: relType });
+		const relatedEntities = await apiFetch<ContentConnectRelatedEntities>({ path, method: 'POST', data: body });
+		return relatedEntities;
+	} catch (error) {
+		console.error('Failed to update related entities:', error);
+		throw error;
+	}
 }
