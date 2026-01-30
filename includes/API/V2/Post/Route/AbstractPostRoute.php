@@ -31,7 +31,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 				'sanitize_callback' => 'absint',
 				'validate_callback' => 'rest_validate_request_arg',
 				'required'          => true,
-				'minLength'         => 1,
+				'minimum'           => 1,
 			),
 			'rel_key'  => array(
 				'description'       => __( 'The relationship key.', 'tenup-content-connect' ),
