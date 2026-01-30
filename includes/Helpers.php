@@ -94,19 +94,32 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  */
 function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
+	// Use static cache for repeated calls within the same request.
+	static $cache = array();
+
+	$cache_key = $field . '_' . $value;
+
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return array( $value => $relationship );
+			$result              = array( $value => $relationship );
+			$cache[ $cache_key ] = $result;
+			return $result;
 		}
 
+		$cache[ $cache_key ] = false;
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
+		$cache[ $cache_key ] = array();
 		return array();
 	}
 
@@ -137,6 +150,8 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 		}
 	}
 
+	$cache[ $cache_key ] = $post_to_post_relationships;
+
 	return $post_to_post_relationships;
 }
 
@@ -154,19 +169,32 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
  */
 function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
+	// Use static cache for repeated calls within the same request.
+	static $cache = array();
+
+	$cache_key = $field . '_' . $value;
+
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			return array( $value => $relationship );
+			$result              = array( $value => $relationship );
+			$cache[ $cache_key ] = $result;
+			return $result;
 		}
 
+		$cache[ $cache_key ] = false;
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
+		$cache[ $cache_key ] = array();
 		return array();
 	}
 
@@ -185,6 +213,8 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 				break;
 		}
 	}
+
+	$cache[ $cache_key ] = $post_to_user_relationships;
 
 	return $post_to_user_relationships;
 }
