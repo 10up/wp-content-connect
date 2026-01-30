@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
-## [1.7.0] - TBD
+## [2.0.0] - TBD
 ### Added
 - New helper functions for programmatic access to relationship data: `get_post_to_post_relationships_by()`, `get_post_to_user_relationships_by()`, `get_post_relationships_data()`, `get_post_to_post_relationships_data()`, `get_post_to_user_relationships_data()` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#96](https://github.com/10up/wp-content-connect/pull/96)).
 - New V2 REST API endpoints for managing relationships: `GET/POST/PUT/DELETE /content-connect/v2/post/{id}/related`, `GET /content-connect/v2/post/{id}/relationships`, `GET /content-connect/v2/relationships` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#95](https://github.com/10up/wp-content-connect/pull/95)).
@@ -94,7 +94,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Initial plugin release.
 
 [Unreleased]: https://github.com/10up/wp-content-connect/compare/master...develop
-[1.7.0]: https://github.com/10up/wp-content-connect/compare/1.6.0...1.7.0
+[2.0.0]: https://github.com/10up/wp-content-connect/compare/1.6.0...2.0.0
 [1.6.0]: https://github.com/10up/wp-content-connect/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/10up/wp-content-connect/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/10up/wp-content-connect/compare/1.3.0...1.4.0

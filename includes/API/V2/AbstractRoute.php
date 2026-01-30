@@ -14,7 +14,7 @@ abstract class AbstractRoute {
 	/**
 	 * Endpoint namespace.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @var string
 	 */
@@ -23,7 +23,7 @@ abstract class AbstractRoute {
 	/**
 	 * Route base.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @var string
 	 */
@@ -32,7 +32,7 @@ abstract class AbstractRoute {
 	/**
 	 * Setup the REST API routes module.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
@@ -41,7 +41,7 @@ abstract class AbstractRoute {
 	/**
 	 * Registers the REST API routes.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @return void
 	 */
@@ -50,7 +50,7 @@ abstract class AbstractRoute {
 	/**
 	 * Get the post, if the ID is valid.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  int $id Supplied ID.
 	 * @return \WP_Post|\WP_Error Post object if ID is valid, WP_Error otherwise.
@@ -79,7 +79,7 @@ abstract class AbstractRoute {
 	/**
 	 * Get the user, if the ID is valid.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  int $id Supplied ID.
 	 * @return \WP_User|\WP_Error True if ID is valid, WP_Error otherwise.

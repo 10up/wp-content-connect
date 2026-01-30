@@ -14,7 +14,7 @@ class ClassicEditor {
 	/**
 	 * Setup the classic editor module.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function setup() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_classic_editor_assets' ) );
@@ -24,7 +24,7 @@ class ClassicEditor {
 	/**
 	 * Enqueue classic editor assets.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param string $hook_suffix The current admin page.
 	 * @return void
@@ -70,7 +70,7 @@ class ClassicEditor {
 	/**
 	 * Adds the relationships meta boxes to the classic editor.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param string   $post_type The post type.
 	 * @param \WP_Post $post      The post object.
@@ -110,7 +110,7 @@ class ClassicEditor {
 	/**
 	 * Renders a relationship meta box.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param \WP_Post $post The post object.
 	 * @param array    $args The meta box arguments.
