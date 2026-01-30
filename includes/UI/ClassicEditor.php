@@ -40,6 +40,10 @@ class ClassicEditor {
 			return;
 		}
 
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return;
+		}
+
 		$use_block_editor = use_block_editor_for_post( $post );
 
 		if ( $use_block_editor ) {
@@ -82,6 +86,10 @@ class ClassicEditor {
 			return;
 		}
 
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return;
+		}
+
 		$use_block_editor = use_block_editor_for_post( $post );
 
 		if ( $use_block_editor ) {
@@ -117,6 +125,10 @@ class ClassicEditor {
 	 * @return void
 	 */
 	public function render_relationship_meta_box( $post, $args ) {
+
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return;
+		}
 
 		if ( empty( $args['args']['relationship'] ) ) {
 			return;
