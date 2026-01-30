@@ -55,7 +55,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	/**
 	 * Prepare a collection of post items for the REST API.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param array  $items        Post objects.
 	 * @param string $relationship Relationship name.
@@ -75,7 +75,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	/**
 	 * Prepare a collection of user items for the REST API.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param array  $items        User objects.
 	 * @param string $relationship Relationship name.
@@ -95,7 +95,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	/**
 	 * Prepare a single post item for the REST API.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param int|\WP_Post $item         Post object or ID.
 	 * @param string       $relationship Relationship name.
@@ -133,7 +133,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	/**
 	 * Prepare a single user item for the REST API.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param int|\WP_User $item         User object or ID.
 	 * @param string       $relationship Relationship name.
