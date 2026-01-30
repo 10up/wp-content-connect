@@ -56,7 +56,13 @@ class ClassicEditor {
 			return;
 		}
 
-		$asset_info = require CONTENT_CONNECT_PATH . 'dist/js/classic-editor.asset.php';
+		$asset_file = CONTENT_CONNECT_PATH . 'dist/js/classic-editor.asset.php';
+
+		if ( ! file_exists( $asset_file ) ) {
+			return;
+		}
+
+		$asset_info = require $asset_file;
 
 		wp_register_script(
 			'wp-content-connect-classic-editor',
