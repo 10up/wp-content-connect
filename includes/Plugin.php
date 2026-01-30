@@ -24,36 +24,6 @@ class Plugin {
 	public $registry;
 
 	/**
-	 * @var WPQueryIntegration
-	 */
-	public $wp_query_integration;
-
-	/**
-	 * @var UserQueryIntegration
-	 */
-	public $user_query_integration;
-
-	/**
-	 * @var MetaBox
-	 */
-	public $meta_box;
-
-	/**
-	 * @var BlockEditor
-	 */
-	public $block_editor;
-
-	/**
-	 * @var Search
-	 */
-	public $search;
-
-	/**
-	 * @var DeletedItems
-	 */
-	public $deleted_items;
-
-	/**
 	 * The single instance of the class.
 	 *
 	 * @var Plugin
