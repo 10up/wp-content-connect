@@ -41,7 +41,12 @@ class RelatedEntities extends AbstractPostRoute {
 							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'tenup-content-connect' ),
 							'type'              => 'array',
 							'default'           => 'publish',
-							'sanitize_callback' => 'sanitize_text_field',
+							'sanitize_callback' => function ( $value ) {
+								if ( is_array( $value ) ) {
+									return array_map( 'sanitize_text_field', $value );
+								}
+								return sanitize_text_field( $value );
+							},
 							'validate_callback' => 'rest_validate_request_arg',
 							'items'             => array(
 								'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
