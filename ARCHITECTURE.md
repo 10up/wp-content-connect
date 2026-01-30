@@ -37,9 +37,11 @@ wp-content-connect/
 │       ├── hooks/                   # React hooks
 │       │   ├── use-relationships.ts # Relationship data hook
 │       │   └── use-related-entities.ts # Related entities hook
-│       └── components/              # React components
-│           ├── relationships-panel.tsx  # Block Editor sidebar panel
-│           └── relationship-manager.tsx # Content picker UI
+│       └── components/              # React components (directory-based)
+│           ├── RelationshipManager/
+│           │   └── index.tsx        # Content picker UI with filters
+│           └── RelationshipsPanel/
+│               └── index.tsx        # Block Editor sidebar panel
 ├── dist/                            # Compiled assets (generated)
 │   └── js/
 │       ├── block-editor.js          # Block Editor bundle
@@ -411,16 +413,22 @@ abstract class BaseTable {
 
 ### UI/BlockEditor.php
 
-Enqueues Block Editor assets.
+Enqueues Block Editor assets (JavaScript and CSS).
 
 ```php
 namespace TenUp\ContentConnect\UI;
 
 class BlockEditor {
     public function setup();                    // Hooks enqueue_block_editor_assets
-    public function enqueue_block_editor_assets(); // Enqueues block-editor.js
+    public function enqueue_block_editor_assets(); // Enqueues block-editor.js and admin-styles.css
 }
 ```
+
+**Asset Loading:**
+
+- Loads `dist/js/block-editor.js` with dependencies from `.asset.php`
+- Loads `dist/css/admin-styles.css` if the asset file exists
+- Both assets check for file existence before enqueuing
 
 ### UI/ClassicEditor.php
 
@@ -614,7 +622,39 @@ Resolvers automatically fetch data from REST API when selectors are called:
 GET /content-connect/v2/post/{postId}/relationships
 
 // When getRelatedEntities is called, if data not in store:
-GET /content-connect/v2/post/{postId}/related?rel_key=X&rel_type=Y
+// Uses getAllRelatedEntities() to fetch all pages automatically
+GET /content-connect/v2/post/{postId}/related?rel_key=X&rel_type=Y&per_page=100&page=1
+// Continues fetching until all pages retrieved via X-WP-TotalPages header
+```
+
+#### API Wrapper Functions
+
+The store uses wrapper functions in `store/api.ts`:
+
+| Function | Purpose |
+|----------|---------|
+| `getRelationships` | Fetch relationship definitions for a post |
+| `getRelatedEntities` | Fetch single page of related entities |
+| `getAllRelatedEntities` | Fetch all pages of related entities (pagination) |
+| `updateRelatedEntities` | Replace all related entities for a relationship |
+
+**Pagination Support:**
+
+The `getAllRelatedEntities()` function handles large relationship lists by:
+
+1. Fetching with `per_page=100` (configurable via options)
+2. Reading `X-WP-TotalPages` response header
+3. Looping through all pages until complete
+4. Returning concatenated results
+
+```typescript
+export async function getAllRelatedEntities(
+    postId: number,
+    options: GetRelatedEntitiesOptions
+): Promise<ContentConnectRelatedEntities> {
+    const perPage = options.per_page ?? 100;
+    // Fetches all pages and returns combined array
+}
 ```
 
 #### Auto-Persistence
@@ -654,6 +694,8 @@ function useRelatedEntities(
 
 #### RelationshipsPanel (Block Editor)
 
+**Location:** `assets/js/components/RelationshipsPanel/index.tsx`
+
 Registered as a Gutenberg plugin that renders Document Settings panels.
 
 ```tsx
@@ -668,18 +710,43 @@ Registered as a Gutenberg plugin that renders Document Settings panels.
 
 #### RelationshipManager
 
-Wrapper around `@10up/block-components` ContentPicker.
+**Location:** `assets/js/components/RelationshipManager/index.tsx`
+
+Wrapper around `@10up/block-components` ContentPicker with full TypeScript support.
 
 **Props:**
 
-- `relationship` - Relationship definition object
+- `postId` - Current post ID (number | null)
+- `relationship` - Relationship definition object (ContentConnectRelationship)
 
 **Features:**
 
 - Configures ContentPicker based on relationship settings
 - Handles post-to-post and post-to-user modes
 - Supports sortable (drag-and-drop)
-- Applies JavaScript filter hooks
+- Applies JavaScript filter hooks via `useMemo` for performance
+- Full TypeScript types for filter callbacks
+
+**TypeScript Types:**
+
+```typescript
+type SearchResultFilter = (
+    item: NormalizedSuggestion,
+    originalResult: WP_REST_API_Search_Result | WP_REST_API_User
+) => NormalizedSuggestion;
+
+type PickedItemFilter = (
+    item: Partial<PickedItemType>,
+    originalResult: Post | Term | User
+) => Partial<PickedItemType>;
+
+type FilterContext = {
+    rel_key: string;
+    rel_type: string;
+    postId: number | null;
+    mode: 'post' | 'user' | 'term';
+};
+```
 
 **CSS Classes:**
 
@@ -729,10 +796,22 @@ addFilter(
 
 The Classic Editor entry point (`classic-editor.tsx`):
 
-1. Finds all `[data-content-connect]` containers
-2. Mounts `RelationshipManager` components into each
-3. Intercepts form submission to call `persistContentConnectChanges()`
-4. Re-submits form after persistence completes
+1. Finds all `[data-content-connect]` containers on `domReady`
+2. Parses relationship data from `data-relationship` JSON attribute
+3. Mounts `RelationshipManager` components into each container
+4. Initializes relationships in the store via `setRelationships()`
+5. Intercepts form submission to call exported `persistContentConnectChanges()`
+6. Re-submits form after persistence completes
+
+**Store Integration:**
+
+The classic editor imports the shared store and `persistContentConnectChanges`:
+
+```typescript
+import { store, persistContentConnectChanges } from './store';
+```
+
+The `markPostAsDirty` action gracefully handles the missing editor store in classic editor context by catching errors when attempting to call `editPost()`.
 
 ## Query Integration
 
