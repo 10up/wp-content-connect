@@ -7,7 +7,7 @@ use TenUp\ContentConnect\Plugin;
 /**
  * Returns the instance of the plugin.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @return \TenUp\ContentConnect\Plugin
  */
@@ -43,7 +43,7 @@ function is_doing_tests() {
  * Unlike other functions, this does not restrict results by post type, making it useful
  * for cases where multiple post types share the same relationship name.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  int    $post_id           The ID of the post to retrieve relationships for.
  * @param  string $relationship_name The name of the relationship to filter by.
@@ -92,7 +92,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 /**
  * Retrieves post-to-post relationships based on a specified field.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  string $field The field to query against. Accepts 'any', 'key', 'post_type', 'from', or 'to'.
  *                       - 'key': Returns a single relationship by its unique key.
@@ -180,7 +180,7 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 /**
  * Retrieves post-to-user relationships based on a specified field.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  string $field The field to query against. Accepts 'any', 'key' or 'post_type'.
  *                       - 'key': Returns a single relationship by its unique key.
@@ -260,7 +260,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  * Retrieves relationship data for a specific post, optionally filtered by relationship type
  * ('post-to-post' or 'post-to-user') and, for post-to-post relationships, by post type.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
  * @param  string       $rel_type        Optional. The relationship type. Accepts 'post-to-post', 'post-to-user', or 'any' (default).
@@ -320,7 +320,7 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
  * Fetches related posts based on post-to-post relationships configured in Content Connect.
  * Optionally filters results by a specific post type.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  int|\WP_Post $post            Post ID or post object.
  * @param  string|false $other_post_type Optional. A post type to filter relationships by.
@@ -435,7 +435,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				/**
 				 * Filters the post item data.
 				 *
-				 * @since 1.7.0
+				 * @since 2.0.0
 				 * @param array    $item_data The item data.
 				 * @param \WP_Post $post      The post object.
 				 * @param Relationship $relationship The relationship object.
@@ -459,7 +459,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
  *
  * Fetches related users based on post-to-user relationships configured in Content Connect.
  *
- * @since 1.7.0
+ * @since 2.0.0
  *
  * @param  int|\WP_Post $post    Post ID or post object.
  * @param  string       $context         Optional. Defines the level of detail in the response.
@@ -539,7 +539,7 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 				/**
 				 * Filters the user item data.
 				 *
-				 * @since 1.7.0
+				 * @since 2.0.0
 				 * @param array        $item_data The item data.
 				 * @param \WP_User     $user      The user object.
 				 * @param Relationship $relationship The relationship object.

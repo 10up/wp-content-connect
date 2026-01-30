@@ -16,7 +16,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * The relationship object.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @var \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser
 	 */
@@ -137,7 +137,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Retrieves a collection of related entities for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -211,7 +211,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to retrieve related entities for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -234,7 +234,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Updates related entities for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -264,7 +264,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to update related entities for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -287,7 +287,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Adds a related entity for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -329,7 +329,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to add a related entity for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -341,7 +341,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Deletes a related entity for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -383,7 +383,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to delete a related entity for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -395,7 +395,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Validate the `orderby` request parameter.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed            $value   The value of the 'orderby' request parameter.
 	 * @param \WP_REST_Request $request The request object.
@@ -430,7 +430,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Performs a permissions check for managing related entities for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -467,7 +467,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Get posts related to a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
@@ -538,7 +538,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Get users related to a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
@@ -602,7 +602,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Update posts related to a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
@@ -637,7 +637,7 @@ class RelatedEntities extends AbstractPostRoute {
 	/**
 	 * Update users related to a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param \WP_Post         $post    The post object.
 	 * @param \WP_REST_Request $request The request object.
