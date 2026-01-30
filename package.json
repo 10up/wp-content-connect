@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
