@@ -15,6 +15,9 @@
     "test": "tests"
   },
   "scripts": {
+    "build": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
+    "makepot": "wpi18n makepot && echo '.pot file updated'",
+    "archive": "composer archive --file=$npm_package_name --format=zip",
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "wp-env:start": "wp-env start",
@@ -35,6 +38,7 @@
     "babel-runtime": "^6.26.0",
     "browserify": "^16.2.3",
     "node-sass": "^9.0.0",
+    "node-wp-i18n": "^1.2.8",
     "vue": "^2.4.4",
     "vue-resource": "^1.5.3",
     "vuedraggable": "^2.14.1",
