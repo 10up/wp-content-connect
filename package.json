@@ -28,7 +28,7 @@
     "wp-env:clean": "wp-env clean all",
     "wp-env:destroy": "wp-env destroy",
     "test:setup": "npm run wp-env:start",
-    "test:unit": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'"
+    "test:php": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'"
   },
   "dependencies": {
     "@10up/block-components": "^1.22.1",
