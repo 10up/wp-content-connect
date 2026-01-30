@@ -9,7 +9,7 @@ class REST {
 	/**
 	 * Setup the REST module.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'add_links' ) );
@@ -18,7 +18,7 @@ class REST {
 	/**
 	 * Adds links to the REST API responses for post types that support REST.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function add_links() {
 
@@ -31,7 +31,7 @@ class REST {
 	/**
 	 * Prepares the links for the REST API response.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Response $response The response object.
 	 * @param  \WP_Post          $post     The post object.
