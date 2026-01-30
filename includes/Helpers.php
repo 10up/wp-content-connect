@@ -321,9 +321,20 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 		if ( 'embed' === $context ) {
 
+			/**
+			 * Filters the default posts per page limit for relationship queries.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param int    $posts_per_page Default number of posts to retrieve. Default 100.
+			 * @param string $rel_key        The relationship key.
+			 * @param int    $post_id        The post ID being queried.
+			 */
+			$posts_per_page = apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
+
 			$query_args = array(
 				'post_type'              => $relationship_data['post_type'],
-				'posts_per_page'         => 100,
+				'posts_per_page'         => $posts_per_page,
 				'relationship_query'     => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
