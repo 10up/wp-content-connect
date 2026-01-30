@@ -236,9 +236,9 @@ async function persistContentConnectionChanges() {
 						rel_type: relationship.rel_type,
 					});
 
-					const relatedIds = relatedEntities.map(entity =>
-						typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id
-					);
+					const relatedIds = relatedEntities
+						.map(entity => typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id)
+						.filter(id => !isNaN(id) && id > 0);
 
 					await api.updateRelatedEntities(
 						postId,
@@ -252,7 +252,7 @@ async function persistContentConnectionChanges() {
 	);
 
 	// Clear dirty entities after successful save
-	(dispatch(STORE_NAME) as any).clearDirtyEntities();
+	dispatch(STORE_NAME).clearDirtyEntities();
 }
 
 // Add the pre-save hook to persist changes
