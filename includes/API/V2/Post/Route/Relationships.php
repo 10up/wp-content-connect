@@ -29,7 +29,7 @@ class Relationships extends AbstractPostRoute {
 						'sanitize_callback' => 'absint',
 						'validate_callback' => 'rest_validate_request_arg',
 						'required'          => true,
-						'minLength'         => 1,
+						'minimum'           => 1,
 					),
 					'rel_type'  => array(
 						'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),

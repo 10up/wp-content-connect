@@ -100,7 +100,7 @@ class RelatedEntities extends AbstractPostRoute {
 					),
 				),
 				array(
-					'methods'             => 'PUT',
+					'methods'             => \WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'add_item' ),
 					'permission_callback' => array( $this, 'add_item_permissions_check' ),
 					'args'                => array(
