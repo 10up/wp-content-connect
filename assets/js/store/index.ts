@@ -221,7 +221,7 @@ export const store = createReduxStore(STORE_NAME, {
 		},
 		getRelatedEntities: (postId: number, options: api.GetRelatedEntitiesOptions) => async function thunk({dispatch}) {
 			const key = getRelatedEntitiesKey(postId, options.rel_key);
-			const relatedEntities = await api.getRelatedEntities(postId, options);
+			const relatedEntities = await api.getAllRelatedEntities(postId, options);
 			dispatch.setRelatedEntities(key, relatedEntities);
 		},
 	},

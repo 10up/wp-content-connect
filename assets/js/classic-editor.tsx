@@ -13,7 +13,7 @@ import { select, dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { RelationshipManager } from './components/relationship-manager';
+import { RelationshipManager } from './components/RelationshipManager';
 import { store, persistContentConnectChanges } from './store';
 import { ContentConnectRelationship } from './store/types';
 
