@@ -60,7 +60,7 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Retrieves a collection of relationships by type.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -128,7 +128,7 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Checks if a given request has access to retrieve relationships by type.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
@@ -149,7 +149,7 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Validates the `filter_by` parameter.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  mixed            $value   The value to validate.
 	 * @param  \WP_REST_Request $request Full details about the request.
