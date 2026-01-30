@@ -29,17 +29,21 @@ class BlockEditor {
 			$asset_info = require CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php';
 
 			wp_enqueue_script(
-				'wp-content-connect',
-				CONTENT_CONNECT_URL . 'dist/js/wp-content-connect.js',
+				'wp-content-connect-block-editor',
+				CONTENT_CONNECT_URL . 'dist/js/block-editor.js',
 				$asset_info['dependencies'],
 				$asset_info['version'],
 				true
 			);
+		}
+
+		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php' ) ) {
+			$asset_info = require CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php';
 
 			wp_enqueue_style(
-				'wp-content-connect',
-				CONTENT_CONNECT_URL . 'dist/css/wp-content-connect.css',
-				array(),
+				'wp-content-connect-admin-styles',
+				CONTENT_CONNECT_URL . 'dist/css/admin-styles.css',
+				$asset_info['dependencies'],
 				$asset_info['version']
 			);
 		}

@@ -65,25 +65,30 @@ class ClassicEditor {
 			return;
 		}
 
-		$asset_file = CONTENT_CONNECT_PATH . 'dist/js/classic-editor.asset.php';
+		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/js/classic-editor.asset.php' ) ) {
+			$asset_info = require CONTENT_CONNECT_PATH . 'dist/js/classic-editor.asset.php';
 
-		if ( ! file_exists( $asset_file ) ) {
-			return;
+			wp_enqueue_script(
+				'wp-content-connect-classic-editor',
+				CONTENT_CONNECT_URL . 'dist/js/classic-editor.js',
+				$asset_info['dependencies'],
+				$asset_info['version'],
+				true
+			);
+
+			wp_enqueue_style( 'wp-components' );
 		}
 
-		$asset_info = require $asset_file;
+		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php' ) ) {
+			$asset_info = require CONTENT_CONNECT_PATH . 'dist/css/admin-styles.asset.php';
 
-		wp_register_script(
-			'wp-content-connect-classic-editor',
-			CONTENT_CONNECT_URL . 'dist/js/classic-editor.js',
-			$asset_info['dependencies'],
-			$asset_info['version'],
-			true
-		);
-
-		wp_enqueue_script( 'wp-content-connect-classic-editor' );
-
-		wp_enqueue_style( 'wp-components' );
+			wp_enqueue_style(
+				'wp-content-connect-admin-styles',
+				CONTENT_CONNECT_URL . 'dist/css/admin-styles.css',
+				$asset_info['dependencies'],
+				$asset_info['version']
+			);
+		}
 	}
 
 	/**
