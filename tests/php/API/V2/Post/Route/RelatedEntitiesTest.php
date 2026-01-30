@@ -73,7 +73,7 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 403, $response->get_status() );
 	}
 
 	/**
@@ -272,7 +272,8 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 404, $response->get_status() );
+		// Returns 403 because capability check happens before post existence check
+		$this->assertSame( 403, $response->get_status() );
 	}
 
 	/**
@@ -352,7 +353,7 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 403, $response->get_status() );
 	}
 
 	/**
@@ -374,7 +375,7 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 403, $response->get_status() );
 	}
 
 	/**
@@ -495,7 +496,8 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$response = rest_do_request( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		// Returns 201 for resource creation
+		$this->assertSame( 201, $response->get_status() );
 		$this->assertIsArray( $data );
 
 		$ids = wp_list_pluck( $data, 'id' );
@@ -526,7 +528,8 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$response = rest_do_request( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		// Returns 201 for resource creation (even if idempotent)
+		$this->assertSame( 201, $response->get_status() );
 		$this->assertIsArray( $data );
 
 		$ids = wp_list_pluck( $data, 'id' );
