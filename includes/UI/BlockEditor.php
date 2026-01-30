@@ -12,7 +12,7 @@ class BlockEditor {
 	/**
 	 * Setup the block editor module.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function setup() {
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
@@ -21,7 +21,7 @@ class BlockEditor {
 	/**
 	 * Enqueue block editor assets.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function enqueue_block_editor_assets() {
 
