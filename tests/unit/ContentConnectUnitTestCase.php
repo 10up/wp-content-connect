@@ -9,7 +9,7 @@ class ContentConnectUnitTestCase extends \PHPUnit\Framework\TestCase {
 
 		// Define constants that are normally set by Plugin::instance()
 		if ( ! defined( 'CONTENT_CONNECT_VERSION' ) ) {
-			define( 'CONTENT_CONNECT_VERSION', '1.7.0' );
+			define( 'CONTENT_CONNECT_VERSION', '2.0.0' );
 		}
 
 		if ( ! defined( 'CONTENT_CONNECT_URL' ) ) {

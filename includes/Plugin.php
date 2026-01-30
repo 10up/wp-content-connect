@@ -64,7 +64,7 @@ class Plugin {
 		$modules = array(
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
-			new MetaBox(), // @deprecated remove in 1.7.0
+			new MetaBox(), // @deprecated remove in 2.0.0
 			new DeletedItems(),
 			new REST(),
 			new API\V1\Search(),
@@ -97,7 +97,7 @@ class Plugin {
 	public function define_constants() {
 
 		if ( ! defined( 'CONTENT_CONNECT_VERSION' ) ) {
-			define( 'CONTENT_CONNECT_VERSION', '1.7.0' );
+			define( 'CONTENT_CONNECT_VERSION', '2.0.0' );
 		}
 
 		if ( ! defined( 'CONTENT_CONNECT_URL' ) ) {
