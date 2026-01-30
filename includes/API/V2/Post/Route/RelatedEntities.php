@@ -41,7 +41,12 @@ class RelatedEntities extends AbstractPostRoute {
 							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'tenup-content-connect' ),
 							'type'              => 'array',
 							'default'           => 'publish',
-							'sanitize_callback' => 'sanitize_text_field',
+							'sanitize_callback' => function ( $value ) {
+								if ( is_array( $value ) ) {
+									return array_map( 'sanitize_text_field', $value );
+								}
+								return sanitize_text_field( $value );
+							},
 							'validate_callback' => 'rest_validate_request_arg',
 							'items'             => array(
 								'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
@@ -100,7 +105,7 @@ class RelatedEntities extends AbstractPostRoute {
 					),
 				),
 				array(
-					'methods'             => 'PUT',
+					'methods'             => \WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'add_item' ),
 					'permission_callback' => array( $this, 'add_item_permissions_check' ),
 					'args'                => array(
@@ -213,11 +218,13 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		$post_id = $request->get_param( 'id' );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to retrieve related entities for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
@@ -234,7 +241,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items( $request ) {
 
-		$post     = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$rel_type = $request->get_param( 'rel_type' );
 
 		$prepared_items = array();
@@ -259,19 +271,13 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function update_items_permissions_check( $request ) {
 
-		if ( ! is_user_logged_in() ) {
-			return new \WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to update related entities for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
-			);
-		}
+		$post_id = $request->get_param( 'id' );
 
-		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_cannot_edit',
 				__( 'Sorry, you are not allowed to update this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				array( 'status' => 403 )
 			);
 		}
 
@@ -288,7 +294,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function add_item( $request ) {
 
-		$post       = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
@@ -310,7 +321,7 @@ class RelatedEntities extends AbstractPostRoute {
 			$prepared_items = $this->get_related_posts( $post, $request );
 		}
 
-		$response = rest_ensure_response( $prepared_items['items'] );
+		$response = new \WP_REST_Response( $prepared_items['items'], 201 );
 
 		return $response;
 	}
@@ -337,7 +348,12 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function delete_item( $request ) {
 
-		$post       = $this->get_post( $request['id'] );
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$related_id = $request->get_param( 'related_id' );
 
 		if ( empty( $related_id ) ) {
