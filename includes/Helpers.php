@@ -27,6 +27,17 @@ function get_registry() {
 }
 
 /**
+ * Checks if the code is running in a test environment.
+ *
+ * @since 2.0.0
+ *
+ * @return bool True if running tests, false otherwise.
+ */
+function is_doing_tests() {
+	return defined( 'CONTENT_CONNECT_DOING_TESTS' ) && CONTENT_CONNECT_DOING_TESTS;
+}
+
+/**
  * Retrieves all related post IDs for a given post and relationship name.
  *
  * Unlike other functions, this does not restrict results by post type, making it useful
@@ -99,7 +110,7 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
 	$cache_key = $field . '_' . $value;
 
-	if ( isset( $cache[ $cache_key ] ) ) {
+	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
 	}
 
@@ -107,19 +118,28 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			$result              = array( $value => $relationship );
-			$cache[ $cache_key ] = $result;
+			$result = array( $value => $relationship );
+			if ( ! is_doing_tests() ) {
+				$cache[ $cache_key ] = $result;
+			}
 			return $result;
 		}
 
-		$cache[ $cache_key ] = false;
+		if ( ! is_doing_tests() ) {
+			$cache[ $cache_key ] = false;
+		}
+
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
-		$cache[ $cache_key ] = array();
+
+		if ( ! is_doing_tests() ) {
+			$cache[ $cache_key ] = array();
+		}
+
 		return array();
 	}
 
@@ -150,7 +170,9 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 		}
 	}
 
-	$cache[ $cache_key ] = $post_to_post_relationships;
+	if ( ! is_doing_tests() ) {
+		$cache[ $cache_key ] = $post_to_post_relationships;
+	}
 
 	return $post_to_post_relationships;
 }
@@ -174,7 +196,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
 	$cache_key = $field . '_' . $value;
 
-	if ( isset( $cache[ $cache_key ] ) ) {
+	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
 	}
 
@@ -182,19 +204,30 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			$result              = array( $value => $relationship );
-			$cache[ $cache_key ] = $result;
+			$result = array( $value => $relationship );
+
+			if ( ! is_doing_tests() ) {
+				$cache[ $cache_key ] = $result;
+			}
+
 			return $result;
 		}
 
-		$cache[ $cache_key ] = false;
+		if ( ! is_doing_tests() ) {
+			$cache[ $cache_key ] = false;
+		}
+
 		return false;
 	}
 
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
-		$cache[ $cache_key ] = array();
+
+		if ( ! is_doing_tests() ) {
+			$cache[ $cache_key ] = array();
+		}
+
 		return array();
 	}
 
@@ -214,7 +247,9 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 		}
 	}
 
-	$cache[ $cache_key ] = $post_to_user_relationships;
+	if ( ! is_doing_tests() ) {
+		$cache[ $cache_key ] = $post_to_user_relationships;
+	}
 
 	return $post_to_user_relationships;
 }
