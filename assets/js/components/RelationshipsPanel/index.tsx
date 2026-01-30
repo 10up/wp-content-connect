@@ -13,8 +13,8 @@ import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
-import { store } from '../store';
-import { RelationshipManager } from './relationship-manager';
+import { store } from '../../store';
+import { RelationshipManager } from '../RelationshipManager';
 
 export function RelationshipsPanel() {
 	const { postId, relationships } = useSelect((select) => {

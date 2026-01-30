@@ -17,8 +17,8 @@ import type { Post, User } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store } from '../store';
-import { ContentConnectRelationship, Term } from '../store/types';
+import { store } from '../../store';
+import { ContentConnectRelationship } from '../../store/types';
 
 /**
  * Normalized suggestion type for search results.
