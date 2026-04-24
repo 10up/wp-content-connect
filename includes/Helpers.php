@@ -277,7 +277,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
@@ -336,7 +336,7 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
@@ -470,7 +470,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
