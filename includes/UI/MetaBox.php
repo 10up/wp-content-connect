@@ -46,7 +46,7 @@ class MetaBox {
 	}
 
 	public function save_post( $post_id ) {
-		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( $_POST['tenup-content-connect-save' ], 'content-connect-save' ) ) {
+		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tenup-content-connect-save'] ) ), 'content-connect-save' ) ) {
 			return false;
 		}
 
