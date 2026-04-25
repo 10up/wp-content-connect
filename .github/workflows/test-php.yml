@@ -43,7 +43,7 @@ jobs:
           coverage: none
 
       - name: Install Node dependencies
-        run: npm ci --no-optional
+        run: npm ci --omit=optional
 
       - name: Install dependencies
         run: composer install --ignore-platform-reqs
