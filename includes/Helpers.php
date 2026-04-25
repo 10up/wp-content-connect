@@ -108,7 +108,7 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 	// Use static cache for repeated calls within the same request.
 	static $cache = array();
 
-	$cache_key = $field . '_' . $value;
+	$cache_key = $field . '|' . $value;
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
@@ -194,7 +194,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 	// Use static cache for repeated calls within the same request.
 	static $cache = array();
 
-	$cache_key = $field . '_' . $value;
+	$cache_key = $field . '|' . $value;
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
