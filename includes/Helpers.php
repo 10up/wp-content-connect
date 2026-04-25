@@ -264,9 +264,12 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  *
  * @param  int|\WP_Post $post            Post ID or post object.
  * @param  string       $rel_type        Optional. The relationship type. Accepts 'post-to-post', 'post-to-user', or 'any' (default).
- *                                       If 'any', the function retrieves both post-to-post and post-to-user relationships.
+ *                                       If 'any', returns both post-to-post and post-to-user relationships, unless
+ *                                       $other_post_type is set (see below).
  * @param  string|false $other_post_type Optional. The post type to filter post-to-post relationships by.
- *                                       Ignored for post-to-user relationships. Default false (returns all relationships).
+ *                                       When set together with $rel_type='any', post-to-user relationships are
+ *                                       excluded from the result, since they cannot be filtered by a related post type.
+ *                                       Default false (returns all relationships).
  * @param  string       $context         Optional. Defines the level of detail in the response.
  *                                       - 'view': Returns basic relationship metadata without fetching related entities.
  *                                       - 'embed': Includes the full list of related posts or users in the response.
