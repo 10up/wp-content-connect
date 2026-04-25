@@ -210,12 +210,28 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Cleans up after each test.
 	 *
-	 * Resets the registry to ensure test isolation.
+	 * Resets the registry and unregisters relationship UI hooks to ensure test isolation.
 	 *
 	 * @return void
 	 */
 	public function tearDown(): void {
 		$plugin = Plugin::instance();
+
+		foreach ( $plugin->registry->get_post_to_post_relationships() as $relationship ) {
+			if ( ! empty( $relationship->from_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->from_ui, 'filter_data' ), 10 );
+			}
+			if ( ! empty( $relationship->to_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->to_ui, 'filter_data' ), 10 );
+			}
+		}
+
+		foreach ( $plugin->registry->get_post_to_user_relationships() as $relationship ) {
+			if ( ! empty( $relationship->from_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->from_ui, 'filter_data' ), 10 );
+			}
+		}
+
 		$plugin->registry = new Registry();
 		$plugin->registry->setup();
 
