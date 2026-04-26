@@ -3,6 +3,7 @@
 namespace TenUp\ContentConnect\Helpers;
 
 use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Relationships\Cache;
 
 /**
  * Returns the instance of the plugin.
@@ -59,6 +60,14 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 		return array();
 	}
 
+	$post_id   = (int) $post_id;
+	$cache_key = Cache::get_related_ids_key( $post_id, $relationship_name );
+	$cached    = Cache::get( $cache_key );
+
+	if ( false !== $cached && ! is_doing_tests() ) {
+		return $cached;
+	}
+
 	$table = get_plugin()->get_table( 'p2p' );
 
 	if ( empty( $table ) ) {
@@ -77,6 +86,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 	}
 
 	if ( empty( $objects ) ) {
+		Cache::set( $cache_key, array() );
 		return array();
 	}
 
@@ -84,9 +94,11 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 		$objects = array( $objects );
 	}
 
-	$related_ids = wp_list_pluck( $objects, 'ID' );
+	$related_ids = array_map( 'intval', wp_list_pluck( $objects, 'ID' ) );
 
-	return array_map( 'intval', $related_ids );
+	Cache::set( $cache_key, $related_ids );
+
+	return $related_ids;
 }
 
 /**
