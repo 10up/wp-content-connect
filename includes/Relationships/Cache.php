@@ -22,11 +22,11 @@ class Cache {
 	const GROUP = 'tenup_content_connect';
 
 	/**
-	 * Default cache TTL in seconds.
+	 * Default cache TTL in seconds (1 hour).
 	 *
 	 * @var int
 	 */
-	const TTL = HOUR_IN_SECONDS;
+	const TTL = 3600;
 
 	/**
 	 * Registers hooks.
