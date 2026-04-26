@@ -508,18 +508,31 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 
 		if ( 'embed' === $context ) {
 
+			/**
+			 * Filters the default users per page limit for relationship queries.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param int    $users_per_page Default number of users to retrieve. Default 100.
+			 * @param string $rel_key        The relationship key.
+			 * @param int    $post_id        The post ID being queried.
+			 */
+			$users_per_page = (int) apply_filters( 'tenup_content_connect_users_per_page', 100, $rel_key, $post->ID );
+
 			$query_args = array(
 				'relationship_query' => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
 				),
+				'number'             => $users_per_page,
+				'count_total'        => false,
 			);
 
 			if ( $relationship->from_sortable ) {
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/MetaBox.php */
+			/** This filter is documented in includes/UI/PostToUser.php */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_user_query_args', $query_args, $post );
 
 			$query = new \WP_User_Query( $query_args );
@@ -534,7 +547,7 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 					'name' => $queried_user->display_name,
 				);
 
-				/** This filter is documented in includes/UI/MetaBox.php */
+				/** This filter is documented in includes/UI/PostToUser.php */
 				$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 				/**
