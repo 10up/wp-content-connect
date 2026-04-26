@@ -398,7 +398,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			 * @param string $rel_key        The relationship key.
 			 * @param int    $post_id        The post ID being queried.
 			 */
-			$posts_per_page = apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
+			$posts_per_page = (int) apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
 
 			$query_args = array(
 				'post_type'              => $relationship_data['post_type'],
@@ -415,7 +415,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/MetaBox.php */
+			/** This filter is documented in includes/UI/PostToPost.php */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_query_args', $query_args, $post );
 
 			$query = new \WP_Query( $query_args );
@@ -430,7 +430,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 					'name' => $queried_post->post_title,
 				);
 
-				/** This filter is documented in includes/UI/MetaBox.php */
+				/** This filter is documented in includes/UI/PostToPost.php */
 				$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 				/**
