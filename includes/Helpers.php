@@ -362,14 +362,18 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
+		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
+
+		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship_to, true ) && $relationship->from !== $other_post_type ) {
+			continue;
+		}
+
 		$relationship_data = array(
 			'rel_key'     => $rel_key,
 			'rel_type'    => 'post-to-post',
 			'rel_name'    => $relationship->name,
 			'object_type' => 'post',
 		);
-
-		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
 
 		if ( $post->post_type === $relationship->from ) {
 			$relationship_data['labels']    = $relationship->from_labels;
@@ -381,10 +385,6 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			$relationship_data['enable_ui'] = $relationship->enable_to_ui;
 			$relationship_data['sortable']  = $relationship->to_sortable;
 			$relationship_data['post_type'] = array( $relationship->from );
-		}
-
-		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship_to, true ) && $relationship->from !== $other_post_type ) {
-			continue;
 		}
 
 		if ( 'embed' === $context ) {
