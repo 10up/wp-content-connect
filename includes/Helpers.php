@@ -264,15 +264,25 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
 	}
 
 	if ( ! empty( $other_post_type ) ) {
-		return get_post_to_post_relationships_data( $post, $other_post_type, $context );
+		$relationship_data = get_post_to_post_relationships_data( $post, $other_post_type, $context );
+	} else {
+		$relationship_data = array_merge(
+			get_post_to_post_relationships_data( $post, $other_post_type, $context ),
+			get_post_to_user_relationships_data( $post, $context )
+		);
 	}
 
-	$relationship_data = array_merge(
-		get_post_to_post_relationships_data( $post, $other_post_type, $context ),
-		get_post_to_user_relationships_data( $post, $context )
-	);
-
-	return $relationship_data;
+	/**
+	 * Filters the merged relationship data for a post.
+	 *
+	 * Kept for backwards compatibility with the legacy metabox UI.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array    $relationship_data Associative array of relationship data keyed by rel_key.
+	 * @param \WP_Post $post              The post object.
+	 */
+	return apply_filters( 'tenup_content_connect_post_relationship_data', $relationship_data, $post );
 }
 
 /**
