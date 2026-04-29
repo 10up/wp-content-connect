@@ -72,20 +72,21 @@ const registerPanels = () => {
 	// Hook into form submission to persist relationships before save
 	postForm.addEventListener('submit', async (event) => {
 		const dirtyEntityIds = select(store).getDirtyEntityIds();
-		console.log('dirtyEntityIds', dirtyEntityIds);
 
 		// Only intercept if there are unsaved relationship changes
-		if (dirtyEntityIds.length > 0) {
-			event.preventDefault();
-			event.stopPropagation();
+		if (dirtyEntityIds.length === 0) {
+			return;
+		}
 
-			try {
-				await persistContentConnectChanges();
-				postForm.submit();
-			} catch (error) {
-				console.error('Failed to persist Content Connect changes:', error); // eslint-disable-line no-console
-				postForm.submit();
-			}
+		event.preventDefault();
+		event.stopPropagation();
+
+		try {
+			await persistContentConnectChanges();
+			postForm.submit();
+		} catch (error) {
+			console.error('Failed to persist Content Connect changes:', error); // eslint-disable-line no-console
+			window.alert('Failed to save relationship changes. The post will not be saved. Please try again.'); // eslint-disable-line no-alert
 		}
 	});
 }
