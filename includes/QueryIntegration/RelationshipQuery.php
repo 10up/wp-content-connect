@@ -103,11 +103,11 @@ class RelationshipQuery {
 			$this->segments[] = $new_segment;
 		}
 
-		foreach( $this->relationship_query as $key => $segment ) {
+		foreach ( $this->relationship_query as $key => $segment ) {
 			if ( is_array( $segment ) && $this->is_valid_segment( $segment ) ) {
 				$this->segments[] = $segment;
-			} else if ( strtolower( $key ) == 'relation' ) {
-				$this->relation = in_array( strtolower( $segment ), array( 'and', 'or' ) ) ? strtoupper( $segment ) : 'AND';
+			} elseif ( is_string( $key ) && 'relation' === strtolower( $key ) ) {
+				$this->relation = in_array( strtolower( (string) $segment ), array( 'and', 'or' ), true ) ? strtoupper( $segment ) : 'AND';
 			}
 		}
 	}
