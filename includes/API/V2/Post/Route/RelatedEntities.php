@@ -179,7 +179,8 @@ class RelatedEntities extends AbstractPostRoute {
 		$response->header( 'X-WP-TotalPages', (int) $max_pages );
 
 		$request_params = $request->get_query_params();
-		$url            = rest_url(
+
+		$url = rest_url(
 			sprintf(
 				'/%s/%s/%d/related',
 				$this->namespace,
@@ -187,7 +188,8 @@ class RelatedEntities extends AbstractPostRoute {
 				$request['id']
 			)
 		);
-		$base           = add_query_arg( urlencode_deep( $request_params ), $url );
+
+		$base = add_query_arg( urlencode_deep( $request_params ), $url );
 
 		if ( $page > 1 ) {
 			$prev_page = $page - 1;

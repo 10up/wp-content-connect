@@ -1,0 +1,4 @@
+.content-connect-relationship-manager .block-editor-link-control__search-items {
+	max-height: 350px;
+	overflow-y: auto;
+}

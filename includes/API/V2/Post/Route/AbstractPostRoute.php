@@ -108,7 +108,6 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		$item_data = array(
-			'ID'   => $item->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
 			'id'   => $item->ID,
 			'name' => $item->post_title,
 			'type' => $item->post_type,
@@ -155,7 +154,6 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		$item_data = array(
-			'ID'   => $item->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
 			'id'   => $item->ID,
 			'name' => $item_name,
 			'type' => 'user',

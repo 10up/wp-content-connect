@@ -1,0 +1,157 @@
+# Copyright (C) 2026 10up
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Content Connect 2.0.0\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/wp-content-connect\n"
+"POT-Creation-Date: 2026-01-30 13:13:39+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: node-wp-i18n 1.2.8\n"
+
+#: includes/API/V2/AbstractRoute.php:62
+msgid "Invalid post ID."
+msgstr ""
+
+#: includes/API/V2/AbstractRoute.php:91
+msgid "Invalid user ID."
+msgstr ""
+
+#: includes/API/V2/Post/Route/AbstractPostRoute.php:29
+#: includes/API/V2/Post/Route/Relationships.php:27
+msgid "The current post ID."
+msgstr ""
+
+#: includes/API/V2/Post/Route/AbstractPostRoute.php:37
+msgid "The relationship key."
+msgstr ""
+
+#: includes/API/V2/Post/Route/AbstractPostRoute.php:45
+msgid "The relationship type."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:41
+msgid "Limit result set to posts assigned one or more statuses."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:57
+msgid "Current page of the collection."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:65
+msgid "Maximum number of items to be returned in result set."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:74
+msgid "Order sort attribute ascending or descending."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:82
+msgid "Sort collection by relationship or object attribute."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:96
+msgid "List of related IDs."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:113
+#: includes/API/V2/Post/Route/RelatedEntities.php:126
+msgid "The related ID."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:169
+msgid "The page number requested is larger than the number of pages available."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:226
+msgid "Sorry, you are not allowed to retrieve related entities for this post."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:279
+msgid "Sorry, you are not allowed to update this post."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:308
+#: includes/API/V2/Post/Route/RelatedEntities.php:362
+msgid "No related entity provided."
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:420
+#. translators: %s: valid values
+msgid "Invalid orderby value. Must be one of: %s"
+msgstr ""
+
+#: includes/API/V2/Post/Route/RelatedEntities.php:459
+msgid "The requested relationship was not found."
+msgstr ""
+
+#: includes/API/V2/Post/Route/Relationships.php:35
+#: includes/API/V2/Route/Relationships.php:32
+msgid "The relationship type to filter relationships by."
+msgstr ""
+
+#: includes/API/V2/Post/Route/Relationships.php:43
+msgid "The post type to filter relationships by."
+msgstr ""
+
+#: includes/API/V2/Post/Route/Relationships.php:50
+msgid ""
+"Scope under which the request is made; determines fields present in "
+"response."
+msgstr ""
+
+#: includes/API/V2/Post/Route/Relationships.php:102
+msgid "Sorry, you are not allowed to view relationships for this post."
+msgstr ""
+
+#: includes/API/V2/Post/Route/Relationships.php:122
+msgid "Invalid post type."
+msgstr ""
+
+#: includes/API/V2/Route/Relationships.php:40
+msgid "The criteria to filter relationships by."
+msgstr ""
+
+#: includes/API/V2/Route/Relationships.php:48
+msgid "The value to use with the selected filter."
+msgstr ""
+
+#: includes/API/V2/Route/Relationships.php:141
+msgid "Sorry, you are not allowed to view relationships for this type."
+msgstr ""
+
+#: includes/API/V2/Route/Relationships.php:173
+#. translators: %s: filter value
+msgid "%s is not valid for post-to-user relationships"
+msgstr ""
+
+#: includes/UI/MetaBox.php:41
+msgid "Relationships"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WP Content Connect"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/10up/wp-content-connect"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"WordPress library that enables direct relationships for posts to posts and "
+"posts to users."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "10up"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://10up.com"
+msgstr ""
