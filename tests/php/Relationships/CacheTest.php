@@ -2,14 +2,14 @@
 /**
  * Tests for Cache relationship module.
  *
- * @package TenUp\ContentConnect\Tests\Integration\Relationships
+ * @package TenUp\ContentConnect\Tests\Relationships
  */
 
-namespace TenUp\ContentConnect\Tests\Integration\Relationships;
+namespace TenUp\ContentConnect\Tests\Relationships;
 
 use TenUp\ContentConnect\Relationships\Cache;
 use TenUp\ContentConnect\Relationships\PostToPost;
-use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
+use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 
 /**
  * Test cases for the Cache class.
