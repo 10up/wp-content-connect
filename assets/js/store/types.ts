@@ -10,18 +10,30 @@ export type ContentConnectRelationshipLabels = {
 	name: string;
 };
 
-export type ContentConnectRelationship = {
+type ContentConnectRelationshipBase = {
 	rel_key: string;
-	rel_type: 'post-to-post' | 'post-to-user';
 	rel_name: string;
-	object_type: 'post' | 'user';
-	post_type: string[];
 	labels: ContentConnectRelationshipLabels;
 	sortable: boolean;
 	current_post_id: number;
 	max_items: number;
 	enable_ui: boolean;
 };
+
+export type ContentConnectPostToPostRelationship = ContentConnectRelationshipBase & {
+	rel_type: 'post-to-post';
+	object_type: 'post';
+	post_type: string[];
+};
+
+export type ContentConnectPostToUserRelationship = ContentConnectRelationshipBase & {
+	rel_type: 'post-to-user';
+	object_type: 'user';
+};
+
+export type ContentConnectRelationship =
+	| ContentConnectPostToPostRelationship
+	| ContentConnectPostToUserRelationship;
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/relationships` endpoint returns
 export type ContentConnectRelationships = {
@@ -41,16 +53,4 @@ export type ContentConnectState = {
 		[key: string]: ContentConnectRelatedEntities;
 	};
 	dirtyEntityIds: Set<number>;
-};
-
-export type Term = {
-	count: number;
-	description: string;
-	id: number;
-	link: string;
-	meta: Record<string, unknown>;
-	name: string;
-	parent: number;
-	slug: string;
-	taxonomy: string;
 };

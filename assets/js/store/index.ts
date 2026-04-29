@@ -1,10 +1,12 @@
 import { createReduxStore, register, select, dispatch, createSelector } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
 import * as api from './api';
-import { ContentConnectRelatedEntities, ContentConnectRelationships, ContentConnectState } from './types';
+import { ContentConnectRelatedEntities, ContentConnectRelationship, ContentConnectRelationships, ContentConnectState } from './types';
 
-export const STORE_NAME = 'wp-content-connect';
+const STORE_NAME = 'wp-content-connect';
 
 /**
  * Generates a unique key for related entities based on post ID and relationship key.
@@ -134,7 +136,7 @@ const actions = {
 		relType: string,
 		entities: ContentConnectRelatedEntities
 	) {
-		return async function thunk({dispatch, select}) {
+		return async function thunk({ dispatch }) {
 			if (postId === null) {
 				return;
 			}
@@ -188,7 +190,15 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	actions,
 	selectors: {
-		getRelationships(state: ContentConnectState, postId: number | null, options?: api.GetRelationshipsOptions): Record<string, { rel_key: string; rel_type: string }> {
+		/**
+		 * Returns the relationships cached for a post.
+		 *
+		 * State is keyed by post ID only; if the resolver was invoked multiple
+		 * times for the same post with different `GetRelationshipsOptions`, only
+		 * the last result is retained. Callers needing options-aware caching
+		 * should resolve via `useRelationships` with stable option objects.
+		 */
+		getRelationships(state: ContentConnectState, postId: number | null): ContentConnectRelationships {
 			if (postId === null) {
 				return {};
 			}
@@ -235,24 +245,24 @@ register(store);
  * @returns Promise that resolves when all changes are persisted.
  */
 export async function persistContentConnectChanges() {
-	const dirtyEntityIds = select(STORE_NAME).getDirtyEntityIds();
+	const dirtyEntityIds = select(store).getDirtyEntityIds();
 
 	// Process each dirty post
 	await Promise.all(
 		dirtyEntityIds.map(async (postId) => {
-			const relationships = select(STORE_NAME).getRelationships(postId);
+			const relationships = select(store).getRelationships(postId);
 
 			// Update each relationship for the post
 			await Promise.all(
-				(Object.values(relationships) as Array<{ rel_key: string; rel_type: string }>).map(async (relationship) => {
-					const relatedEntities = select(STORE_NAME).getRelatedEntities(postId, {
+				(Object.values(relationships) as ContentConnectRelationship[]).map(async (relationship) => {
+					const relatedEntities = select(store).getRelatedEntities(postId, {
 						rel_key: relationship.rel_key,
 						rel_type: relationship.rel_type,
 					});
 
 					const relatedIds = relatedEntities
-						.map(entity => typeof entity.id === 'string' ? parseInt(entity.id, 10) : entity.id)
-						.filter(id => !isNaN(id) && id > 0);
+						.map((entity) => entity.id)
+						.filter((id): id is number => typeof id === 'number' && id > 0);
 
 					await api.updateRelatedEntities(
 						postId,
@@ -266,7 +276,7 @@ export async function persistContentConnectChanges() {
 	);
 
 	// Clear dirty entities after successful save
-	dispatch(STORE_NAME).clearDirtyEntities();
+	dispatch(store).clearDirtyEntities();
 }
 
 // Add the pre-save hook to persist changes
@@ -274,14 +284,21 @@ addFilter(
 	'editor.preSavePost',
 	'wp-content-connect/persist-content-connect-changes',
 	async (edits, options: { readonly isAutosave: boolean; readonly isPreview: boolean }) => {
-		try {
-			if (!options.isAutosave && !options.isPreview) {
-				await persistContentConnectChanges();
-			}
-			return edits;
-		} catch (error) {
-			console.error('Failed to persist Content Connect changes:', error);
+		if (options.isAutosave || options.isPreview) {
 			return edits;
 		}
+
+		try {
+			await persistContentConnectChanges();
+		} catch (error) {
+			console.error('Failed to persist Content Connect changes:', error); // eslint-disable-line no-console
+			dispatch(noticesStore).createErrorNotice(
+				__('Failed to save relationship changes. Please try again.', 'tenup-content-connect'),
+				{ type: 'snackbar' }
+			);
+			throw error;
+		}
+
+		return edits;
 	}
 );
