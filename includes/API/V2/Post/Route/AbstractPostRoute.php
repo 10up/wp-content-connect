@@ -124,7 +124,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['uuid'] = wp_generate_uuid4();
+			$item_data['uuid'] = $this->generate_deterministic_uuid( $relationship, 'post', $item->ID );
 		}
 
 		return $item_data;
@@ -170,9 +170,45 @@ abstract class AbstractPostRoute extends AbstractRoute {
 		}
 
 		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['uuid'] = wp_generate_uuid4();
+			$item_data['uuid'] = $this->generate_deterministic_uuid( $relationship, 'user', $item->ID );
 		}
 
 		return $item_data;
+	}
+
+	/**
+	 * Generate a deterministic UUID-shaped identifier for an item within a relationship.
+	 *
+	 * Built from the relationship name, the item type, and the item ID so the same
+	 * tuple always produces the same UUID. This keeps REST responses cacheable
+	 * (CDN/edge layers) while still satisfying the 10up Content Picker requirement
+	 * for a stable per-item `uuid` key.
+	 *
+	 * The output matches the canonical UUID 8-4-4-4-12 hex shape but is not RFC 4122
+	 * compliant. Consumers should treat it as an opaque identifier.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param mixed  $relationship Relationship object (must expose a `name` property) or relationship name string.
+	 * @param string $item_type    'post' or 'user'.
+	 * @param int    $item_id      Item ID.
+	 * @return string
+	 */
+	protected function generate_deterministic_uuid( $relationship, $item_type, $item_id ) {
+
+		$rel_name = is_object( $relationship ) && isset( $relationship->name )
+			? (string) $relationship->name
+			: (string) $relationship;
+
+		$hash = md5( $rel_name . '|' . $item_type . '|' . (int) $item_id );
+
+		return sprintf(
+			'%s-%s-%s-%s-%s',
+			substr( $hash, 0, 8 ),
+			substr( $hash, 8, 4 ),
+			substr( $hash, 12, 4 ),
+			substr( $hash, 16, 4 ),
+			substr( $hash, 20, 12 )
+		);
 	}
 }
