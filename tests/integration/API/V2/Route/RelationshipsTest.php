@@ -173,8 +173,7 @@ class RelationshipsTest extends ContentConnectTestCase {
 		$this->assertIsArray( $data );
 
 		foreach ( $data as $relationship ) {
-			$post_types = is_array( $relationship['to']['object_type'] ) ? $relationship['to']['object_type'] : array( $relationship['to']['object_type'] );
-			$this->assertContains( 'car', $post_types );
+			$this->assertContains( 'car', $relationship['to']['object_types'] );
 		}
 	}
 
@@ -226,8 +225,7 @@ class RelationshipsTest extends ContentConnectTestCase {
 		$this->assertIsArray( $data );
 
 		foreach ( $data as $relationship ) {
-			$post_types = is_array( $relationship['to']['object_type'] ) ? $relationship['to']['object_type'] : array( $relationship['to']['object_type'] );
-			$this->assertContains( 'car', $post_types );
+			$this->assertContains( 'car', $relationship['to']['object_types'] );
 		}
 	}
 
@@ -290,7 +288,7 @@ class RelationshipsTest extends ContentConnectTestCase {
 	public function test_rejects_invalid_filter_by_for_post_to_user() {
 		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
 		$request->set_param( 'rel_type', 'post-to-user' );
-		$request->set_param( 'filter_by', 'post_type' );
+		$request->set_param( 'filter_by', 'from' );
 
 		$response = rest_do_request( $request );
 
