@@ -573,4 +573,70 @@ class RelationshipQueryTest extends ContentConnectTestCase {
 		$expected = " left join {$wpdb->prefix}post_to_post as p2p1 on {$wpdb->posts}.ID = p2p1.id1 left join {$wpdb->prefix}post_to_user as p2u2 on {$wpdb->posts}.ID = p2u2.post_id left join {$wpdb->prefix}post_to_post as p2p3 on {$wpdb->posts}.ID = p2p3.id1 left join {$wpdb->prefix}post_to_user as p2u4 on {$wpdb->posts}.ID = p2u4.post_id";
 		$this->assertEquals( $expected, $query->join );
 	}
+
+	/**
+	 * Tests that an unknown relation value falls back to 'AND'.
+	 *
+	 * @return void
+	 */
+	public function test_unknown_relation_falls_back_to_and(): void {
+		$query = new RelationshipQuery( array( 'relation' => 'XOR' ) );
+		$this->assertSame( 'AND', $query->relation );
+	}
+
+	/**
+	 * Tests that segments missing required keys are dropped.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_segments_are_skipped(): void {
+		// Missing 'name' → invalid.
+		$query = new RelationshipQuery(
+			array(
+				array( 'related_to_post' => 1 ),
+			)
+		);
+		$this->assertCount( 0, $query->segments );
+
+		// Both related_to_post AND related_to_user → invalid (mutually exclusive).
+		$query = new RelationshipQuery(
+			array(
+				array(
+					'name'            => 'x',
+					'related_to_post' => 1,
+					'related_to_user' => 2,
+				),
+			)
+		);
+		$this->assertCount( 0, $query->segments );
+	}
+
+	/**
+	 * Tests that WHERE and JOIN aliases stay aligned when a valid segment is followed by
+	 * a segment whose relationship lookup returns false.
+	 *
+	 * @return void
+	 */
+	public function test_where_and_join_aliases_stay_aligned_for_invalid_relationships(): void {
+		$registry = Plugin::instance()->get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'aligned' );
+
+		$query = new RelationshipQuery(
+			array(
+				array(
+					'name'            => 'aligned',
+					'related_to_post' => 1,
+				),
+				array(
+					'name'            => 'nonexistent-relationship',
+					'related_to_post' => 2,
+				),
+				'relation' => 'AND',
+			)
+		);
+
+		// The valid segment should produce an alias matching its corresponding JOIN alias.
+		$this->assertStringContainsString( 'p2p1.id2', $query->where );
+		$this->assertStringContainsString( 'p2p1.id1', $query->join );
+	}
 }
