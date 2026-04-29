@@ -386,6 +386,25 @@ class PostToPostTest extends ContentConnectTestCase {
 		$this->assertSame( 1, (int) $wpdb->get_var( "select count(id1) from {$wpdb->prefix}post_to_post where id1=1 and id2=6 and `name`='basic';") );
 	}
 
+	/**
+	 * Tests that `get_related_object_ids()` returns native integers, not numeric strings.
+	 *
+	 * MySQL returns column values as strings; the method must int-cast the IDs so
+	 * downstream consumers (REST handlers, WP_Query, type-hinted helpers) receive a
+	 * correctly-shaped `int[]`.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_object_ids_returns_integers(): void {
+		$rel = new PostToPost( 'post', 'post', 'int-cast' );
+		$rel->add_relationship( 1, 2 );
+		$rel->add_relationship( 1, 3 );
 
+		$ids = $rel->get_related_object_ids( 1 );
 
+		$this->assertNotEmpty( $ids );
+		foreach ( $ids as $id ) {
+			$this->assertIsInt( $id, 'Expected integer ID, got ' . gettype( $id ) );
+		}
+	}
 }

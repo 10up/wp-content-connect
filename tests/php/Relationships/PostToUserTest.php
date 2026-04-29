@@ -458,4 +458,39 @@ class PostToUserTest extends ContentConnectTestCase {
 		$this->assertEquals( 1, $wpdb->get_var( "select count(user_id) from {$wpdb->prefix}post_to_user where user_id=1 and post_id=6 and `name`='owner';") );
 	}
 
+	/**
+	 * Tests that `get_related_user_ids()` returns native integers.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_user_ids_returns_integers(): void {
+		$rel = new PostToUser( 'post', 'int-cast-users' );
+		$rel->add_relationship( 1, 1 );
+		$rel->add_relationship( 1, 2 );
+
+		$ids = $rel->get_related_user_ids( 1 );
+
+		$this->assertNotEmpty( $ids );
+		foreach ( $ids as $id ) {
+			$this->assertIsInt( $id, 'Expected integer user ID, got ' . gettype( $id ) );
+		}
+	}
+
+	/**
+	 * Tests that `get_related_post_ids()` returns native integers.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_post_ids_returns_integers(): void {
+		$rel = new PostToUser( 'post', 'int-cast-posts' );
+		$rel->add_relationship( 1, 1 );
+		$rel->add_relationship( 2, 1 );
+
+		$ids = $rel->get_related_post_ids( 1 );
+
+		$this->assertNotEmpty( $ids );
+		foreach ( $ids as $id ) {
+			$this->assertIsInt( $id, 'Expected integer post ID, got ' . gettype( $id ) );
+		}
+	}
 }
