@@ -146,15 +146,16 @@ class UserRelationshipQuery {
 
 		$where_parts = array();
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
 				$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.post_id = %d and p2u{$wherecount}.name = %s)", $segment['related_to_post'], $segment['name'] );
-			}
 
-			// Only increment counter no "AND" relations, when we are joining a table for each segment
-			if ( $this->relation === 'AND' ) {
-				$wherecount++;
+				// Only increment counter on "AND" relations, when we are joining a table for each segment.
+				// Counter must stay aligned with generate_join_clause() which also gates on a valid relationship.
+				if ( $this->relation === 'AND' ) {
+					$wherecount++;
+				}
 			}
 		}
 
