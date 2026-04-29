@@ -21,6 +21,21 @@ import { store } from '../../store';
 import { ContentConnectRelationship } from '../../store/types';
 
 /**
+ * Minimal taxonomy term shape used only by the picked-item filter signature.
+ */
+type Term = {
+	count: number;
+	description: string;
+	id: number;
+	link: string;
+	meta: Record<string, unknown>;
+	name: string;
+	parent: number;
+	slug: string;
+	taxonomy: string;
+};
+
+/**
  * Normalized suggestion type for search results.
  */
 type NormalizedSuggestion = {
