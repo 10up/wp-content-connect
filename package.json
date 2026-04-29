@@ -36,7 +36,9 @@
   },
   "10up-toolkit": {
     "entry": {
-      "wp-content-connect": "assets/js/index.ts"
+      "block-editor": "assets/js/index.ts",
+      "classic-editor": "assets/js/classic-editor.tsx",
+      "admin-styles": "assets/css/admin-styles.css"
     }
   },
   "devDependencies": {

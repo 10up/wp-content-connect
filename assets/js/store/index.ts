@@ -89,12 +89,21 @@ const actions = {
 	 * @returns The action to mark the post as dirty.
 	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
-		// Trigger the block editor to mark the post as dirty.
-		dispatch(editorStore).editPost({
-			meta: {
-				_content_connect_edit_lock: Date.now()
+		// Only mark as dirty in block editor if the editor store is available and initialized
+		try {
+			const postType = select(editorStore).getCurrentPostType();
+			if (postType) {
+				// Trigger the block editor to mark the post as dirty.
+				dispatch(editorStore).editPost({
+					meta: {
+						_content_connect_edit_lock: Date.now()
+					}
+				});
 			}
-		});
+		} catch (error) {
+			// Editor store not available (e.g., in classic editor)
+			// Silently skip - the dirty state is still tracked in our store
+		}
 
 		return {
 			type: 'MARK_POST_AS_DIRTY',
@@ -220,7 +229,12 @@ export const store = createReduxStore(STORE_NAME, {
 
 register(store);
 
-async function persistContentConnectionChanges() {
+/**
+ * Persists Content Connect changes.
+ *
+ * @returns Promise that resolves when all changes are persisted.
+ */
+export async function persistContentConnectChanges() {
 	const dirtyEntityIds = select(STORE_NAME).getDirtyEntityIds();
 
 	// Process each dirty post
@@ -258,15 +272,15 @@ async function persistContentConnectionChanges() {
 // Add the pre-save hook to persist changes
 addFilter(
 	'editor.preSavePost',
-	'wp-content-connect/persist-connections',
+	'wp-content-connect/persist-content-connect-changes',
 	async (edits, options: { readonly isAutosave: boolean; readonly isPreview: boolean }) => {
 		try {
 			if (!options.isAutosave && !options.isPreview) {
-				await persistContentConnectionChanges();
+				await persistContentConnectChanges();
 			}
 			return edits;
 		} catch (error) {
-			console.error('Failed to persist content connections:', error);
+			console.error('Failed to persist Content Connect changes:', error);
 			return edits;
 		}
 	}

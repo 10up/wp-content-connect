@@ -13,13 +13,6 @@ class PostToUser extends Relationship {
 	 */
 	public $post_type;
 
-	/**
-	 * The UI object for the "from" (post) relationship, if the UI is enabled
-	 *
-	 * @var \TenUp\ContentConnect\UI\PostToUser
-	 */
-	public $from_ui;
-
 	public function __construct( $post_type, $name, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
 			throw new \Exception( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" );
@@ -29,13 +22,6 @@ class PostToUser extends Relationship {
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$post_type}-user";
 
 		parent::__construct( $name, $args );
-	}
-
-	public function setup() {
-		if ( $this->enable_from_ui ) {
-			$this->from_ui = new \TenUp\ContentConnect\UI\PostToUser( $this, $this->post_type, $this->from_labels, $this->from_sortable );
-			$this->from_ui->setup();
-		}
 	}
 
 	/**
