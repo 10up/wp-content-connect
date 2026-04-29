@@ -232,7 +232,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  *                                       - 'view': Returns basic relationship metadata without fetching related entities.
  *                                       - 'embed': Includes the full list of related posts or users in the response.
  *                                       Defaults to 'view' for performance reasons.
- * @return array<int, array<string, mixed>> Associative array containing relationship data.
+ * @return array<string, array<string, mixed>> Associative array containing relationship data, keyed by relationship key.
  *                                          Each relationship entry includes:
  *                                          - 'rel_key' (string): The unique key of the relationship.
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
@@ -291,7 +291,7 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
  *                                       - 'view': Returns basic relationship metadata without fetching related entities.
  *                                       - 'embed': Includes the full list of related posts or users in the response.
  *                                       Defaults to 'view' for performance reasons.
- * @return array<int, array<string, mixed>> Associative array containing relationship data.
+ * @return array<string, array<string, mixed>> Associative array containing relationship data, keyed by relationship key.
  *                                          Each relationship entry includes:
  *                                          - 'rel_key' (string): The unique key of the relationship.
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
@@ -375,7 +375,14 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/PostToPost.php */
+			/**
+			 * Filters the WP_Query args used to fetch related posts for the embed context.
+			 *
+			 * @since 1.x
+			 *
+			 * @param array    $query_args The WP_Query arguments.
+			 * @param \WP_Post $post       The current post.
+			 */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_query_args', $query_args, $post );
 
 			$query = new \WP_Query( $query_args );
@@ -386,19 +393,27 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			foreach ( $queried_posts as $queried_post ) {
 
 				$item_data = array(
-					'ID'   => $queried_post->ID,
+					'ID'   => $queried_post->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
 					'name' => $queried_post->post_title,
 				);
 
-				/** This filter is documented in includes/UI/PostToPost.php */
+				/**
+				 * Filters the post item data shape produced for a related post.
+				 *
+				 * @since 1.x
+				 *
+				 * @param array        $item_data    The item data.
+				 * @param Relationship $relationship The relationship object.
+				 */
 				$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 				/**
 				 * Filters the post item data.
 				 *
 				 * @since 2.0.0
-				 * @param array    $item_data The item data.
-				 * @param \WP_Post $post      The post object.
+				 *
+				 * @param array        $item_data    The item data.
+				 * @param \WP_Post     $post         The post object.
 				 * @param Relationship $relationship The relationship object.
 				 */
 				$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $queried_post, $relationship );
@@ -427,7 +442,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
  *                                       - 'view': Returns basic relationship metadata without fetching related entities.
  *                                       - 'embed': Includes the full list of related posts or users in the response.
  *                                       Defaults to 'view' for performance reasons.
- * @return array<int, array<string, mixed>> Associative array containing relationship data.
+ * @return array<string, array<string, mixed>> Associative array containing relationship data, keyed by relationship key.
  *                                          Each relationship entry includes:
  *                                          - 'rel_key' (string): The unique key of the relationship.
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
@@ -492,7 +507,14 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/PostToUser.php */
+			/**
+			 * Filters the WP_User_Query args used to fetch related users for the embed context.
+			 *
+			 * @since 1.x
+			 *
+			 * @param array    $query_args The WP_User_Query arguments.
+			 * @param \WP_Post $post       The current post.
+			 */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_user_query_args', $query_args, $post );
 
 			$query = new \WP_User_Query( $query_args );
@@ -503,19 +525,27 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 			foreach ( $queried_users as $queried_user ) {
 
 				$item_data = array(
-					'ID'   => $queried_user->ID,
+					'ID'   => $queried_user->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
 					'name' => $queried_user->display_name,
 				);
 
-				/** This filter is documented in includes/UI/PostToUser.php */
+				/**
+				 * Filters the user item data shape produced for a related user.
+				 *
+				 * @since 1.x
+				 *
+				 * @param array        $item_data    The item data.
+				 * @param Relationship $relationship The relationship object.
+				 */
 				$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 				/**
 				 * Filters the user item data.
 				 *
 				 * @since 2.0.0
-				 * @param array        $item_data The item data.
-				 * @param \WP_User     $user      The user object.
+				 *
+				 * @param array        $item_data    The item data.
+				 * @param \WP_User     $user         The user object.
 				 * @param Relationship $relationship The relationship object.
 				 */
 				$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $queried_user, $relationship );

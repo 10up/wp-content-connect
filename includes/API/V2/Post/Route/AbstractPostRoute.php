@@ -113,7 +113,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 			'type' => $item->post_type,
 		);
 
-		/** This filter is documented in includes/UI/MetaBox.php */
+		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 		/** This filter is documented in includes/Helpers.php */
@@ -159,7 +159,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 			'type' => 'user',
 		);
 
-		/** This filter is documented in includes/UI/MetaBox.php */
+		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 		/** This filter is documented in includes/Helpers.php */
