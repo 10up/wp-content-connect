@@ -21,7 +21,7 @@ class Relationships extends AbstractRoute {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/relationships',
+			'/relationships',
 			array(
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
