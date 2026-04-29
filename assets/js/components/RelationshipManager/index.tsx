@@ -171,14 +171,7 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 				contentTypes={relationship?.post_type}
 				maxContentItems={relationship?.max_items ?? 100}
 				isOrderable={relationship?.sortable ?? false}
-				queryFilter={(query) => {
-					if (relationship?.rel_key) {
-						return addQueryArgs(query, {
-							content_connect: relationship.rel_key
-						});
-					}
-					return query;
-				}}
+				queryFilter={(query) => addQueryArgs(query, { content_connect: relationship.rel_key })}
 				searchResultFilter={searchResultFilter}
 				pickedItemFilter={pickedItemFilter}
 				PickedItemPreviewComponent={pickedItemPreviewComponent}
