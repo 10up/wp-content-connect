@@ -1,7 +1,18 @@
+/**
+ * External dependencies
+ */
 import React from 'react';
+
+/**
+ * WordPress dependencies
+ */
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+
+/**
+ * Internal dependencies
+ */
 import { store } from '../../store';
 import { RelationshipManager } from '../RelationshipManager';
 
