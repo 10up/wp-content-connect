@@ -404,7 +404,9 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 				$item_data = array(
 					'ID'   => $queried_post->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
+					'id'   => $queried_post->ID,
 					'name' => $queried_post->post_title,
+					'type' => $queried_post->post_type,
 				);
 
 				/**
@@ -536,7 +538,9 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 
 				$item_data = array(
 					'ID'   => $queried_user->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
+					'id'   => $queried_user->ID,
 					'name' => $queried_user->display_name,
+					'type' => 'user',
 				);
 
 				/**
