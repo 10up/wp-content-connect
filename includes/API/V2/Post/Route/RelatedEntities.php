@@ -710,16 +710,18 @@ class RelatedEntities extends AbstractPostRoute {
 		$orderby     = $request->get_param( 'orderby' );
 
 		$query_args = array(
-			'post_status'        => $post_status,
-			'paged'              => $page,
-			'posts_per_page'     => $per_page,
-			'relationship_query' => array(
+			'post_status'            => $post_status,
+			'paged'                  => $page,
+			'posts_per_page'         => $per_page,
+			'relationship_query'     => array(
 				array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
 				),
 			),
-			'orderby'            => $orderby,
+			'orderby'                => $orderby,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 		);
 
 		if ( $post->post_type === $relationship->from ) {
