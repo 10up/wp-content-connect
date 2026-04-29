@@ -3,6 +3,7 @@
 namespace TenUp\ContentConnect\Helpers;
 
 use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Relationships\Cache;
 
 /**
  * Returns the instance of the plugin.
@@ -59,6 +60,14 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 		return array();
 	}
 
+	$post_id   = (int) $post_id;
+	$cache_key = Cache::get_related_ids_key( $post_id, $relationship_name );
+	$cached    = Cache::get( $cache_key );
+
+	if ( false !== $cached && ! is_doing_tests() ) {
+		return $cached;
+	}
+
 	$table = get_plugin()->get_table( 'p2p' );
 
 	if ( empty( $table ) ) {
@@ -77,6 +86,7 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 	}
 
 	if ( empty( $objects ) ) {
+		Cache::set( $cache_key, array() );
 		return array();
 	}
 
@@ -84,9 +94,11 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 		$objects = array( $objects );
 	}
 
-	$related_ids = wp_list_pluck( $objects, 'ID' );
+	$related_ids = array_map( 'intval', wp_list_pluck( $objects, 'ID' ) );
 
-	return array_map( 'intval', $related_ids );
+	Cache::set( $cache_key, $related_ids );
+
+	return $related_ids;
 }
 
 /**
@@ -108,7 +120,7 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 	// Use static cache for repeated calls within the same request.
 	static $cache = array();
 
-	$cache_key = $field . '_' . $value;
+	$cache_key = $field . '|' . $value;
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
@@ -194,7 +206,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 	// Use static cache for repeated calls within the same request.
 	static $cache = array();
 
-	$cache_key = $field . '_' . $value;
+	$cache_key = $field . '|' . $value;
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
@@ -264,9 +276,12 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  *
  * @param  int|\WP_Post $post            Post ID or post object.
  * @param  string       $rel_type        Optional. The relationship type. Accepts 'post-to-post', 'post-to-user', or 'any' (default).
- *                                       If 'any', the function retrieves both post-to-post and post-to-user relationships.
+ *                                       If 'any', returns both post-to-post and post-to-user relationships, unless
+ *                                       $other_post_type is set (see below).
  * @param  string|false $other_post_type Optional. The post type to filter post-to-post relationships by.
- *                                       Ignored for post-to-user relationships. Default false (returns all relationships).
+ *                                       When set together with $rel_type='any', post-to-user relationships are
+ *                                       excluded from the result, since they cannot be filtered by a related post type.
+ *                                       Default false (returns all relationships).
  * @param  string       $context         Optional. Defines the level of detail in the response.
  *                                       - 'view': Returns basic relationship metadata without fetching related entities.
  *                                       - 'embed': Includes the full list of related posts or users in the response.
@@ -277,7 +292,7 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
@@ -336,7 +351,7 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
@@ -359,14 +374,18 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 	foreach ( $relationships as $rel_key => $relationship ) {
 
+		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
+
+		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship_to, true ) && $relationship->from !== $other_post_type ) {
+			continue;
+		}
+
 		$relationship_data = array(
 			'rel_key'     => $rel_key,
 			'rel_type'    => 'post-to-post',
 			'rel_name'    => $relationship->name,
 			'object_type' => 'post',
 		);
-
-		$relationship_to = is_array( $relationship->to ) ? $relationship->to : array( $relationship->to );
 
 		if ( $post->post_type === $relationship->from ) {
 			$relationship_data['labels']    = $relationship->from_labels;
@@ -380,10 +399,6 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			$relationship_data['post_type'] = array( $relationship->from );
 		}
 
-		if ( ! empty( $other_post_type ) && ! in_array( $other_post_type, $relationship_to, true ) && $relationship->from !== $other_post_type ) {
-			continue;
-		}
-
 		if ( 'embed' === $context ) {
 
 			/**
@@ -395,7 +410,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 			 * @param string $rel_key        The relationship key.
 			 * @param int    $post_id        The post ID being queried.
 			 */
-			$posts_per_page = apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
+			$posts_per_page = (int) apply_filters( 'tenup_content_connect_posts_per_page', 100, $rel_key, $post->ID );
 
 			$query_args = array(
 				'post_type'              => $relationship_data['post_type'],
@@ -412,7 +427,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/MetaBox.php */
+			/** This filter is documented in includes/UI/PostToPost.php */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_query_args', $query_args, $post );
 
 			$query = new \WP_Query( $query_args );
@@ -427,7 +442,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 					'name' => $queried_post->post_title,
 				);
 
-				/** This filter is documented in includes/UI/MetaBox.php */
+				/** This filter is documented in includes/UI/PostToPost.php */
 				$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 				/**
@@ -470,7 +485,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
  *                                          - 'rel_type' (string): Either 'post-to-post' or 'post-to-user'.
  *                                          - 'rel_name' (string): The relationship name.
  *                                          - 'object_type' (string): 'post' or 'user'.
- *                                          - 'post_type' (string|null): The related post type (only for post-to-post).
+ *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
@@ -505,18 +520,31 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 
 		if ( 'embed' === $context ) {
 
+			/**
+			 * Filters the default users per page limit for relationship queries.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param int    $users_per_page Default number of users to retrieve. Default 100.
+			 * @param string $rel_key        The relationship key.
+			 * @param int    $post_id        The post ID being queried.
+			 */
+			$users_per_page = (int) apply_filters( 'tenup_content_connect_users_per_page', 100, $rel_key, $post->ID );
+
 			$query_args = array(
 				'relationship_query' => array(
 					'name'            => $relationship->name,
 					'related_to_post' => $post->ID,
 				),
+				'number'             => $users_per_page,
+				'count_total'        => false,
 			);
 
 			if ( $relationship->from_sortable ) {
 				$query_args['orderby'] = 'relationship';
 			}
 
-			/** This filter is documented in includes/UI/MetaBox.php */
+			/** This filter is documented in includes/UI/PostToUser.php */
 			$query_args = apply_filters( 'tenup_content_connect_post_ui_user_query_args', $query_args, $post );
 
 			$query = new \WP_User_Query( $query_args );
@@ -531,7 +559,7 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 					'name' => $queried_user->display_name,
 				);
 
-				/** This filter is documented in includes/UI/MetaBox.php */
+				/** This filter is documented in includes/UI/PostToUser.php */
 				$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 				/**
