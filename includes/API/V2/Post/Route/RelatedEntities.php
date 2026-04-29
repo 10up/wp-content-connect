@@ -38,7 +38,7 @@ class RelatedEntities extends AbstractPostRoute {
 								}
 								return sanitize_text_field( $value );
 							},
-							'validate_callback' => 'rest_validate_request_arg',
+							'validate_callback' => array( $this, 'validate_post_status_request_arg' ),
 							'items'             => array(
 								'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
 								'type' => 'string',
@@ -422,6 +422,105 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	public function delete_item_permissions_check( $request ) {
 		return $this->update_items_permissions_check( $request );
+	}
+
+	/**
+	 * Validate the `post_status` request parameter.
+	 *
+	 * Restricts the requested statuses to those the current user can read for the
+	 * resolved related post type(s). Prevents authenticated users from peeking at
+	 * statuses they cannot otherwise read (e.g. `private`, `trash`, `draft`).
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  mixed            $value   The submitted post_status value.
+	 * @param  \WP_REST_Request $request The request.
+	 * @param  string           $param   The parameter name.
+	 * @return true|\WP_Error
+	 */
+	public function validate_post_status_request_arg( $value, \WP_REST_Request $request, $param ) {
+
+		$result = rest_validate_request_arg( $value, $request, $param );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		// Defer existence/permission checks for the post and relationship to the
+		// callback layer so they can surface 404/403 with the correct status.
+		// Here we only enforce post_status visibility when both resolve cleanly.
+		$relationship = $this->resolve_relationship( $request );
+
+		if ( is_wp_error( $relationship ) ) {
+			return true;
+		}
+
+		$post = $this->get_post( $request['id'] );
+
+		if ( is_wp_error( $post ) ) {
+			return true;
+		}
+
+		// Determine target post type(s) of the related collection.
+		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\PostToUser ) {
+			// post-to-user does not honor post_status; nothing to constrain.
+			return true;
+		}
+
+		$target_post_types = ( $post->post_type === $relationship->from )
+			? (array) $relationship->to
+			: array( $relationship->from );
+
+		$requested_statuses = is_array( $value ) ? $value : array( $value );
+
+		foreach ( $requested_statuses as $status ) {
+			if ( 'any' === $status ) {
+				continue;
+			}
+
+			$status_obj = get_post_status_object( $status );
+
+			if ( ! $status_obj ) {
+				return new \WP_Error(
+					'rest_invalid_post_status',
+					/* translators: %s: status slug */
+					sprintf( __( 'Invalid post status: %s', 'tenup-content-connect' ), $status ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Public statuses are always allowed.
+			if ( ! empty( $status_obj->public ) ) {
+				continue;
+			}
+
+			// Non-public: require user can read posts of that status for any of the target types.
+			$can_read = false;
+			foreach ( $target_post_types as $target_post_type ) {
+				$post_type_obj = get_post_type_object( $target_post_type );
+				if ( ! $post_type_obj ) {
+					continue;
+				}
+				$cap = ! empty( $post_type_obj->cap->read_private_posts )
+					? $post_type_obj->cap->read_private_posts
+					: 'read_private_posts';
+				if ( current_user_can( $cap ) ) {
+					$can_read = true;
+					break;
+				}
+			}
+
+			if ( ! $can_read ) {
+				return new \WP_Error(
+					'rest_forbidden_post_status',
+					/* translators: %s: status slug */
+					sprintf( __( 'You are not allowed to view posts with the %s status.', 'tenup-content-connect' ), $status ),
+					array( 'status' => 403 )
+				);
+			}
+		}
+
+		return true;
 	}
 
 	/**
