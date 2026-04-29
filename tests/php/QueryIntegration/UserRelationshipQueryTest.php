@@ -303,4 +303,39 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$expected .= " left join {$wpdb->prefix}post_to_user as p2u2 on {$wpdb->users}.ID = p2u2.user_id";
 		$this->assertEquals( $expected, $query->join );
 	}
+
+	/**
+	 * Tests that WHERE and JOIN aliases stay aligned when a valid segment is followed
+	 * by a segment whose relationship lookup returns false.
+	 *
+	 * Regression test for the previous behavior where $wherecount incremented even
+	 * when no relationship was resolved, drifting the WHERE alias out of sync with
+	 * the JOIN alias counter.
+	 *
+	 * @return void
+	 */
+	public function test_where_and_join_aliases_stay_aligned_for_invalid_relationships(): void {
+		$registry = Plugin::instance()->get_registry();
+		$registry->define_post_to_user( 'post', 'aligned' );
+
+		$query = new UserRelationshipQuery(
+			array(
+				array(
+					'name'            => 'aligned',
+					'related_to_post' => 1,
+				),
+				array(
+					'name'            => 'nonexistent-relationship',
+					'related_to_post' => 2,
+				),
+				'relation' => 'AND',
+			)
+		);
+
+		$this->assertStringContainsString( 'p2u1.post_id', $query->where );
+		$this->assertStringContainsString( 'p2u1.user_id', $query->join );
+		// p2u2 must NOT appear since the second segment has no resolvable relationship.
+		$this->assertStringNotContainsString( 'p2u2', $query->where );
+		$this->assertStringNotContainsString( 'p2u2', $query->join );
+	}
 }
