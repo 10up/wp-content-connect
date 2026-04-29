@@ -635,5 +635,90 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$this->assertContains( 2, $ids );
 		$this->assertContains( 4, $ids );
 	}
+
+	/**
+	 * Tests that the `uuid` field is deterministic across requests for the same item.
+	 *
+	 * Stable UUIDs let REST responses be cached at edge layers without bypassing the cache
+	 * on every request.
+	 *
+	 * @return void
+	 */
+	public function test_item_uuid_is_deterministic_across_requests() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'uuid-stable' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'uuid-stable' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, 2 );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+
+		$response_a = rest_do_request( $request );
+		$response_b = rest_do_request( $request );
+
+		$data_a = $response_a->get_data();
+		$data_b = $response_b->get_data();
+
+		$this->assertNotEmpty( $data_a );
+		$this->assertNotEmpty( $data_b );
+		$this->assertSame( $data_a[0]['uuid'], $data_b[0]['uuid'], 'UUID must be stable across requests for the same item' );
+	}
+
+	/**
+	 * Tests that the `uuid` differs across distinct items so the picker keys do not collide.
+	 *
+	 * @return void
+	 */
+	public function test_item_uuid_differs_per_item() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'uuid-unique' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'uuid-unique' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, 2 );
+		$relationship->add_relationship( 1, 3 );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertGreaterThanOrEqual( 2, count( $data ) );
+
+		$uuids = wp_list_pluck( $data, 'uuid' );
+		$this->assertSame( $uuids, array_unique( $uuids ), 'UUIDs must be unique per item' );
+	}
+
+	/**
+	 * Tests that `uuid` matches the canonical 8-4-4-4-12 hex shape.
+	 *
+	 * @return void
+	 */
+	public function test_item_uuid_has_canonical_shape() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'uuid-shape' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'uuid-shape' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, 2 );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertNotEmpty( $data );
+		$this->assertMatchesRegularExpression(
+			'/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/',
+			$data[0]['uuid']
+		);
+	}
 }
 

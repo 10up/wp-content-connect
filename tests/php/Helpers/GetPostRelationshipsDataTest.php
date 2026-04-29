@@ -156,4 +156,52 @@ class GetPostRelationshipsDataTest extends ContentConnectTestCase {
 			}
 		}
 	}
+
+	/**
+	 * Tests that the `tenup_content_connect_post_relationship_data` filter is applied
+	 * to the returned data so legacy extenders can still mutate the payload.
+	 *
+	 * @return void
+	 */
+	public function test_applies_post_relationship_data_filter() {
+		$this->add_post_relations();
+
+		$callback = function ( $data, $post ) {
+			$this->assertInstanceOf( \WP_Post::class, $post );
+			$data['__filter_marker'] = $post->ID;
+			return $data;
+		};
+
+		add_filter( 'tenup_content_connect_post_relationship_data', $callback, 10, 2 );
+
+		$result = get_post_relationships_data( 1 );
+
+		remove_filter( 'tenup_content_connect_post_relationship_data', $callback, 10 );
+
+		$this->assertArrayHasKey( '__filter_marker', $result );
+		$this->assertSame( 1, $result['__filter_marker'] );
+	}
+
+	/**
+	 * Tests that the legacy filter still fires when the `$other_post_type` short-circuit path is taken.
+	 *
+	 * @return void
+	 */
+	public function test_applies_post_relationship_data_filter_with_other_post_type() {
+		$this->add_post_relations();
+
+		$called = 0;
+		$callback = function ( $data ) use ( &$called ) {
+			$called++;
+			return $data;
+		};
+
+		add_filter( 'tenup_content_connect_post_relationship_data', $callback );
+
+		get_post_relationships_data( 1, 'any', 'car' );
+
+		remove_filter( 'tenup_content_connect_post_relationship_data', $callback );
+
+		$this->assertSame( 1, $called );
+	}
 }
