@@ -144,8 +144,11 @@ export function RelationshipManager({ postId, relationship }: RelationshipManage
 		) as PickedItemPreviewComponent | undefined;
 	}, [filterContext]);
 
+	const safeRelKey  = relationship.rel_key.replace(/[^a-z0-9_-]/gi, '-');
+	const safeRelName = (relationship.rel_name ?? '').replace(/[^a-z0-9_-]/gi, '-');
+
 	return (
-		<div className={`content-connect-relationship-manager content-connect-relationship-manager-${relationship.rel_name} content-connect-relationship-manager-${relationship.rel_key}`}>
+		<div className={`content-connect-relationship-manager content-connect-relationship-manager-${safeRelName} content-connect-relationship-manager-${safeRelKey}`}>
 			<ContentPicker
 				onPickChange={handleChange}
 				mode={relationship?.object_type ?? 'post'}

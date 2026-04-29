@@ -41,18 +41,21 @@ export function RelationshipsPanel() {
 
 	return (
 		<>
-			{enabledRelationships.map((relationship) => (
-				<PluginDocumentSettingPanel
-					key={relationship.rel_key}
-					name={`content-connect-relationship-${relationship.rel_key}`}
-					title={relationship.labels.name}
-				>
-					<RelationshipManager
-						postId={postId}
-						relationship={relationship}
-					/>
-				</PluginDocumentSettingPanel>
-			))}
+			{enabledRelationships.map((relationship) => {
+				const safeRelKey = relationship.rel_key.replace(/[^a-z0-9_-]/gi, '-');
+				return (
+					<PluginDocumentSettingPanel
+						key={relationship.rel_key}
+						name={`content-connect-relationship-${safeRelKey}`}
+						title={relationship.labels.name}
+					>
+						<RelationshipManager
+							postId={postId}
+							relationship={relationship}
+						/>
+					</PluginDocumentSettingPanel>
+				);
+			})}
 		</>
 	);
 }

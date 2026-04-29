@@ -123,8 +123,9 @@ class ClassicEditor {
 		}
 
 		foreach ( $relationships as $rel_key => $relationship ) {
+			$safe_rel_key = preg_replace( '/[^a-z0-9_-]/i', '-', $rel_key );
 			add_meta_box(
-				'wp-content-connect-relationship-' . $rel_key,
+				'wp-content-connect-relationship-' . $safe_rel_key,
 				$relationship['labels']['name'],
 				array( $this, 'render_relationship_meta_box' ),
 				$post_type,
