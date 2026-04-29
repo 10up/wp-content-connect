@@ -5,6 +5,7 @@ namespace TenUp\ContentConnect;
 use TenUp\ContentConnect\API;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
+use TenUp\ContentConnect\Relationships\Cache;
 use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
@@ -65,6 +66,7 @@ class Plugin {
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
 			new MetaBox(), // @deprecated remove in 2.0.0
+			new Cache(),
 			new DeletedItems(),
 			new REST(),
 			new API\V1\Search(),
