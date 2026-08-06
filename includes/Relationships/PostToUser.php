@@ -20,6 +20,15 @@ class PostToUser extends Relationship {
 	 */
 	public $from_ui;
 
+	/**
+	 * Post to user relationships have no "to" UI. Declared so MetaBox::save_post() can
+	 * safely read $relationship->to_ui without triggering an undefined-property warning
+	 * on PHP 8+.
+	 *
+	 * @var null
+	 */
+	public $to_ui;
+
 	public function __construct( $post_type, $name, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
 			throw new \Exception( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" );

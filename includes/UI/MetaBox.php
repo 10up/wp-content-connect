@@ -54,11 +54,21 @@ class MetaBox {
 			return false;
 		}
 
+		if ( ! isset( $_POST['tenup-content-connect-relationships'] ) ) {
+			return false;
+		}
+
 		$registry = Plugin::instance()->get_registry();
 
 		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
 
+		if ( ! is_array( $relationships ) ) {
+			return false;
+		}
+
 		foreach ( $relationships as $relationship_data ) {
+			$relationship = null;
+
 			switch( $relationship_data['reltype'] ) {
 				case 'post-to-post':
 					$relationship = $registry->get_post_to_post_relationship_by_key( $relationship_data['relid'] );
@@ -66,6 +76,13 @@ class MetaBox {
 				case 'post-to-user':
 					$relationship = $registry->get_post_to_user_relationship_by_key( $relationship_data['relid'] );
 					break;
+				default:
+					break;
+			}
+
+			// Skip unknown relationship types or unregistered relationship keys.
+			if ( ! is_object( $relationship ) ) {
+				continue;
 			}
 
 			// Determine save direction and call proper save function
