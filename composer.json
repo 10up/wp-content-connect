@@ -17,6 +17,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "composer/installers": "^1.2"
     },
@@ -31,7 +32,7 @@
         ]
     },
     "require-dev": {
-        "10up/wp_mock": "^0.3.0",
+        "10up/wp_mock": "^1.1",
         "phpunit/phpunit": "^9.6",
         "yoast/phpunit-polyfills": "^2.0"
     },
