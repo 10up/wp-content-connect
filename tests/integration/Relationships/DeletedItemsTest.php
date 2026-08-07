@@ -7,6 +7,7 @@
 
 namespace TenUp\ContentConnect\Tests\Integration\Relationships;
 
+use TenUp\ContentConnect\Relationships\Cache;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
 use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
@@ -124,6 +125,37 @@ class DeletedItemsTest extends ContentConnectTestCase {
 
 		wp_delete_user( 1 );
 		$this->assertSame( 0, (int) $wpdb->get_var( "select count(user_id) from {$wpdb->prefix}post_to_user where user_id=1;" ) );
+	}
+
+	/**
+	 * Tests that deleting a post clears the related-id cache for the post and its related posts.
+	 *
+	 * The raw deletes in deleted_post() bypass delete_relationship(), so the cache must be
+	 * invalidated explicitly; otherwise a related post keeps serving a cached list containing
+	 * the deleted ID.
+	 *
+	 * @return void
+	 */
+	public function test_deleting_a_post_invalidates_related_ids_cache(): void {
+		$relationship = new PostToPost( 'car', 'tire', 'test' );
+
+		// 11 (car) related to 21 (tire).
+		$relationship->add_relationship( 11, 21 );
+
+		// Seed the related-id cache for both endpoints, as get_related_ids_by_name() would.
+		$key_11 = Cache::get_related_ids_key( 11, 'test' );
+		$key_21 = Cache::get_related_ids_key( 21, 'test' );
+		Cache::set( $key_11, array( 21 ) );
+		Cache::set( $key_21, array( 11 ) );
+
+		$this->assertSame( array( 21 ), Cache::get( $key_11 ) );
+		$this->assertSame( array( 11 ), Cache::get( $key_21 ) );
+
+		// Hard-deleting the post must clear the cached lookups for it and its related post.
+		wp_delete_post( 11 );
+
+		$this->assertFalse( Cache::get( $key_11 ) );
+		$this->assertFalse( Cache::get( $key_21 ) );
 	}
 
 }
