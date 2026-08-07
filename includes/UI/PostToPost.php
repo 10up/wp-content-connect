@@ -11,13 +11,22 @@ class PostToPost extends PostUI {
 	}
 
 	public function filter_data( $data, $post ) {
+
+		if ( ! is_array( $this->render_post_type ) ) {
+			$this->render_post_type = array( $this->render_post_type );
+		}
+
 		// Don't add any data if we aren't on the post type we're supposed to render for
-		if ( $post->post_type !== $this->render_post_type ) {
+		if ( ! in_array( $post->post_type, $this->render_post_type ) ) {
 			return $data;
 		}
 
 		// Determine the other post type in the relationship
-		$other_post_type = $this->relationship->from == $this->render_post_type ? $this->relationship->to : $this->relationship->from;
+		if ( $post->post_type === $this->relationship->from ) {
+			$other_post_type = $this->relationship->to;
+		} else {
+			$other_post_type = $this->relationship->from;
+		}
 
 		$final_posts = array();
 

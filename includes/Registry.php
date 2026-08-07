@@ -35,7 +35,7 @@ class Registry {
 		sort( $to );
 		$to = implode( '.', $to );
 
-		return "{$from}_{$to}_{$name}";
+		return "{$from}~{$to}~{$name}";
 	}
 
 	/**
@@ -70,6 +70,20 @@ class Registry {
 			return $this->post_post_relationships[ $key ];
 		}
 
+		// Fuzzy match the relationship by parsing the key and looping through the relationships
+		foreach ( $this->post_post_relationships as $relationship_key => $relationship ) {
+			$relationship_key_parts = explode( '~', $relationship_key );
+			$key_parts = explode( '~', $key );
+
+			if (
+				$key_parts[0] === $relationship_key_parts[0] &&
+				strpos( $relationship_key_parts[1], $key_parts[1] ) !== false &&
+				$key_parts[2] === $relationship_key_parts[2]
+			) {
+				return $this->post_post_relationships[ $relationship_key ];
+			}
+		}
+
 		return false;
 	}
 
@@ -91,10 +105,6 @@ class Registry {
 			return $relationship;
 		}
 
-		// Try the inverse, only if "cpt2" isn't an array
-		if ( is_array( $cpt2 ) ) {
-			return false;
-		}
 		$key = $this->get_relationship_key( $cpt2, $cpt1, $name );
 
 		$relationship = $this->get_post_to_post_relationship_by_key( $key );
