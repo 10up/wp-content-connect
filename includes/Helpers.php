@@ -340,6 +340,7 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
  *                                          - 'object_type' (string): 'post' or 'user'.
  *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
+ *                                          - 'enable_ui' (bool): Whether the editing UI is enabled for this relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
  */
@@ -474,6 +475,7 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
  *                                          - 'object_type' (string): 'post' or 'user'.
  *                                          - 'post_type' (string[]): The related post types (only for post-to-post).
  *                                          - 'labels' (array): UI labels associated with the relationship.
+ *                                          - 'enable_ui' (bool): Whether the editing UI is enabled for this relationship.
  *                                          - 'sortable' (bool): Whether the relationship supports sorting.
  *                                          - 'related' (array): The actual related posts/users (only when context='embed').
  */
