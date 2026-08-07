@@ -60,7 +60,13 @@ class MetaBox {
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
+		$raw_relationships = wp_unslash( $_POST['tenup-content-connect-relationships'] );
+
+		if ( ! is_string( $raw_relationships ) ) {
+			return false;
+		}
+
+		$relationships = json_decode( $raw_relationships, true );
 
 		if ( ! is_array( $relationships ) ) {
 			return false;
