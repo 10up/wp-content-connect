@@ -30,7 +30,8 @@ npm-debug.log
 sassdoc
 scss-lint-report.xml
 config.codekit
+.phpunit.result.cache
+artifacts/
 
 /assets/js/content-connect.js
 /assets/js/content-connect.min.js
-

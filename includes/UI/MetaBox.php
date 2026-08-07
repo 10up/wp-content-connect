@@ -80,6 +80,13 @@ class MetaBox {
 				case 'post-to-user':
 					$relationship = $registry->get_post_to_user_relationship_by_key( $relationship_data['relid'] );
 					break;
+				default:
+					break;
+			}
+
+			// Skip unknown relationship types or unregistered relationship keys.
+			if ( ! is_object( $relationship ) ) {
+				continue;
 			}
 
 			if ( ! $relationship ) {

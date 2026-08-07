@@ -17,6 +17,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0"
     },
@@ -31,9 +32,9 @@
         ]
     },
     "require-dev": {
-        "10up/wp_mock": "^0.3.0",
+        "10up/wp_mock": "^1.1",
         "phpunit/phpunit": "^9.6",
-        "yoast/phpunit-polyfills": "^1.1"
+        "yoast/phpunit-polyfills": "^2.0"
     },
     "config": {
         "sort-packages": true,
