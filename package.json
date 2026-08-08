@@ -15,7 +15,7 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
+    "build": "node build.js",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
     "archive": "composer archive --no-interaction --file=$npm_package_name --format=zip --dir=release",
     "test": "echo \"Error: no test specified\" && exit 1",
