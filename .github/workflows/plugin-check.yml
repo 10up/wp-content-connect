@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    uses: 10up/wp-content-connect/.github/workflows/build-release-zip.yml@develop
+    uses: 10up/wp-content-connect/.github/workflows/build-release-zip.yml@fix/tests
 
   test:
     needs: build

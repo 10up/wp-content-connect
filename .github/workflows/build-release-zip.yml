@@ -52,12 +52,15 @@ jobs:
       run: composer install --no-dev -o
 
     - name: Build
+      timeout-minutes: 5
       run: npm run build
 
     - name: Makepot
+      timeout-minutes: 5
       run: npm run makepot
 
     - name: Archive
+      timeout-minutes: 5
       run: npm run archive
 
     - name: Upload the ZIP file as an artifact

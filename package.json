@@ -17,7 +17,7 @@
   "scripts": {
     "build": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "composer archive --file=$npm_package_name --format=zip --dir=release",
+    "archive": "composer archive --no-interaction --file=$npm_package_name --format=zip --dir=release",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
