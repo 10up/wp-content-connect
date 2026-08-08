@@ -4,6 +4,7 @@ namespace TenUp\ContentConnect\Helpers;
 
 use TenUp\ContentConnect\Plugin;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_plugin' ) ) :
 /**
  * Returns the instance of the plugin.
  *
@@ -14,7 +15,9 @@ use TenUp\ContentConnect\Plugin;
 function get_plugin() {
 	return Plugin::instance();
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_registry' ) ) :
 /**
  * Returns the instance of the relationship registry.
  *
@@ -25,7 +28,9 @@ function get_plugin() {
 function get_registry() {
 	return get_plugin()->get_registry();
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\is_doing_tests' ) ) :
 /**
  * Checks if the code is running in a test environment.
  *
@@ -36,7 +41,9 @@ function get_registry() {
 function is_doing_tests() {
 	return defined( 'CONTENT_CONNECT_DOING_TESTS' ) && CONTENT_CONNECT_DOING_TESTS;
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_related_ids_by_name' ) ) :
 /**
  * Retrieves all related post IDs for a given post and relationship name.
  *
@@ -81,13 +88,11 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
 		return array();
 	}
 
-	if ( ! is_array( $objects ) ) {
-		$objects = array( $objects );
-	}
-
 	return array_map( 'intval', wp_list_pluck( $objects, 'ID' ) );
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_by' ) ) :
 /**
  * Retrieves post-to-post relationships based on a specified field.
  *
@@ -104,10 +109,12 @@ function get_related_ids_by_name( $post_id, $relationship_name ) {
  */
 function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
-	// Use static cache for repeated calls within the same request.
+	// Use static cache for repeated calls within the same request. The registry relationship
+	// count is part of the key so a result cached before all relationships are registered is
+	// invalidated once more are registered later in the request.
 	static $cache = array();
 
-	$cache_key = $field . '|' . $value;
+	$cache_key = $field . '|' . $value . '|' . count( (array) get_registry()->get_post_to_post_relationships() );
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
@@ -175,7 +182,9 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
 	return $post_to_post_relationships;
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_by' ) ) :
 /**
  * Retrieves post-to-user relationships based on a specified field.
  *
@@ -190,10 +199,12 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
  */
 function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
-	// Use static cache for repeated calls within the same request.
+	// Use static cache for repeated calls within the same request. The registry relationship
+	// count is part of the key so a result cached before all relationships are registered is
+	// invalidated once more are registered later in the request.
 	static $cache = array();
 
-	$cache_key = $field . '|' . $value;
+	$cache_key = $field . '|' . $value . '|' . count( (array) get_registry()->get_post_to_user_relationships() );
 
 	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
@@ -252,7 +263,9 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
 	return $post_to_user_relationships;
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_post_relationships_data' ) ) :
 /**
  * Retrieves relationships (post-to-post and post-to-user) for a given post.
  *
@@ -315,7 +328,9 @@ function get_post_relationships_data( $post, $rel_type = 'any', $other_post_type
 
 	return $relationship_data;
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_data' ) ) :
 /**
  * Retrieves post-to-post relationship data for a given post.
  *
@@ -454,7 +469,9 @@ function get_post_to_post_relationships_data( $post, $other_post_type = false, $
 
 	return $relationships_data;
 }
+endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_data' ) ) :
 /**
  * Retrieves post-to-user relationship data for a given post.
  *
@@ -572,3 +589,4 @@ function get_post_to_user_relationships_data( $post, $context = 'view' ) {
 
 	return $relationships_data;
 }
+endif;
