@@ -40,5 +40,17 @@
         "allow-plugins": {
             "composer/installers": true
         }
+    },
+    "archive": {
+        "exclude": [
+            "/node_modules",
+            "/tests",
+            "/.github",
+            "/.git*",
+            "/release",
+            "/phpunit*.xml",
+            "/.wp-env.json",
+            "/.nvmrc"
+        ]
     }
 }
