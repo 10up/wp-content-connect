@@ -4,6 +4,10 @@ namespace TenUp\ContentConnect\Helpers;
 
 use TenUp\ContentConnect\Plugin;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 if ( ! function_exists( __NAMESPACE__ . '\\get_plugin' ) ) :
 /**
  * Returns the instance of the plugin.

@@ -32,7 +32,7 @@ class MetaBox {
 			return;
 		}
 
-		\add_meta_box( 'tenup-content-connect-relationships', __( "Relationships", "tenup-content-connect" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
+		\add_meta_box( 'tenup-content-connect-relationships', __( "Relationships", "wp-content-connect" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 
 		wp_enqueue_script( 'tenup-content-connect', Plugin::instance()->url . 'assets/js/content-connect.js', array(), Plugin::instance()->version, true );
 		wp_localize_script( 'tenup-content-connect', 'ContentConnectData', apply_filters( 'tenup_content_connect_localize_data', $relationship_data ) );

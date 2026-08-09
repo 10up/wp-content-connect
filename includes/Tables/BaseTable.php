@@ -124,11 +124,7 @@ abstract class BaseTable {
 		$column_updates = $this->get_column_updates_query( $columns );
 		$values = $this->get_values_query( $columns, $rows );
 
-		$query = <<<SQL
-			INSERT INTO `{$table_name}` {$column_names}
-				VALUES {$values}
-				ON DUPLICATE KEY UPDATE {$column_updates};
-SQL;
+		$query = "INSERT INTO `{$table_name}` {$column_names} VALUES {$values} ON DUPLICATE KEY UPDATE {$column_updates};";
 
 		return $db->query( $query );
 	}
