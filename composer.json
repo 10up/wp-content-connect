@@ -45,5 +45,28 @@
             "composer/installers": true,
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "archive": {
+        "exclude": [
+            "/node_modules",
+            "/tests",
+            "/.github",
+            "/.git*",
+            "/.claude",
+            ".DS_Store",
+            "/.phpunit.result.cache",
+            "/release",
+            "/artifacts",
+            "/bin",
+            "/docs",
+            "/run-tests.sh",
+            "/phpunit*.xml",
+            "/.wp-env.json",
+            "/.nvmrc",
+            "/build.js",
+            "/CONTRIBUTING.md",
+            "/CODE_OF_CONDUCT.md",
+            "/CREDITS.md"
+        ]
     }
 }

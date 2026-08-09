@@ -66,7 +66,13 @@ class MetaBox {
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
+		$raw_relationships = wp_unslash( $_POST['tenup-content-connect-relationships'] );
+
+		if ( ! is_string( $raw_relationships ) ) {
+			return false;
+		}
+
+		$relationships = json_decode( $raw_relationships, true );
 
 		if ( ! is_array( $relationships ) ) {
 			return false;
@@ -86,9 +92,12 @@ class MetaBox {
 				case 'post-to-user':
 					$relationship = $registry->get_post_to_user_relationship_by_key( $relationship_data['relid'] );
 					break;
+				default:
+					break;
 			}
 
-			if ( ! $relationship ) {
+			// Skip unknown relationship types or unregistered relationship keys.
+			if ( ! is_object( $relationship ) ) {
 				continue;
 			}
 

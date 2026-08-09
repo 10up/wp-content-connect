@@ -5,7 +5,6 @@ namespace TenUp\ContentConnect;
 use TenUp\ContentConnect\API;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
-use TenUp\ContentConnect\Relationships\Cache;
 use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;

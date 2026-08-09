@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
@@ -15,9 +15,9 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
+    "build": "node build.js",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "archive": "composer archive --no-interaction --file=$npm_package_name --format=zip --dir=release",
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
     "wp-env:start": "wp-env start",
