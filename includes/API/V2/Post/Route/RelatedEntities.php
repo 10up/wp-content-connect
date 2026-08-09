@@ -637,7 +637,8 @@ class RelatedEntities extends AbstractPostRoute {
 		$total_items = $query->found_posts;
 
 		if ( $total_items < 1 && $page > 1 ) {
-			// Out-of-bounds, run the query again without LIMIT for total count.
+			// On an out-of-bounds page the relationship_query JOIN can leave found_posts at 0,
+			// so re-run without the paged LIMIT to get an accurate total for pagination headers.
 			unset( $query_args['paged'] );
 
 			$count_query = new \WP_Query();
@@ -677,6 +678,11 @@ class RelatedEntities extends AbstractPostRoute {
 		$per_page = (int) $request->get_param( 'per_page' );
 		$order    = $request->get_param( 'order' );
 		$orderby  = $request->get_param( 'orderby' );
+
+		// WP_User_Query has no "date" orderby; map it to the user registration date.
+		if ( 'date' === $orderby ) {
+			$orderby = 'registered';
+		}
 
 		$query_args = array(
 			'number'             => $per_page,
