@@ -28,8 +28,23 @@ class RESTTest extends ContentConnectTestCase {
 		$this->add_post_relations();
 		$this->add_user_relations();
 
+		// prepare_links() gates on read_post, so requests must run as a capable user.
+		$admin_id = $this->factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+
 		$rest = new \TenUp\ContentConnect\REST();
 		$rest->add_links();
+	}
+
+	/**
+	 * Cleans up the test environment.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		wp_set_current_user( 0 );
+
+		parent::tearDown();
 	}
 
 	/**
@@ -274,5 +289,37 @@ class RESTTest extends ContentConnectTestCase {
 
 		$this->assertContains( 'post-to-post', $rel_types );
 		$this->assertContains( 'post-to-user', $rel_types );
+	}
+
+	/**
+	 * Tests that adding relationship links does not duplicate the standard core links.
+	 *
+	 * Regression: prepare_links() previously seeded its working array from
+	 * $response->get_links() and re-added the whole set, appending a second copy
+	 * of every standard link (self, collection, about, ...) on each response.
+	 *
+	 * @return void
+	 */
+	public function test_standard_links_are_not_duplicated() {
+		$request  = new \WP_REST_Request( 'GET', '/wp/v2/posts/1' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+
+		$this->assertSame( 200, $response->get_status() );
+		// Post 1 has relationships, so prepare_links() runs and adds its own links.
+		$this->assertArrayHasKey( 'content-connect:relationships', $links );
+
+		foreach ( $links as $rel => $set ) {
+			$hrefs = wp_list_pluck( $set, 'href' );
+			$this->assertSame(
+				array_values( array_unique( $hrefs ) ),
+				array_values( $hrefs ),
+				sprintf( 'Duplicate href found for link relation "%s".', $rel )
+			);
+		}
+
+		// The core `self` link must be present exactly once.
+		$this->assertArrayHasKey( 'self', $links );
+		$this->assertCount( 1, $links['self'] );
 	}
 }

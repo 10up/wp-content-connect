@@ -65,7 +65,6 @@ class Plugin {
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
 			new MetaBox(), // @deprecated remove in 2.0.0
-			new Cache(),
 			new DeletedItems(),
 			new REST(),
 			new API\V1\Search(),
