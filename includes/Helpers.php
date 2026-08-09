@@ -34,19 +34,6 @@ function get_registry() {
 }
 endif;
 
-if ( ! function_exists( __NAMESPACE__ . '\\is_doing_tests' ) ) :
-/**
- * Checks if the code is running in a test environment.
- *
- * @since 2.0.0
- *
- * @return bool True if running tests, false otherwise.
- */
-function is_doing_tests() {
-	return defined( 'CONTENT_CONNECT_DOING_TESTS' ) && CONTENT_CONNECT_DOING_TESTS;
-}
-endif;
-
 if ( ! function_exists( __NAMESPACE__ . '\\get_related_ids_by_name' ) ) :
 /**
  * Retrieves all related post IDs for a given post and relationship name.
@@ -113,30 +100,11 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_by' ) 
  */
 function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 
-	// Use static cache for repeated calls within the same request. The registry relationship
-	// count is part of the key so a result cached before all relationships are registered is
-	// invalidated once more are registered later in the request.
-	static $cache = array();
-
-	$cache_key = $field . '|' . $value . '|' . count( (array) get_registry()->get_post_to_post_relationships() );
-
-	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
-		return $cache[ $cache_key ];
-	}
-
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_post_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			$result = array( $value => $relationship );
-			if ( ! is_doing_tests() ) {
-				$cache[ $cache_key ] = $result;
-			}
-			return $result;
-		}
-
-		if ( ! is_doing_tests() ) {
-			$cache[ $cache_key ] = false;
+			return array( $value => $relationship );
 		}
 
 		return false;
@@ -145,11 +113,6 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 	$relationships = get_registry()->get_post_to_post_relationships();
 
 	if ( empty( $relationships ) ) {
-
-		if ( ! is_doing_tests() ) {
-			$cache[ $cache_key ] = array();
-		}
-
 		return array();
 	}
 
@@ -180,10 +143,6 @@ function get_post_to_post_relationships_by( $field = 'any', $value = '' ) {
 		}
 	}
 
-	if ( ! is_doing_tests() ) {
-		$cache[ $cache_key ] = $post_to_post_relationships;
-	}
-
 	return $post_to_post_relationships;
 }
 endif;
@@ -203,32 +162,11 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_by' ) 
  */
 function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 
-	// Use static cache for repeated calls within the same request. The registry relationship
-	// count is part of the key so a result cached before all relationships are registered is
-	// invalidated once more are registered later in the request.
-	static $cache = array();
-
-	$cache_key = $field . '|' . $value . '|' . count( (array) get_registry()->get_post_to_user_relationships() );
-
-	if ( ! is_doing_tests() && isset( $cache[ $cache_key ] ) ) {
-		return $cache[ $cache_key ];
-	}
-
 	if ( 'key' === $field ) {
 		$relationship = get_registry()->get_post_to_user_relationship_by_key( $value );
 
 		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\Relationship ) {
-			$result = array( $value => $relationship );
-
-			if ( ! is_doing_tests() ) {
-				$cache[ $cache_key ] = $result;
-			}
-
-			return $result;
-		}
-
-		if ( ! is_doing_tests() ) {
-			$cache[ $cache_key ] = false;
+			return array( $value => $relationship );
 		}
 
 		return false;
@@ -237,11 +175,6 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 	$relationships = get_registry()->get_post_to_user_relationships();
 
 	if ( empty( $relationships ) ) {
-
-		if ( ! is_doing_tests() ) {
-			$cache[ $cache_key ] = array();
-		}
-
 		return array();
 	}
 
@@ -259,10 +192,6 @@ function get_post_to_user_relationships_by( $field = 'any', $value = '' ) {
 				$post_to_user_relationships[ $key ] = $relationship;
 				break;
 		}
-	}
-
-	if ( ! is_doing_tests() ) {
-		$cache[ $cache_key ] = $post_to_user_relationships;
 	}
 
 	return $post_to_user_relationships;
