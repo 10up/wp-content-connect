@@ -31,7 +31,7 @@ class PostToUser extends Relationship {
 
 	public function __construct( $post_type, $name, $args = array() ) {
 		if ( ! post_type_exists( $post_type ) ) {
-			throw new \Exception( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" );
+			throw new \Exception( esc_html( "Post Type {$post_type} does not exist. Post types must exist to create a relationship" ) );
 		}
 
 		$this->post_type = $post_type;

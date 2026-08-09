@@ -36,13 +36,13 @@ class PostToPost extends Relationship {
 
 	public function __construct( $from, $to, $name, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
-			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
+			throw new \Exception( esc_html( "Post Type {$from} does not exist. Post types must exist to create a relationship" ) );
 		}
 
 		$to = (array) $to;
 		foreach( $to as $to_post_type ) {
 			if ( ! post_type_exists( $to_post_type ) ) {
-				throw new \Exception( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" );
+				throw new \Exception( esc_html( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" ) );
 			}
 		}
 

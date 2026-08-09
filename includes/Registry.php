@@ -116,7 +116,7 @@ class Registry {
 	public function define_post_to_post( $from, $to, $name, $args = array() ) {
 		if ( $this->post_to_post_relationship_exists( $from, $to, $name ) ) {
 			$to = implode( ', ', (array) $to );
-			throw new \Exception( "A relationship already exists between {$from} and {$to} with name {$name}" );
+			throw new \Exception( esc_html( "A relationship already exists between {$from} and {$to} with name {$name}" ) );
 		}
 
 		$key = $this->get_relationship_key( $from, $to, $name );
@@ -185,7 +185,7 @@ class Registry {
 	 */
 	public function define_post_to_user( $post_type, $name, $args = array() ) {
 		if ( $this->post_to_user_relationship_exists( $post_type, $name ) ) {
-			throw new \Exception( "A relationship already exists between users and post type {$post_type} named {$name}" );
+			throw new \Exception( esc_html( "A relationship already exists between users and post type {$post_type} named {$name}" ) );
 		}
 
 		$key = $this->get_relationship_key( $post_type, 'user', $name );
