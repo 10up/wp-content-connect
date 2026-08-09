@@ -7,6 +7,7 @@
 
 namespace TenUp\ContentConnect\Tests\API\V1;
 
+use TenUp\ContentConnect\API\V1\Search;
 use TenUp\ContentConnect\Tests\ContentConnectTestCase;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
@@ -23,6 +24,13 @@ class SearchTest extends ContentConnectTestCase {
 	private $user_id;
 
 	/**
+	 * Posts created during a test, removed on tearDown.
+	 *
+	 * @var int[]
+	 */
+	private $created_posts = array();
+
+	/**
 	 * Sets up the test environment.
 	 *
 	 * @return void
@@ -36,6 +44,43 @@ class SearchTest extends ContentConnectTestCase {
 			)
 		);
 		wp_set_current_user( $this->user_id );
+	}
+
+	/**
+	 * Cleans up the test environment.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		foreach ( $this->created_posts as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+		$this->created_posts = array();
+
+		wp_set_current_user( 0 );
+
+		parent::tearDown();
+	}
+
+	/**
+	 * Creates a published post and tracks it for cleanup.
+	 *
+	 * @param  string $title     The post title.
+	 * @param  string $post_type The post type.
+	 * @return int The created post ID.
+	 */
+	private function make_post( $title, $post_type = 'post' ) {
+		$post_id = wp_insert_post(
+			array(
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_type'   => $post_type,
+			)
+		);
+
+		$this->created_posts[] = $post_id;
+
+		return $post_id;
 	}
 
 	/**
@@ -361,5 +406,191 @@ class SearchTest extends ContentConnectTestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertIsArray( $data );
 		$this->assertArrayHasKey( 'data', $data );
+	}
+
+	/**
+	 * Tests that the search endpoint is registered on rest_api_init.
+	 *
+	 * @return void
+	 */
+	public function test_endpoint_is_registered() {
+		$search = new Search();
+
+		// Routes must be registered on rest_api_init; register within that action.
+		add_action( 'rest_api_init', array( $search, 'register_endpoint' ) );
+		do_action( 'rest_api_init' );
+
+		$routes = rest_get_server()->get_routes();
+
+		remove_action( 'rest_api_init', array( $search, 'register_endpoint' ) );
+
+		$this->assertArrayHasKey( '/content-connect/v1/search', $routes );
+	}
+
+	/**
+	 * Tests that localize_endpoints() adds the search URL and nonce.
+	 *
+	 * @return void
+	 */
+	public function test_localize_endpoints_adds_url_and_nonce() {
+		$search = new Search();
+
+		$data = $search->localize_endpoints(
+			array(
+				'endpoints' => array(),
+				'nonces'    => array(),
+			)
+		);
+
+		$this->assertArrayHasKey( 'search', $data['endpoints'] );
+		$this->assertStringContainsString( 'content-connect/v1/search', $data['endpoints']['search'] );
+		$this->assertArrayHasKey( 'search', $data['nonces'] );
+		$this->assertNotEmpty( $data['nonces']['search'] );
+	}
+
+	/**
+	 * Tests that process_search() trims and strips tags from the search text.
+	 *
+	 * @return void
+	 */
+	public function test_process_search_sanitizes_search_text() {
+		$captured = null;
+
+		add_filter(
+			'tenup_content_connect_search_posts_query_args',
+			function ( $query_args ) use ( &$captured ) {
+				$captured = $query_args;
+				return $query_args;
+			}
+		);
+
+		$search  = new Search();
+		$request = new \WP_REST_Request( 'POST', '/content-connect/v1/search' );
+		$request->set_param( 'object_type', 'post' );
+		$request->set_param( 'post_type', array( 'post' ) );
+		$request->set_param( 'search', '  <b>hey</b>  ' );
+		$search->process_search( $request );
+
+		remove_all_filters( 'tenup_content_connect_search_posts_query_args' );
+
+		$this->assertNotNull( $captured );
+		$this->assertSame( 'hey', $captured['s'] );
+	}
+
+	/**
+	 * Tests that search_posts() normalizes results and applies the final_post filter.
+	 *
+	 * @return void
+	 */
+	public function test_search_posts_normalizes_results_and_applies_filter() {
+		$post_id = $this->make_post( 'ContentConnectSearchNeedle' );
+
+		$filter_ran = false;
+		add_filter(
+			'tenup_content_connect_final_post',
+			function ( $final_post ) use ( &$filter_ran ) {
+				$filter_ran         = true;
+				$final_post['flag'] = 'yes';
+				return $final_post;
+			}
+		);
+
+		$search  = new Search();
+		$results = $search->search_posts(
+			'ContentConnectSearchNeedle',
+			array( 'post' ),
+			array(
+				'current_post_id'   => 1,
+				'relationship_name' => '',
+			)
+		);
+
+		remove_all_filters( 'tenup_content_connect_final_post' );
+
+		$ids = wp_list_pluck( $results['data'], 'ID' );
+		$this->assertContains( $post_id, $ids );
+		$this->assertTrue( $filter_ran );
+		$this->assertSame( 'yes', $results['data'][0]['flag'] );
+	}
+
+	/**
+	 * Tests that search_posts() reports prev/next page flags correctly.
+	 *
+	 * @return void
+	 */
+	public function test_search_posts_pagination_flags() {
+		$this->make_post( 'PaginateNeedle One' );
+		$this->make_post( 'PaginateNeedle Two' );
+
+		// Force one result per page so two matching posts span two pages.
+		add_filter(
+			'tenup_content_connect_search_posts_query_args',
+			function ( $query_args ) {
+				$query_args['posts_per_page'] = 1;
+				return $query_args;
+			}
+		);
+
+		$search = new Search();
+
+		$page1 = $search->search_posts(
+			'PaginateNeedle',
+			array( 'post' ),
+			array(
+				'paged'             => 1,
+				'current_post_id'   => 1,
+				'relationship_name' => '',
+			)
+		);
+		$page2 = $search->search_posts(
+			'PaginateNeedle',
+			array( 'post' ),
+			array(
+				'paged'             => 2,
+				'current_post_id'   => 1,
+				'relationship_name' => '',
+			)
+		);
+
+		remove_all_filters( 'tenup_content_connect_search_posts_query_args' );
+
+		$this->assertFalse( $page1['prev_pages'] );
+		$this->assertTrue( $page1['more_pages'] );
+		$this->assertTrue( $page2['prev_pages'] );
+		$this->assertFalse( $page2['more_pages'] );
+	}
+
+	/**
+	 * Tests that search_users() normalizes results and applies the final_user filter.
+	 *
+	 * @return void
+	 */
+	public function test_search_users_normalizes_results_and_applies_filter() {
+		$filter_ran = false;
+		add_filter(
+			'tenup_content_connect_final_user',
+			function ( $final_user ) use ( &$filter_ran ) {
+				$filter_ran = true;
+				return $final_user;
+			}
+		);
+
+		$search = new Search();
+		// Fixture user 1 has display_name "1"; "*1*" matches users 1 and 10.
+		$results = $search->search_users(
+			'1',
+			array(
+				'current_post_id'   => 1,
+				'relationship_name' => '',
+			)
+		);
+
+		remove_all_filters( 'tenup_content_connect_final_user' );
+
+		$this->assertArrayHasKey( 'data', $results );
+		$this->assertNotEmpty( $results['data'] );
+		$this->assertArrayHasKey( 'ID', $results['data'][0] );
+		$this->assertArrayHasKey( 'name', $results['data'][0] );
+		$this->assertTrue( $filter_ran );
 	}
 }

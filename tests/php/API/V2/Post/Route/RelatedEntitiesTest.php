@@ -635,5 +635,92 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$this->assertContains( 2, $ids );
 		$this->assertContains( 4, $ids );
 	}
+
+	/**
+	 * Tests that the GET endpoint denies a user who cannot edit the post.
+	 *
+	 * The read path gates on edit_post, so read-capable-but-not-edit users
+	 * (e.g. subscribers) must be rejected, not just logged-out requests.
+	 *
+	 * @return void
+	 */
+	public function test_get_requires_edit_post_capability() {
+		wp_set_current_user( $this->subscriber_id );
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-get-cap' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-get-cap' );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 403, $response->get_status() );
+	}
+
+	/**
+	 * Tests that related users can be ordered by ID.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_users_ordered_by_id() {
+		$registry = get_registry();
+		$registry->define_post_to_user( 'post', 'test-users-orderby-id' );
+		$rel_key = $registry->get_relationship_key( 'post', 'user', 'test-users-orderby-id' );
+
+		$relationship = $registry->get_post_to_user_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, 3 );
+		$relationship->add_relationship( 1, 2 );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-user' );
+		$request->set_param( 'orderby', 'id' );
+
+		$request->set_param( 'order', 'asc' );
+		$asc = wp_list_pluck( rest_do_request( $request )->get_data(), 'id' );
+		$this->assertSame( array( 2, 3 ), $asc );
+
+		$request->set_param( 'order', 'desc' );
+		$desc = wp_list_pluck( rest_do_request( $request )->get_data(), 'id' );
+		$this->assertSame( array( 3, 2 ), $desc );
+	}
+
+	/**
+	 * Tests that ordering related users by "date" sorts on the registration date.
+	 *
+	 * WP_User_Query has no "date" orderby; the endpoint maps it to "registered".
+	 * Without that mapping the value is silently ignored and results fall back to
+	 * login order, so this also guards that regression.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_users_ordered_by_date_uses_registration() {
+		$earlier = $this->factory()->user->create( array( 'user_registered' => '2020-01-01 00:00:00' ) );
+		$later   = $this->factory()->user->create( array( 'user_registered' => '2021-06-15 00:00:00' ) );
+
+		$registry = get_registry();
+		$registry->define_post_to_user( 'post', 'test-users-orderby-date' );
+		$rel_key = $registry->get_relationship_key( 'post', 'user', 'test-users-orderby-date' );
+
+		$relationship = $registry->get_post_to_user_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, $later );
+		$relationship->add_relationship( 1, $earlier );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/post/1/related' );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-user' );
+		$request->set_param( 'orderby', 'date' );
+
+		$request->set_param( 'order', 'asc' );
+		$asc = wp_list_pluck( rest_do_request( $request )->get_data(), 'id' );
+		$this->assertSame( array( $earlier, $later ), $asc );
+
+		$request->set_param( 'order', 'desc' );
+		$desc = wp_list_pluck( rest_do_request( $request )->get_data(), 'id' );
+		$this->assertSame( array( $later, $earlier ), $desc );
+	}
 }
 

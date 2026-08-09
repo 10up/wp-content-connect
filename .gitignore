@@ -1,5 +1,7 @@
 .phpunit.result.cache
 test-results/
+tests/e2e/.auth/
+tests/e2e/test-results/
 
 # Version Control
 .svn
@@ -30,3 +32,7 @@ npm-debug.log
 sassdoc
 scss-lint-report.xml
 config.codekit
+artifacts/
+
+/assets/js/content-connect.js
+/assets/js/content-connect.min.js

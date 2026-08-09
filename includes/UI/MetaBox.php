@@ -49,7 +49,7 @@ class MetaBox {
 	}
 
 	public function save_post( $post_id ) {
-		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( $_POST['tenup-content-connect-save'], 'content-connect-save' ) ) {
+		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tenup-content-connect-save'] ) ), 'content-connect-save' ) ) {
 			return false;
 		}
 
@@ -57,11 +57,31 @@ class MetaBox {
 			return false;
 		}
 
+		if ( ! isset( $_POST['tenup-content-connect-relationships'] ) ) {
+			return false;
+		}
+
 		$registry = Plugin::instance()->get_registry();
 
-		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
+		$raw_relationships = wp_unslash( $_POST['tenup-content-connect-relationships'] );
+
+		if ( ! is_string( $raw_relationships ) ) {
+			return false;
+		}
+
+		$relationships = json_decode( $raw_relationships, true );
+
+		if ( ! is_array( $relationships ) ) {
+			return false;
+		}
 
 		foreach ( $relationships as $relationship_data ) {
+			if ( empty( $relationship_data['reltype'] ) || empty( $relationship_data['relid'] ) ) {
+				continue;
+			}
+
+			$relationship = false;
+
 			switch ( $relationship_data['reltype'] ) {
 				case 'post-to-post':
 					$relationship = $registry->get_post_to_post_relationship_by_key( $relationship_data['relid'] );
@@ -69,11 +89,18 @@ class MetaBox {
 				case 'post-to-user':
 					$relationship = $registry->get_post_to_user_relationship_by_key( $relationship_data['relid'] );
 					break;
+				default:
+					break;
+			}
+
+			// Skip unknown relationship types or unregistered relationship keys.
+			if ( ! is_object( $relationship ) ) {
+				continue;
 			}
 
 			// Determine save direction and call proper save function
 			$post_type = get_post_type( $post_id );
-			if ( $relationship->from_ui->render_post_type === $post_type ) {
+			if ( is_object( $relationship->from_ui ) && $relationship->from_ui->render_post_type === $post_type ) {
 				$relationship->from_ui->handle_save( $relationship_data, $post_id );
 			} elseif ( is_object( $relationship->to_ui ) && $relationship->to_ui->render_post_type === $post_type ) {
 				$relationship->to_ui->handle_save( $relationship_data, $post_id );

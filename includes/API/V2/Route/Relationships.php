@@ -110,11 +110,11 @@ class Relationships extends AbstractRoute {
 						'enable_ui'   => $relationship->enable_from_ui,
 					);
 					$prepared_relationships[ $rel_key ]['to']          = array(
-						'object_type' => $relationship->to,
-						'labels'      => $relationship->to_labels,
-						'max_items'   => $relationship->to_max_items,
-						'sortable'    => $relationship->to_sortable,
-						'enable_ui'   => $relationship->enable_to_ui,
+						'object_types' => (array) $relationship->to,
+						'labels'       => $relationship->to_labels,
+						'max_items'    => $relationship->to_max_items,
+						'sortable'     => $relationship->to_sortable,
+						'enable_ui'    => $relationship->enable_to_ui,
 					);
 					break;
 			}
@@ -166,7 +166,7 @@ class Relationships extends AbstractRoute {
 
 		$rel_type = $request->get_param( 'rel_type' );
 
-		if ( 'post-to-user' === $rel_type && in_array( $value, array( 'post_type', 'to' ), true ) ) {
+		if ( 'post-to-user' === $rel_type && in_array( $value, array( 'from', 'to' ), true ) ) {
 			return new \WP_Error(
 				'rest_invalid_param',
 				/* translators: %s: filter value */

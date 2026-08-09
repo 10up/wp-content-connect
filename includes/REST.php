@@ -43,35 +43,31 @@ class REST {
 			return $response;
 		}
 
-		$links = $response->get_links();
-
 		$relationships_data = get_post_relationships_data( $post->ID );
 
 		if ( empty( $relationships_data ) ) {
 			return $response;
 		}
 
-		$links['content-connect:relationships'] = array(
-			'relationships' => array(
-				'href' => rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) ),
-			),
+		$response->add_link(
+			'content-connect:relationships',
+			rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) )
 		);
 
 		foreach ( $relationships_data as $relationship ) {
-			$links['content-connect:related'][] = array(
-				'relationship' => $relationship['rel_name'],
-				'href'         => rest_url(
+			$response->add_link(
+				'content-connect:related',
+				rest_url(
 					sprintf(
 						'/content-connect/v2/post/%1$d/related/?rel_key=%2$s&rel_type=%3$s',
 						$post->ID,
-						$relationship['rel_key'],
+						rawurlencode( $relationship['rel_key'] ),
 						$relationship['rel_type']
 					)
 				),
+				array( 'relationship' => $relationship['rel_name'] )
 			);
 		}
-
-		$response->add_links( $links );
 
 		return $response;
 	}
