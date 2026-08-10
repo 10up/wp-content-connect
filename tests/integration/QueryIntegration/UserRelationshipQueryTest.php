@@ -26,7 +26,7 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		parent::setUp();
 
 		// Force a clear registry for each test
-		$plugin = Plugin::instance();
+		$plugin           = Plugin::instance();
 		$plugin->registry = new Registry();
 		$plugin->registry->setup();
 	}
@@ -75,36 +75,39 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 	 * @return void
 	 */
 	public function test_top_level_segments_are_reformatted_into_nested_arrays_correctly(): void {
-		$query = new UserRelationshipQuery( array(
-			'related_to_post' => '25',
-			'name' => 'owner',
-		) );
+		$query    = new UserRelationshipQuery(
+			array(
+				'related_to_post' => '25',
+				'name'            => 'owner',
+			)
+		);
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'name' => 'owner',
-			)
+				'name'            => 'owner',
+			),
 		);
 		$this->assertEquals( $expected, $query->segments );
 
-
 		// Test top level keys AND segments in arrays
-		$query = new UserRelationshipQuery( array(
-			'related_to_post' => '25',
-			'name' => 'owner',
+		$query    = new UserRelationshipQuery(
 			array(
-				'related_to_post' => '50',
-				'name' => 'contrib',
-			),
-		) );
+				'related_to_post' => '25',
+				'name'            => 'owner',
+				array(
+					'related_to_post' => '50',
+					'name'            => 'contrib',
+				),
+			)
+		);
 		$expected = array(
 			array(
 				'related_to_post' => '25',
-				'name' => 'owner',
+				'name'            => 'owner',
 			),
 			array(
 				'related_to_post' => '50',
-				'name' => 'contrib',
+				'name'            => 'contrib',
 			),
 		);
 		$this->assertEquals( $expected, $query->segments );
@@ -131,10 +134,14 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 	public function test_valid_segments_are_recognized_as_valid(): void {
 		$query = new UserRelationshipQuery( array() );
 
-		$this->assertTrue( $query->is_valid_segment( array(
-			'name' => 'owner',
-			'related_to_post' => 45,
-		) ) );
+		$this->assertTrue(
+			$query->is_valid_segment(
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 45,
+				)
+			)
+		);
 	}
 
 	/**
@@ -146,18 +153,22 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		$query = new UserRelationshipQuery( array() );
 		$this->assertFalse( $query->has_valid_segments() );
 
-		$query = new UserRelationshipQuery( array(
-			'name' => 'owner',
-			'related_to_post' => 25,
-		));
-		$this->assertTrue( $query->has_valid_segments() );
-
-		$query = new UserRelationshipQuery( array(
+		$query = new UserRelationshipQuery(
 			array(
-				'name' => 'contrib',
+				'name'            => 'owner',
 				'related_to_post' => 25,
 			)
-		) );
+		);
+		$this->assertTrue( $query->has_valid_segments() );
+
+		$query = new UserRelationshipQuery(
+			array(
+				array(
+					'name'            => 'contrib',
+					'related_to_post' => 25,
+				),
+			)
+		);
 		$this->assertTrue( $query->has_valid_segments() );
 	}
 
@@ -168,59 +179,62 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 	 */
 	public function test_generate_where_clause(): void {
 		// Should return nothing, since the relationship isn't defined yet
-		$query = new UserRelationshipQuery(array(
-			'name' => 'owner',
-			'related_to_post' => 1,
-		));
+		$query    = new UserRelationshipQuery(
+			array(
+				'name'            => 'owner',
+				'related_to_post' => 1,
+			)
+		);
 		$expected = '';
 		$this->assertEquals( $expected, $query->where );
-
 
 		$registry = Plugin::instance()->get_registry();
 		$registry->define_post_to_user( 'post', 'owner' );
 		$registry->define_post_to_user( 'post', 'contrib' );
 
-
 		// If we end up with all invalid segments, we should have no changes to where
-		$query = new UserRelationshipQuery( array() );
+		$query    = new UserRelationshipQuery( array() );
 		$expected = '';
 		$this->assertEquals( $expected, $query->where );
 
-
-		$query = new UserRelationshipQuery( array(
-			'name' => 'owner',
-			'related_to_post' => 1
-		) );
+		$query    = new UserRelationshipQuery(
+			array(
+				'name'            => 'owner',
+				'related_to_post' => 1,
+			)
+		);
 		$expected = " and ((p2u1.post_id = 1 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
-
-		$query = new UserRelationshipQuery( array(
+		$query    = new UserRelationshipQuery(
 			array(
-				'name' => 'owner',
-				'related_to_post' => 2
-			),
-			array(
-				'name' => 'owner',
-				'related_to_post' => 3,
-			),
-			'relation' => 'OR',
-		) );
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 2,
+				),
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 3,
+				),
+				'relation' => 'OR',
+			)
+		);
 		$expected = " and ((p2u1.post_id = 2 and p2u1.name = 'owner') OR (p2u1.post_id = 3 and p2u1.name = 'owner'))";
 		$this->assertEquals( $expected, $query->where );
 
-
-		$query = new UserRelationshipQuery( array(
+		$query    = new UserRelationshipQuery(
 			array(
-				'name' => 'owner',
-				'related_to_post' => 2
-			),
-			array(
-				'name' => 'contrib',
-				'related_to_post' => 4,
-			),
-			'relation' => 'AND',
-		) );
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 2,
+				),
+				array(
+					'name'            => 'contrib',
+					'related_to_post' => 4,
+				),
+				'relation' => 'AND',
+			)
+		);
 		$expected = " and ((p2u1.post_id = 2 and p2u1.name = 'owner') AND (p2u2.post_id = 4 and p2u2.name = 'contrib'))";
 		$this->assertEquals( $expected, $query->where );
 	}
@@ -234,56 +248,59 @@ class UserRelationshipQueryTest extends ContentConnectTestCase {
 		global $wpdb;
 
 		// Should return nothing, since the relationship isn't defined yet
-		$query = new UserRelationshipQuery(array(
-			'name' => 'owner',
-			'related_to_post' => 1,
-		));
+		$query    = new UserRelationshipQuery(
+			array(
+				'name'            => 'owner',
+				'related_to_post' => 1,
+			)
+		);
 		$expected = '';
 		$this->assertEquals( $expected, $query->join );
 
-
 		$registry = Plugin::instance()->get_registry();
-		$registry->define_post_to_user('post', 'owner' );
-		$registry->define_post_to_user('post', 'contrib' );
+		$registry->define_post_to_user( 'post', 'owner' );
+		$registry->define_post_to_user( 'post', 'contrib' );
 
-
-		$query = new UserRelationshipQuery( array(
-			'name' => 'owner',
-			'related_to_post' => 1
-		) );
+		$query    = new UserRelationshipQuery(
+			array(
+				'name'            => 'owner',
+				'related_to_post' => 1,
+			)
+		);
 		$expected = " left join {$wpdb->prefix}post_to_user as p2u1 on {$wpdb->users}.ID = p2u1.user_id";
 		$this->assertEquals( $expected, $query->join );
 
-
-		$query = new UserRelationshipQuery( array(
+		$query    = new UserRelationshipQuery(
 			array(
-				'name' => 'owner',
-				'related_to_post' => 2
-			),
-			array(
-				'name' => 'owner',
-				'related_to_post' => 3,
-			),
-			'relation' => 'OR',
-		) );
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 2,
+				),
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 3,
+				),
+				'relation' => 'OR',
+			)
+		);
 		$expected = " left join {$wpdb->prefix}post_to_user as p2u1 on {$wpdb->users}.ID = p2u1.user_id";
 		$this->assertEquals( $expected, $query->join );
 
-
-		$query = new UserRelationshipQuery( array(
+		$query     = new UserRelationshipQuery(
 			array(
-				'name' => 'owner',
-				'related_to_post' => 2
-			),
-			array(
-				'name' => 'contrib',
-				'related_to_post' => 4,
-			),
-			'relation' => 'AND',
-		) );
-		$expected =  " left join {$wpdb->prefix}post_to_user as p2u1 on {$wpdb->users}.ID = p2u1.user_id";
+				array(
+					'name'            => 'owner',
+					'related_to_post' => 2,
+				),
+				array(
+					'name'            => 'contrib',
+					'related_to_post' => 4,
+				),
+				'relation' => 'AND',
+			)
+		);
+		$expected  = " left join {$wpdb->prefix}post_to_user as p2u1 on {$wpdb->users}.ID = p2u1.user_id";
 		$expected .= " left join {$wpdb->prefix}post_to_user as p2u2 on {$wpdb->users}.ID = p2u2.user_id";
 		$this->assertEquals( $expected, $query->join );
 	}
-
 }

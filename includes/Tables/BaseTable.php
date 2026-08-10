@@ -35,7 +35,7 @@ abstract class BaseTable {
 	abstract function get_table_name();
 
 	function generate_table_name( $table_name ) {
-		$db = $this->get_db();
+		$db     = $this->get_db();
 		$prefix = $db->prefix;
 
 		return $prefix . $table_name;
@@ -61,13 +61,13 @@ abstract class BaseTable {
 		if ( $this->should_upgrade() || $fresh ) {
 			$sql = $this->get_schema();
 
-			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
+			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 			dbDelta( $sql );
 
 			update_option(
 				$this->get_schema_option_name(),
 				$this->get_schema_version(),
-				"no"
+				'no'
 			);
 
 			return true;
@@ -98,8 +98,8 @@ abstract class BaseTable {
 	 * Bulk replaces records in the database
 	 *
 	 *       INSERT into `table` (id,fruit)
-	 *			VALUES (1,'apple'), (2,'orange'), (3,'peach')
-	 *			ON DUPLICATE KEY UPDATE fruit = VALUES(fruit);
+	 *          VALUES (1,'apple'), (2,'orange'), (3,'peach')
+	 *          ON DUPLICATE KEY UPDATE fruit = VALUES(fruit);
 	 *
 	 * $columns = array(
 	 *      'col1' => '%s',
@@ -118,11 +118,11 @@ abstract class BaseTable {
 	 * );
 	 */
 	public function replace_bulk( $columns, $rows ) {
-		$db = $this->get_db();
-		$table_name = esc_sql( $this->get_table_name() );
-		$column_names = $this->get_column_names_query( $columns, $rows );
+		$db             = $this->get_db();
+		$table_name     = esc_sql( $this->get_table_name() );
+		$column_names   = $this->get_column_names_query( $columns, $rows );
 		$column_updates = $this->get_column_updates_query( $columns );
-		$values = $this->get_values_query( $columns, $rows );
+		$values         = $this->get_values_query( $columns, $rows );
 
 		$query = "INSERT INTO `{$table_name}` {$column_names} VALUES {$values} ON DUPLICATE KEY UPDATE {$column_updates};";
 
@@ -140,14 +140,17 @@ abstract class BaseTable {
 
 		foreach ( $columns as $column => $format ) {
 			if ( ! array_key_exists( $column, (array) $row ) ) {
-				unset( $columns[ $column ]);
+				unset( $columns[ $column ] );
 			}
 		}
 
 		$column_names = array_keys( $columns );
-		$column_names = array_map( function( $value ){
-			return "`{$value}`";
-		}, $column_names );
+		$column_names = array_map(
+			function ( $value ) {
+				return "`{$value}`";
+			},
+			$column_names
+		);
 		return '( ' . implode( ',', array_map( 'esc_sql', $column_names ) ) . ' )';
 	}
 
@@ -156,8 +159,8 @@ abstract class BaseTable {
 
 		foreach ( $columns as $column_name => $column_format ) {
 			$column_name = esc_sql( $column_name );
-			$updates .= "`{$column_name}` = VALUES(`$column_name`)";
-			$updates .= ',';
+			$updates    .= "`{$column_name}` = VALUES(`$column_name`)";
+			$updates    .= ',';
 		}
 
 		$updates = rtrim( $updates, ',' );
@@ -170,7 +173,7 @@ abstract class BaseTable {
 
 		$values = array();
 
-		foreach( $rows as $data ) {
+		foreach ( $rows as $data ) {
 			/*
 			 * $types is an array of values such as %d and %s, used in vsprintf to make sure data is correct format.
 			 * Values are escaped for SQL via the array_map( 'esc_sql', $data ) in the same line
@@ -180,6 +183,4 @@ abstract class BaseTable {
 
 		return implode( ',', $values );
 	}
-
 }
-

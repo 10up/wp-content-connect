@@ -29,5 +29,4 @@ class PostToPostTest extends TestCase {
 
 		$this->assertSame( 1, $result );
 	}
-
 }

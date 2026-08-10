@@ -45,13 +45,13 @@ class PostToPost extends PostUI {
 
 		$query = new \WP_Query( $args );
 
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$related_post = $query->next_post();
+		$queried_posts = $query->get_posts();
+		if ( ! empty( $queried_posts ) ) {
+			foreach ( $queried_posts as $queried_post ) {
 
 				$final_post = array(
-					'ID'   => $related_post->ID,
-					'name' => $related_post->post_title,
+					'ID'   => $queried_post->ID,
+					'name' => $queried_post->post_title,
 				);
 
 				$final_posts[] = apply_filters( 'tenup_content_connect_final_post', $final_post, $this->relationship );
@@ -84,5 +84,4 @@ class PostToPost extends PostUI {
 			$this->relationship->save_sort_data( $post_id, $relationship_data['add_items'] );
 		}
 	}
-
 }

@@ -11,7 +11,9 @@
  * License:           GPL-3.0-or-later
  * License URI:       https://spdx.org/licenses/GPL-3.0-or-later.html
  * Update URI:        https://github.com/10up/wp-content-connect
- * Text Domain:       wp-content-connect
+ * Text Domain:       tenup-content-connect
+ *
+ * @package           TenUp\ContentConnect
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/autoload.php';
+
 wp_content_connect_autoloader();
 
 // Kick things off
