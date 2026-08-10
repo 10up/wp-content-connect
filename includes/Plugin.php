@@ -2,7 +2,7 @@
 
 namespace TenUp\ContentConnect;
 
-use TenUp\ContentConnect\API\Search;
+use TenUp\ContentConnect\API;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
@@ -11,22 +11,6 @@ use TenUp\ContentConnect\Tables\PostToUser;
 use TenUp\ContentConnect\UI\MetaBox;
 
 class Plugin {
-
-	private static $instance;
-
-	/**
-	 * URL to the Plugin
-	 *
-	 * @var string
-	 */
-	public $url;
-
-	/**
-	 * Current plugin version
-	 *
-	 * @var string
-	 */
-	public $version;
 
 	/**
 	 * @var array
@@ -39,42 +23,23 @@ class Plugin {
 	public $registry;
 
 	/**
-	 * @var WPQueryIntegration
+	 * The single instance of the class.
+	 *
+	 * @var Plugin
 	 */
-	public $wp_query_integration;
+	private static $instance;
 
 	/**
-	 * @var UserQueryIntegration
+	 * Get class instance.
+	 *
+	 * @return Plugin
 	 */
-	public $user_query_integration;
-
-	/**
-	 * @var MetaBox
-	 */
-	public $meta_box;
-
-	/**
-	 * @var Search
-	 */
-	public $search;
-
-	/**
-	 * @var DeletedItems
-	 */
-	public $deleted_items;
-
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 			self::$instance->setup();
 		}
-
 		return self::$instance;
-	}
-
-	public function __construct() {
-		$this->url = plugin_dir_url( dirname( __FILE__ ) );
-		$this->version = '1.6.0';
 	}
 
 	public function get_registry() {
@@ -90,33 +55,65 @@ class Plugin {
 	}
 
 	public function setup() {
+		$this->define_constants();
 		$this->register_tables();
 
 		$this->registry = new Registry();
 		$this->registry->setup();
 
-		$this->wp_query_integration = new WPQueryIntegration();
-		$this->wp_query_integration->setup();
+		$modules = array(
+			new WPQueryIntegration(),
+			new UserQueryIntegration(),
+			new MetaBox(), // @deprecated remove in 2.0.0
+			new DeletedItems(),
+			new REST(),
+			new API\V1\Search(),
+			new API\V2\Route\Relationships(),
+			new API\V2\Post\Route\Relationships(),
+			new API\V2\Post\Route\RelatedEntities(),
+		);
 
-		$this->user_query_integration = new UserQueryIntegration();
-		$this->user_query_integration->setup();
+		foreach ( $modules as $module ) {
+			$module->setup();
+		}
 
-		$this->meta_box = new MetaBox();
-		$this->meta_box->setup();
-
-		$this->search = new Search();
-		$this->search->setup();
-
-		$this->deleted_items = new DeletedItems();
-		$this->deleted_items->setup();
-
-		add_action( 'init', array( $this, 'wp_init' ), 100 );
+		add_action( 'init', array( $this, 'init' ), 100 );
 	}
 
-	public function wp_init() {
-		do_action( 'tenup-content-connect-init', $this->registry );
+	/**
+	 * Initializes the plugin and fires an action other plugins can hook into.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		do_action( 'tenup-content-connect-init', $this->registry ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	}
 
+	/**
+	 * Define plugin constants.
+	 *
+	 * @return void
+	 */
+	public function define_constants() {
+
+		if ( ! defined( 'CONTENT_CONNECT_VERSION' ) ) {
+			define( 'CONTENT_CONNECT_VERSION', '2.0.0' );
+		}
+
+		if ( ! defined( 'CONTENT_CONNECT_URL' ) ) {
+			define( 'CONTENT_CONNECT_URL', plugin_dir_url( __DIR__ ) );
+		}
+
+		if ( ! defined( 'CONTENT_CONNECT_PATH' ) ) {
+			define( 'CONTENT_CONNECT_PATH', plugin_dir_path( __DIR__ ) );
+		}
+	}
+
+	/**
+	 * Register the tables for the plugin.
+	 *
+	 * @return void
+	 */
 	public function register_tables() {
 		$this->tables['p2p'] = new PostToPost();
 		$this->tables['p2p']->setup();
@@ -124,5 +121,4 @@ class Plugin {
 		$this->tables['p2u'] = new PostToUser();
 		$this->tables['p2u']->setup();
 	}
-
 }

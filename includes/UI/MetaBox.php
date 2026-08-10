@@ -16,8 +16,14 @@ class MetaBox {
 		if ( ! $post instanceof \WP_Post ) {
 			return;
 		}
-		
-		// If we have any relationships to show on this page, their data will be injected here by filters
+
+		/**
+		 * Filter the relationship data for a post.
+		 *
+		 * @param  array    $relationships Empty array by default.
+		 * @param  \WP_Post $post          The post object.
+		 * @return array
+		 */
 		$relationships = apply_filters( 'tenup_content_connect_post_relationship_data', array(), $post );
 
 		$relationship_data = array(
@@ -32,9 +38,9 @@ class MetaBox {
 			return;
 		}
 
-		\add_meta_box( 'tenup-content-connect-relationships', __( "Relationships", "wp-content-connect" ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
+		\add_meta_box( 'tenup-content-connect-relationships', __( 'Relationships', 'wp-content-connect' ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 
-		wp_enqueue_script( 'tenup-content-connect', Plugin::instance()->url . 'assets/js/content-connect.js', array(), Plugin::instance()->version, true );
+		wp_enqueue_script( 'tenup-content-connect', CONTENT_CONNECT_URL . 'assets/js/content-connect.js', array(), CONTENT_CONNECT_VERSION, true );
 		wp_localize_script( 'tenup-content-connect', 'ContentConnectData', apply_filters( 'tenup_content_connect_localize_data', $relationship_data ) );
 	}
 
@@ -46,7 +52,7 @@ class MetaBox {
 	}
 
 	public function save_post( $post_id ) {
-		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( $_POST['tenup-content-connect-save' ], 'content-connect-save' ) ) {
+		if ( ! isset( $_POST['tenup-content-connect-save'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tenup-content-connect-save'] ) ), 'content-connect-save' ) ) {
 			return false;
 		}
 
@@ -60,16 +66,26 @@ class MetaBox {
 
 		$registry = Plugin::instance()->get_registry();
 
-		$relationships = json_decode( wp_unslash( $_POST['tenup-content-connect-relationships'] ), true );
+		$raw_relationships = wp_unslash( $_POST['tenup-content-connect-relationships'] );
+
+		if ( ! is_string( $raw_relationships ) ) {
+			return false;
+		}
+
+		$relationships = json_decode( $raw_relationships, true );
 
 		if ( ! is_array( $relationships ) ) {
 			return false;
 		}
 
 		foreach ( $relationships as $relationship_data ) {
-			$relationship = null;
+			if ( empty( $relationship_data['reltype'] ) || empty( $relationship_data['relid'] ) ) {
+				continue;
+			}
 
-			switch( $relationship_data['reltype'] ) {
+			$relationship = false;
+
+			switch ( $relationship_data['reltype'] ) {
 				case 'post-to-post':
 					$relationship = $registry->get_post_to_post_relationship_by_key( $relationship_data['relid'] );
 					break;
@@ -87,13 +103,11 @@ class MetaBox {
 
 			// Determine save direction and call proper save function
 			$post_type = get_post_type( $post_id );
-			if ( $relationship->from_ui->render_post_type === $post_type ) {
+			if ( is_object( $relationship->from_ui ) && $relationship->from_ui->render_post_type === $post_type ) {
 				$relationship->from_ui->handle_save( $relationship_data, $post_id );
-			} else if ( is_object( $relationship->to_ui ) && $relationship->to_ui->render_post_type === $post_type ) {
+			} elseif ( is_object( $relationship->to_ui ) && $relationship->to_ui->render_post_type === $post_type ) {
 				$relationship->to_ui->handle_save( $relationship_data, $post_id );
 			}
-
 		}
 	}
-
 }

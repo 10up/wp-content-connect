@@ -1,10 +1,11 @@
 <?php
+/**
+ * PHPUnit bootstrap file
+ *
+ * @package TenUp\ContentConnect\Tests\Integration
+ */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
-
-if ( ! $_tests_dir ) {
-	$_tests_dir = '/tmp/wordpress-tests-lib';
-}
 
 // Load Composer autoloader.
 $plugin_dir = dirname( __DIR__, 2 );

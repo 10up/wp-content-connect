@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
@@ -18,11 +18,20 @@
     "build": "node build.js",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
     "archive": "composer archive --no-interaction --file=$npm_package_name --format=zip --dir=release",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
-    "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
+    "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
+    "wp-env:start": "wp-env start",
+    "wp-env:stop": "wp-env stop",
+    "wp-env:clean": "wp-env clean all",
+    "wp-env:destroy": "wp-env destroy",
+    "test:setup": "npm run wp-env:start",
+    "test": "npm run test:unit",
+    "test:unit": "vendor/bin/phpunit -c phpunit.unit.xml",
+    "test:integration": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.integration.xml'",
+    "test:all": "npm run test:unit && npm run test:integration"
   },
   "devDependencies": {
+    "@wordpress/env": "^9.0.0",
     "babel-core": "^6.26.3",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",

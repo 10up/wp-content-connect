@@ -1,9 +1,17 @@
 <?php
 
-namespace TenUp\ContentConnect\API;
+namespace TenUp\ContentConnect\API\V1;
 
 use TenUp\ContentConnect\Plugin;
 
+/**
+ * Legacy REST API search endpoint.
+ *
+ * @deprecated 2.0.0 Use REST API V2 endpoints instead:
+ *                   - GET /content-connect/v2/relationships
+ *                   - GET /content-connect/v2/post/{id}/relationships
+ *                   - GET/POST/PUT/DELETE /content-connect/v2/post/{id}/related
+ */
 class Search {
 
 	public function setup() {
@@ -128,7 +136,7 @@ class Search {
 		 * Filters the search users query args.
 		 *
 		 * @since  1.5.0
-		 * @param  array $query_args The \WP_Query args.
+		 * @param  array $query_args The \WP_User_Query args.
 		 * @param  array $args       Optional. The search users args. Default empty.
 		 * @return array
 		 */

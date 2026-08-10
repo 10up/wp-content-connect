@@ -49,7 +49,7 @@ class PostToPost extends Relationship {
 		$this->from = $from;
 		$this->to = $to;
 		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
-		
+
 		parent::__construct( $name, $args );
 	}
 
@@ -234,7 +234,7 @@ class PostToPost extends Relationship {
 				'order' => $order
 			);
 		}
-		
+
 		$fields = array(
 			'id1' => '%d',
 			'id2' => '%d',

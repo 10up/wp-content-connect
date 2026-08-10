@@ -1,20 +1,66 @@
 <?php
+/**
+ * Base test case for Content Connect integration tests.
+ *
+ * @package TenUp\ContentConnect\Tests\Integration
+ */
 
 namespace TenUp\ContentConnect\Tests\Integration;
 
+use TenUp\ContentConnect\Plugin;
+use TenUp\ContentConnect\Registry;
 use TenUp\ContentConnect\Relationships\PostToPost;
 use TenUp\ContentConnect\Relationships\PostToUser;
+use function TenUp\ContentConnect\Helpers\get_registry;
 
-class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
+/**
+ * Base test case class for Content Connect integration tests.
+ *
+ * Provides common setup methods and test data helpers.
+ */
+class ContentConnectTestCase extends \WP_UnitTestCase {
 
+	/**
+	 * Sets up the test suite before any tests run.
+	 *
+	 * @return void
+	 */
 	public static function setUpBeforeClass(): void {
-		self::insert_dummy_data();
 		self::register_post_types();
-
 		parent::setUpBeforeClass();
 	}
 
-	public static function insert_dummy_data() {
+	/**
+	 * Sets up the test environment.
+	 *
+	 * @return void
+	 */
+	public function setUp(): void {
+		parent::setUp();
+
+		// Ensure the plugin and registry are initialized
+		$plugin = Plugin::instance();
+		if ( empty( $plugin->registry ) ) {
+			$plugin->registry = new Registry();
+			$plugin->registry->setup();
+		}
+
+		// Ensure custom tables are created/upgraded
+		if ( ! empty( $plugin->tables ) ) {
+			foreach ( $plugin->tables as $table ) {
+				$table->upgrade( true );
+			}
+		}
+
+		self::insert_dummy_data();
+	}
+
+	/**
+	 * Inserts dummy post and user data for testing.
+	 *
+	 * @return void
+	 */
+	public static function insert_dummy_data(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->posts}" );
@@ -24,10 +70,15 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$wpdb->query( "INSERT INTO `{$wpdb->users}` " . file_get_contents( __DIR__ . '/data/users.sql' ) );
 	}
 
-	public static function register_post_types() {
+	/**
+	 * Registers custom post types needed for testing.
+	 *
+	 * @return void
+	 */
+	public static function register_post_types(): void {
 		$post_types = array(
 			'car',
-			'tire'
+			'tire',
 		);
 
 		foreach ( $post_types as $post_type ) {
@@ -38,29 +89,83 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 	/**
-	 * Adds known relationships that we can then test against
+	 * Adds known post-to-post relationships that can be used for testing.
 	 *
 	 * Post Type to Post ID Mapping:
+	 * - Post Type Post: 1-10
+	 * - Post Type Car:  11-20
+	 * - Post Type Tire: 21-30
 	 *
-	 * Post Type Post: 1-10
-	 * Post Type Car:  11-20
-	 * Post Type Tire: 21-30
+	 * @return void
 	 */
-	public function add_post_relations() {
+	public function add_post_relations(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_post;" );
 
-		// post to post "basic" name
-		$ppb = new PostToPost( 'post', 'post', 'basic' );
-		// post to post "complex" name
-		$ppc = new PostToPost( 'post', 'post', 'complex' );
-		$pcb = new PostToPost( 'post', 'car', 'basic' );
-		$pcc = new PostToPost( 'post', 'car', 'complex' );
-		$ptb = new PostToPost( 'post', 'tire', 'basic' );
-		$ptc = new PostToPost( 'post', 'tire', 'complex' );
-		$ctb = new PostToPost( 'car', 'tire', 'basic' );
-		$ctc = new PostToPost( 'car', 'tire', 'complex' );
+		$registry = get_registry();
+
+		// Register relationships in the registry
+		try {
+			$registry->define_post_to_post( 'post', 'post', 'basic' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'post', 'complex' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'car', 'basic' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'car', 'complex' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'tire', 'basic' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'tire', 'complex' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'car', 'tire', 'basic' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'car', 'tire', 'complex' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'post', 'page1' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_post( 'post', 'post', 'page2' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+
+		// Get relationship objects from registry to add actual relationships
+		$ppb = $registry->get_post_to_post_relationship( 'post', 'post', 'basic' );
+		$ppc = $registry->get_post_to_post_relationship( 'post', 'post', 'complex' );
+		$pcb = $registry->get_post_to_post_relationship( 'post', 'car', 'basic' );
+		$pcc = $registry->get_post_to_post_relationship( 'post', 'car', 'complex' );
+		$ptb = $registry->get_post_to_post_relationship( 'post', 'tire', 'basic' );
+		$ptc = $registry->get_post_to_post_relationship( 'post', 'tire', 'complex' );
+		$ctb = $registry->get_post_to_post_relationship( 'car', 'tire', 'basic' );
+		$ctc = $registry->get_post_to_post_relationship( 'car', 'tire', 'complex' );
 
 		$ppb->add_relationship( 1, 2 );
 		$ppb->add_relationship( 1, 3 );
@@ -78,11 +183,11 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$ctc->add_relationship( 13, 23 );
 
 		// for pagination tests, we'll use "page1" and "page2" names to make sure we have different names
-		$p1 = new PostToPost( 'post', 'post', 'page1' );
-		$p2 = new PostToPost( 'post', 'post', 'page2' );
+		$p1 = $registry->get_post_to_post_relationship( 'post', 'post', 'page1' );
+		$p2 = $registry->get_post_to_post_relationship( 'post', 'post', 'page2' );
 
 		for ( $i = 35; $i <= 90; $i++ ) {
-			switch( $i % 4 ) {
+			switch ( $i % 4 ) {
 				case 0:
 					$p1->add_relationship( 31, $i );
 					break;
@@ -99,15 +204,45 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		}
 	}
 
-	public function add_user_relations() {
+	/**
+	 * Adds known post-to-user relationships that can be used for testing.
+	 *
+	 * @return void
+	 */
+	public function add_user_relations(): void {
 		global $wpdb;
 
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}post_to_user;" );
 
-		$postowner = new PostToUser( 'post', 'owner' );
-		$postcontrib = new PostToUser( 'post', 'contrib' );
-		$carowner = new PostToUser( 'car', 'owner' );
-		$carcontrib = new PostToUser( 'car', 'contrib' );
+		$registry = get_registry();
+
+		// Register relationships in the registry
+		try {
+			$registry->define_post_to_user( 'post', 'owner' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_user( 'post', 'contrib' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_user( 'car', 'owner' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+		try {
+			$registry->define_post_to_user( 'car', 'contrib' );
+		} catch ( \Exception $e ) {
+			// Relationship might already exist, that's okay
+		}
+
+		// Get relationship objects from registry to add actual relationships
+		$postowner   = $registry->get_post_to_user_relationship( 'post', 'owner' );
+		$postcontrib = $registry->get_post_to_user_relationship( 'post', 'contrib' );
+		$carowner    = $registry->get_post_to_user_relationship( 'car', 'owner' );
+		$carcontrib  = $registry->get_post_to_user_relationship( 'car', 'contrib' );
 
 		$postowner->add_relationship( 1, 1 );
 		$postowner->add_relationship( 2, 1 );
@@ -174,5 +309,33 @@ class ContentConnectTestCase extends \PHPUnit\Framework\TestCase {
 		$carcontrib->add_relationship( 15, 3 );
 	}
 
-}
+	/**
+	 * Cleans up after each test.
+	 *
+	 * Resets the registry and unregisters relationship UI hooks to ensure test isolation.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		$plugin           = Plugin::instance();
+		$plugin->registry = new Registry();
+		$plugin->registry->setup();
 
+		foreach ( $plugin->registry->get_post_to_post_relationships() as $relationship ) {
+			if ( ! empty( $relationship->from_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->from_ui, 'filter_data' ), 10 );
+			}
+			if ( ! empty( $relationship->to_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->to_ui, 'filter_data' ), 10 );
+			}
+		}
+
+		foreach ( $plugin->registry->get_post_to_user_relationships() as $relationship ) {
+			if ( ! empty( $relationship->from_ui ) ) {
+				remove_filter( 'tenup_content_connect_post_relationship_data', array( $relationship->from_ui, 'filter_data' ), 10 );
+			}
+		}
+
+		parent::tearDown();
+	}
+}
