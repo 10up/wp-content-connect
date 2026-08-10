@@ -29,7 +29,7 @@ class Relationships extends AbstractRoute {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(
 						'rel_type'     => array(
-							'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
+							'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'post-to-post',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -37,7 +37,7 @@ class Relationships extends AbstractRoute {
 							'enum'              => array( 'post-to-post', 'post-to-user' ),
 						),
 						'filter_by'    => array(
-							'description'       => __( 'The criteria to filter relationships by.', 'tenup-content-connect' ),
+							'description'       => __( 'The criteria to filter relationships by.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'any',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -45,7 +45,7 @@ class Relationships extends AbstractRoute {
 							'enum'              => array( 'key', 'post_type', 'from', 'to', 'any' ),
 						),
 						'filter_value' => array(
-							'description'       => __( 'The value to use with the selected filter.', 'tenup-content-connect' ),
+							'description'       => __( 'The value to use with the selected filter.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -136,7 +136,7 @@ class Relationships extends AbstractRoute {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view relationships for this type.', 'tenup-content-connect' ),
+				__( 'Sorry, you are not allowed to view relationships for this type.', 'wp-content-connect' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -168,7 +168,7 @@ class Relationships extends AbstractRoute {
 			return new \WP_Error(
 				'rest_invalid_param',
 				/* translators: %s: filter value */
-				sprintf( __( '%s is not valid for post-to-user relationships', 'tenup-content-connect' ), $value ),
+				sprintf( __( '%s is not valid for post-to-user relationships', 'wp-content-connect' ), $value ),
 				array( 'status' => 400 )
 			);
 		}

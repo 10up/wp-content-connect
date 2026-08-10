@@ -26,7 +26,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	public function get_route_params() {
 		return array(
 			'id'       => array(
-				'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
+				'description'       => __( 'The current post ID.', 'wp-content-connect' ),
 				'type'              => 'integer',
 				'sanitize_callback' => 'absint',
 				'validate_callback' => 'rest_validate_request_arg',
@@ -34,7 +34,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 				'minimum'           => 1,
 			),
 			'rel_key'  => array(
-				'description'       => __( 'The relationship key.', 'tenup-content-connect' ),
+				'description'       => __( 'The relationship key.', 'wp-content-connect' ),
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 				'validate_callback' => 'rest_validate_request_arg',
@@ -42,7 +42,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 				'minLength'         => 1,
 			),
 			'rel_type' => array(
-				'description'       => __( 'The relationship type.', 'tenup-content-connect' ),
+				'description'       => __( 'The relationship type.', 'wp-content-connect' ),
 				'type'              => 'string',
 				'default'           => 'post-to-post',
 				'sanitize_callback' => 'sanitize_text_field',

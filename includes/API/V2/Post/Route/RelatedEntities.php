@@ -29,7 +29,7 @@ class RelatedEntities extends AbstractPostRoute {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(
 						'post_status' => array(
-							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'tenup-content-connect' ),
+							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'wp-content-connect' ),
 							'type'              => 'array',
 							'default'           => 'publish',
 							'sanitize_callback' => function ( $value ) {
@@ -45,7 +45,7 @@ class RelatedEntities extends AbstractPostRoute {
 							),
 						),
 						'page'        => array(
-							'description'       => __( 'Current page of the collection.', 'tenup-content-connect' ),
+							'description'       => __( 'Current page of the collection.', 'wp-content-connect' ),
 							'type'              => 'integer',
 							'default'           => 1,
 							'sanitize_callback' => 'absint',
@@ -53,7 +53,7 @@ class RelatedEntities extends AbstractPostRoute {
 							'minimum'           => 1,
 						),
 						'per_page'    => array(
-							'description'       => __( 'Maximum number of items to be returned in result set.', 'tenup-content-connect' ),
+							'description'       => __( 'Maximum number of items to be returned in result set.', 'wp-content-connect' ),
 							'type'              => 'integer',
 							'default'           => 10,
 							'minimum'           => 1,
@@ -62,7 +62,7 @@ class RelatedEntities extends AbstractPostRoute {
 							'validate_callback' => 'rest_validate_request_arg',
 						),
 						'order'       => array(
-							'description'       => __( 'Order sort attribute ascending or descending.', 'tenup-content-connect' ),
+							'description'       => __( 'Order sort attribute ascending or descending.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'asc',
 							'enum'              => array( 'asc', 'desc' ),
@@ -70,7 +70,7 @@ class RelatedEntities extends AbstractPostRoute {
 							'validate_callback' => 'rest_validate_request_arg',
 						),
 						'orderby'     => array(
-							'description'       => __( 'Sort collection by relationship or object attribute.', 'tenup-content-connect' ),
+							'description'       => __( 'Sort collection by relationship or object attribute.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'relationship',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -84,7 +84,7 @@ class RelatedEntities extends AbstractPostRoute {
 					'permission_callback' => array( $this, 'update_items_permissions_check' ),
 					'args'                => array(
 						'related_ids' => array(
-							'description'       => __( 'List of related IDs.', 'tenup-content-connect' ),
+							'description'       => __( 'List of related IDs.', 'wp-content-connect' ),
 							'type'              => 'array',
 							'default'           => array(),
 							'sanitize_callback' => 'wp_parse_id_list',
@@ -101,7 +101,7 @@ class RelatedEntities extends AbstractPostRoute {
 					'permission_callback' => array( $this, 'add_item_permissions_check' ),
 					'args'                => array(
 						'related_id' => array(
-							'description'       => __( 'The related ID.', 'tenup-content-connect' ),
+							'description'       => __( 'The related ID.', 'wp-content-connect' ),
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
 							'validate_callback' => 'rest_validate_request_arg',
@@ -114,7 +114,7 @@ class RelatedEntities extends AbstractPostRoute {
 					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
 					'args'                => array(
 						'related_id' => array(
-							'description'       => __( 'The related ID.', 'tenup-content-connect' ),
+							'description'       => __( 'The related ID.', 'wp-content-connect' ),
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
 							'validate_callback' => 'rest_validate_request_arg',
@@ -168,7 +168,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( $page > $max_pages && $total > 0 ) {
 			return new \WP_Error(
 				'rest_post_invalid_page_number',
-				__( 'The page number requested is larger than the number of pages available.', 'tenup-content-connect' ),
+				__( 'The page number requested is larger than the number of pages available.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -225,7 +225,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to retrieve related entities for this post.', 'tenup-content-connect' ),
+				__( 'Sorry, you are not allowed to retrieve related entities for this post.', 'wp-content-connect' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -288,7 +288,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_cannot_edit',
-				__( 'Sorry, you are not allowed to update this post.', 'tenup-content-connect' ),
+				__( 'Sorry, you are not allowed to update this post.', 'wp-content-connect' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -323,7 +323,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( empty( $related_id ) ) {
 			return new \WP_Error(
 				'rest_invalid_param',
-				__( 'No related entity provided.', 'tenup-content-connect' ),
+				__( 'No related entity provided.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -389,7 +389,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( empty( $related_id ) ) {
 			return new \WP_Error(
 				'rest_invalid_param',
-				__( 'No related entity provided.', 'tenup-content-connect' ),
+				__( 'No related entity provided.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -447,7 +447,7 @@ class RelatedEntities extends AbstractPostRoute {
 				'rest_invalid_param',
 				sprintf(
 					/* translators: %s: valid values */
-					__( 'Invalid orderby value. Must be one of: %s', 'tenup-content-connect' ),
+					__( 'Invalid orderby value. Must be one of: %s', 'wp-content-connect' ),
 					implode( ', ', $valid_values )
 				),
 				array( 'status' => 400 )
@@ -505,7 +505,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( empty( $relationship ) ) {
 			return new \WP_Error(
 				'rest_relationship_not_found',
-				__( 'The requested relationship was not found.', 'tenup-content-connect' ),
+				__( 'The requested relationship was not found.', 'wp-content-connect' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -535,7 +535,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( $related_id <= 0 ) {
 			return new \WP_Error(
 				'rest_invalid_related_id',
-				__( 'Invalid related ID.', 'tenup-content-connect' ),
+				__( 'Invalid related ID.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -544,7 +544,7 @@ class RelatedEntities extends AbstractPostRoute {
 			if ( ! get_userdata( $related_id ) ) {
 				return new \WP_Error(
 					'rest_invalid_related_id',
-					__( 'Related user does not exist.', 'tenup-content-connect' ),
+					__( 'Related user does not exist.', 'wp-content-connect' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -557,7 +557,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( ! $related_post ) {
 			return new \WP_Error(
 				'rest_invalid_related_id',
-				__( 'Related post does not exist.', 'tenup-content-connect' ),
+				__( 'Related post does not exist.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -567,7 +567,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( ! in_array( $related_post->post_type, $allowed_types, true ) ) {
 			return new \WP_Error(
 				'rest_invalid_related_post_type',
-				__( 'Related post type is not part of this relationship.', 'tenup-content-connect' ),
+				__( 'Related post type is not part of this relationship.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -581,7 +581,7 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( ! ( ( $post_is_from && $other_is_to ) || ( $post_is_to && $other_is_from ) ) ) {
 			return new \WP_Error(
 				'rest_invalid_related_post_type',
-				__( 'Related post type is not part of this relationship.', 'tenup-content-connect' ),
+				__( 'Related post type is not part of this relationship.', 'wp-content-connect' ),
 				array( 'status' => 400 )
 			);
 		}
