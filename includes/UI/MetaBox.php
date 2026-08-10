@@ -38,7 +38,7 @@ class MetaBox {
 			return;
 		}
 
-		\add_meta_box( 'tenup-content-connect-relationships', __( 'Relationships', 'tenup-content-connect' ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
+		\add_meta_box( 'tenup-content-connect-relationships', __( 'Relationships', 'wp-content-connect' ), array( $this, 'render' ), $post_type, 'advanced', 'high' );
 	}
 
 	public function render( $post, $metabox ) {

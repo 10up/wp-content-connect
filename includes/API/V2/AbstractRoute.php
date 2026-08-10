@@ -59,7 +59,7 @@ abstract class AbstractRoute {
 
 		$error = new \WP_Error(
 			'rest_post_invalid_id',
-			__( 'Invalid post ID.', 'tenup-content-connect' ),
+			__( 'Invalid post ID.', 'wp-content-connect' ),
 			array( 'status' => 404 )
 		);
 
@@ -88,7 +88,7 @@ abstract class AbstractRoute {
 
 		$error = new \WP_Error(
 			'rest_user_invalid_id',
-			__( 'Invalid user ID.', 'tenup-content-connect' ),
+			__( 'Invalid user ID.', 'wp-content-connect' ),
 			array( 'status' => 404 )
 		);
 
