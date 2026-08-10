@@ -22,7 +22,7 @@
     "lint-style": "10up-toolkit lint-style",
     "test": "10up-toolkit test-unit-jest",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "archive": "mkdir -p release && composer archive --file=release/$npm_package_name --format=zip",
     "wp-env:start": "wp-env start",
     "wp-env:stop": "wp-env stop",
     "wp-env:clean": "wp-env clean all",
