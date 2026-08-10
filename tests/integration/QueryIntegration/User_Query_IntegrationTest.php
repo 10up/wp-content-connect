@@ -11,7 +11,7 @@ use TenUp\ContentConnect\Tests\Integration\ContentConnectTestCase;
 
 class User_Query_IntegrationTest extends ContentConnectTestCase {
 
-	public function setUp() {
+	public function setUp(): void {
 		global $wpdb;
 
 		$wpdb->query( "delete from {$wpdb->prefix}post_to_post" );
@@ -31,7 +31,7 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$registry->define_post_to_user( 'post', 'contrib' );
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 	}
 
@@ -262,6 +262,13 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 2, 3 ), $query->get_results() );
 
 		$rel->save_post_to_user_sort_data( 5, array( 3, 2 ) );
+
+		// Saving sort order writes the relationship junction table directly, which does not
+		// bump the users cache's last_changed key. WP_User_Query would otherwise serve the
+		// first query's cached result for these identical args. Flush so the re-saved order
+		// is read back from the database.
+		wp_cache_flush();
+
 		$query = new \WP_User_Query( $args );
 		$this->assertEquals( array( 3, 2 ), $query->get_results() );
 	}

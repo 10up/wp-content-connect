@@ -3,10 +3,15 @@
 		bootstrap="tests/integration/bootstrap.php"
 		backupGlobals="false"
 		colors="true"
+		convertDeprecationsToExceptions="true"
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
 		convertWarningsToExceptions="true"
 >
+	<php>
+		<const name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="vendor/yoast/phpunit-polyfills"/>
+	</php>
+
 	<testsuites>
 		<testsuite name="integration">
 			<directory>tests/integration</directory>
