@@ -350,4 +350,35 @@ class RelationshipsTest extends ContentConnectTestCase {
 		$this->assertArrayHasKey( 'sortable', $relationship['to'] );
 		$this->assertArrayHasKey( 'enable_ui', $relationship['to'] );
 	}
+
+	/**
+	 * Tests that post-to-post relationships expose max_items for from and to.
+	 *
+	 * @return void
+	 */
+	public function test_post_to_post_includes_max_items() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-max' );
+
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-max' );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'filter_by', 'key' );
+		$request->set_param( 'filter_value', $rel_key );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( $rel_key, $data );
+
+		$relationship = $data[ $rel_key ];
+		$this->assertArrayHasKey( 'max_items', $relationship['from'] );
+		$this->assertArrayHasKey( 'max_items', $relationship['to'] );
+		$this->assertIsInt( $relationship['from']['max_items'] );
+		$this->assertIsInt( $relationship['to']['max_items'] );
+		$this->assertSame( 100, $relationship['from']['max_items'] );
+		$this->assertSame( 100, $relationship['to']['max_items'] );
+	}
 }
