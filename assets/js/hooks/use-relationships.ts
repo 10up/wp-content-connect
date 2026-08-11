@@ -14,7 +14,7 @@ export function useRelationships(
 		(select) => {
 			const params = [postId, options] as const;
 			const relationships = select(store).getRelationships(...params);
-			// @ts-expect-error - The hasFinishedResolution method is a meta-method that coming
+			// @ts-expect-error - The hasFinishedResolution method is a meta-method that comes
 			// from WordPress. Because of that, it's not typed correctly in our custom store.
 			const hasResolved: boolean = select(store).hasFinishedResolution('getRelationships', params);
 

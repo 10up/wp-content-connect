@@ -2,7 +2,8 @@
 	"core": "WordPress/WordPress#master",
 	"phpVersion": "8.2",
 	"plugins": [
-		"."
+		".",
+		"./tests/plugin/content-connect-example-data"
 	],
 	"mappings": {
 		"wp-content/plugins/wp-content-connect": "."
@@ -10,6 +11,9 @@
 	"config": {
 		"WP_DEBUG": true,
 		"SCRIPT_DEBUG": true
+	},
+	"lifecycleScripts": {
+		"afterStart": "wp-env run tests-cli wp content-connect-example generate"
 	}
 }
 

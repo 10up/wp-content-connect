@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
@@ -22,13 +22,17 @@
     "lint-style": "10up-toolkit lint-style",
     "test": "10up-toolkit test-unit-jest",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "archive": "mkdir -p release && composer archive --file=release/$npm_package_name --format=zip",
     "wp-env:start": "wp-env start",
     "wp-env:stop": "wp-env stop",
     "wp-env:clean": "wp-env clean all",
     "wp-env:destroy": "wp-env destroy",
     "test:setup": "npm run wp-env:start",
-    "test:php": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'"
+    "test:php": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'",
+    "test:e2e": "playwright test --config=tests/e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config=tests/e2e/playwright.config.ts --ui",
+    "test:e2e:setup": "npm run wp-env:start && wp-env run tests-cli wp content-connect-example generate",
+    "test:e2e:reset": "wp-env run tests-cli wp content-connect-example delete --yes && wp-env run tests-cli wp content-connect-example generate"
   },
   "dependencies": {
     "@10up/block-components": "^1.22.1",
@@ -42,7 +46,9 @@
     }
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
     "@wordpress/api-fetch": "^7.18.0",
+    "@wordpress/e2e-test-utils-playwright": "^1.39.0",
     "@wordpress/data": "^10.18.0",
     "@wordpress/edit-post": "^8.18.0",
     "@wordpress/editor": "^14.18.0",

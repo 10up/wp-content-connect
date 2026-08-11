@@ -15,7 +15,7 @@ export function useRelatedEntities(postId: number, options: GetRelatedEntitiesOp
 		(select) => {
 			const params = [postId, options] as const;
 			const relatedEntities = select(store).getRelatedEntities(...params);
-			// @ts-expect-error - The hasFinishedResolution method is a meta-method that coming
+			// @ts-expect-error - The hasFinishedResolution method is a meta-method that comes
 			// from WordPress. Because of that, it's not typed correctly in our custom store.
 			const hasResolved: boolean = select(store).hasFinishedResolution('getRelatedEntities', params);
 

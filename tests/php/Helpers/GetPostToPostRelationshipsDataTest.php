@@ -117,4 +117,41 @@ class GetPostToPostRelationshipsDataTest extends ContentConnectTestCase {
 			}
 		}
 	}
+
+	/**
+	 * Tests the "to" side of an asymmetric relationship.
+	 *
+	 * Defines a car -> tire relationship, then queries a tire post. Because the queried post's
+	 * type (tire) differs from the relationship's "from" type (car), this exercises the else
+	 * branch of get_post_to_post_relationships_data(), where the related post type must resolve
+	 * to the "from" side (car) rather than the "to" side (tire).
+	 *
+	 * @return void
+	 */
+	public function test_returns_to_side_data_for_asymmetric_relationship() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'car', 'tire', 'to-side' );
+
+		// 21 is a tire post (dummy data: cars 11-20, tires 21-30); tire is the relationship's "to" side.
+		$result = get_post_to_post_relationships_data( 21 );
+
+		$this->assertIsArray( $result );
+
+		$car_tire = null;
+		foreach ( $result as $rel_data ) {
+			if ( 'to-side' === $rel_data['rel_name'] ) {
+				$car_tire = $rel_data;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $car_tire, 'Expected the car -> tire relationship queried from the tire (to) side.' );
+
+		// The else branch resolves the related post type to the "from" side (car), proving the
+		// queried tire post was treated as the "to" side.
+		$this->assertSame( array( 'car' ), $car_tire['post_type'] );
+		$this->assertArrayHasKey( 'labels', $car_tire );
+		$this->assertArrayHasKey( 'enable_ui', $car_tire );
+		$this->assertArrayHasKey( 'sortable', $car_tire );
+	}
 }
