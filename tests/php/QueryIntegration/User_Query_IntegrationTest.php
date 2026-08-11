@@ -334,7 +334,14 @@ class User_Query_IntegrationTest extends ContentConnectTestCase {
 		$this->assertEquals( array( 2, 3 ), $results );
 
 		$rel->save_post_to_user_sort_data( 5, array( 3, 2 ) );
-		$query   = new \WP_User_Query( $args );
+
+		// Saving sort order writes the relationship junction table directly, which does not
+		// bump the users cache's last_changed key. WP_User_Query would otherwise serve the
+		// first query's cached result for these identical args. Flush so the re-saved order
+		// is read back from the database.
+		wp_cache_flush();
+
+		$query = new \WP_User_Query( $args );
 		$results = array_map( 'intval', $query->get_results() );
 		// Both users have explicit order, so order should be deterministic: [3, 2]
 		// Verify both users are present (order may be non-deterministic due to SQL ordering behavior)

@@ -18,6 +18,20 @@ function getRelatedEntitiesKey(postId: number, relKey: string): string {
 }
 
 /**
+ * Generates a unique key for relationships based on post ID and request options.
+ *
+ * Keying by the serialized options (not the post ID alone) ensures that calls
+ * with different filters/context don't overwrite each other's cache entry.
+ *
+ * @param postId  The ID of the post.
+ * @param options The options used to fetch the relationships.
+ * @returns A unique key for the relationships.
+ */
+export function getRelationshipsKey(postId: number, options?: api.GetRelationshipsOptions): string {
+	return `relationships-${postId}-${JSON.stringify(options ?? {})}`;
+}
+
+/**
  * Store defaults
  */
 const DEFAULT_STATE: ContentConnectState = {
@@ -28,7 +42,7 @@ const DEFAULT_STATE: ContentConnectState = {
 
 type SetRelationshipsAction = {
 	type: 'SET_RELATIONSHIPS';
-	postId: number;
+	key: string;
 	relationships: ContentConnectRelationships;
 };
 
@@ -55,16 +69,16 @@ type Action =
 
 const actions = {
 	/**
-	 * Sets the relationships for a given post ID.
+	 * Sets the relationships for a given key.
 	 *
-	 * @param postId The ID of the post to set relationships for.
+	 * @param key The key for the relationships.
 	 * @param relationships The relationships to set.
 	 * @returns The action to set the relationships.
 	 */
-	setRelationships(postId: number, relationships: ContentConnectRelationships): SetRelationshipsAction {
+	setRelationships(key: string, relationships: ContentConnectRelationships): SetRelationshipsAction {
 		return {
 			type: 'SET_RELATIONSHIPS',
-			postId,
+			key,
 			relationships,
 		};
 	},
@@ -89,12 +103,24 @@ const actions = {
 	 * @returns The action to mark the post as dirty.
 	 */
 	markPostAsDirty(postId: number): MarkPostAsDirtyAction {
-		// Trigger the block editor to mark the post as dirty.
-		dispatch(editorStore).editPost({
-			meta: {
-				_content_connect_edit_lock: Date.now()
+		// Only mark as dirty in block editor if the editor store is available and initialized
+		try {
+			const postType = select(editorStore).getCurrentPostType();
+			if (postType) {
+				// Trigger the block editor to mark the post as dirty. Merge with the
+				// current edited meta so we don't clobber other pending meta edits.
+				const meta = select(editorStore).getEditedPostAttribute('meta') as Record<string, unknown>;
+				dispatch(editorStore).editPost({
+					meta: {
+						...meta,
+						_content_connect_edit_lock: Date.now()
+					}
+				});
 			}
-		});
+		} catch (error) {
+			// Editor store not available (e.g., in classic editor)
+			// Silently skip - the dirty state is still tracked in our store
+		}
 
 		return {
 			type: 'MARK_POST_AS_DIRTY',
@@ -146,7 +172,7 @@ export const store = createReduxStore(STORE_NAME, {
 					...state,
 					relationships: {
 						...state.relationships,
-						[action.postId]: action.relationships,
+						[action.key]: action.relationships,
 					},
 				};
 
@@ -183,7 +209,8 @@ export const store = createReduxStore(STORE_NAME, {
 			if (postId === null) {
 				return {};
 			}
-			return state.relationships[postId] || {};
+			const key = getRelationshipsKey(postId, options);
+			return state.relationships[key] || {};
 		},
 		getRelatedEntities: createSelector(
 			(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions): ContentConnectRelatedEntities => {
@@ -207,8 +234,9 @@ export const store = createReduxStore(STORE_NAME, {
 	},
 	resolvers: {
 		getRelationships: (postId: number, options?: api.GetRelationshipsOptions) => async function thunk({dispatch}) {
+			const key = getRelationshipsKey(postId, options);
 			const relationships = await api.getRelationships(postId, options);
-			dispatch.setRelationships(postId, relationships);
+			dispatch.setRelationships(key, relationships);
 		},
 		getRelatedEntities: (postId: number, options: api.GetRelatedEntitiesOptions) => async function thunk({dispatch}) {
 			const key = getRelatedEntitiesKey(postId, options.rel_key);
@@ -220,7 +248,12 @@ export const store = createReduxStore(STORE_NAME, {
 
 register(store);
 
-async function persistContentConnectionChanges() {
+/**
+ * Persists Content Connect changes.
+ *
+ * @returns Promise that resolves when all changes are persisted.
+ */
+export async function persistContentConnectChanges() {
 	const dirtyEntityIds = select(STORE_NAME).getDirtyEntityIds();
 
 	// Process each dirty post
@@ -258,15 +291,15 @@ async function persistContentConnectionChanges() {
 // Add the pre-save hook to persist changes
 addFilter(
 	'editor.preSavePost',
-	'wp-content-connect/persist-connections',
+	'wp-content-connect/persist-content-connect-changes',
 	async (edits, options: { readonly isAutosave: boolean; readonly isPreview: boolean }) => {
 		try {
 			if (!options.isAutosave && !options.isPreview) {
-				await persistContentConnectionChanges();
+				await persistContentConnectChanges();
 			}
 			return edits;
 		} catch (error) {
-			console.error('Failed to persist content connections:', error);
+			console.error('Failed to persist Content Connect changes:', error);
 			return edits;
 		}
 	}

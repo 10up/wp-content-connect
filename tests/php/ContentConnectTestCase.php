@@ -312,7 +312,7 @@ class ContentConnectTestCase extends \WP_UnitTestCase {
 	/**
 	 * Cleans up after each test.
 	 *
-	 * Resets the registry to ensure test isolation.
+	 * Resets the registry and unregisters relationship UI hooks to ensure test isolation.
 	 *
 	 * @return void
 	 */

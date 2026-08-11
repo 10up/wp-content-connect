@@ -24,7 +24,7 @@ class Relationships extends AbstractPostRoute {
 			array(
 				'args' => array(
 					'id'        => array(
-						'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
+						'description'       => __( 'The current post ID.', 'wp-content-connect' ),
 						'type'              => 'integer',
 						'sanitize_callback' => 'absint',
 						'validate_callback' => 'rest_validate_request_arg',
@@ -32,7 +32,7 @@ class Relationships extends AbstractPostRoute {
 						'minimum'           => 1,
 					),
 					'rel_type'  => array(
-						'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'default'           => 'any',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -40,14 +40,14 @@ class Relationships extends AbstractPostRoute {
 						'enum'              => array( 'any', 'post-to-post', 'post-to-user' ),
 					),
 					'post_type' => array(
-						'description'       => __( 'The post type to filter relationships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The post type to filter relationships by.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'default'           => '',
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => 'rest_validate_request_arg',
 					),
 					'context'   => array(
-						'description'       => __( 'Scope under which the request is made; determines fields present in response.' ),
+						'description'       => __( 'Scope under which the request is made; determines fields present in response.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_key',
 						'validate_callback' => 'rest_validate_request_arg',
@@ -99,7 +99,7 @@ class Relationships extends AbstractPostRoute {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view relationships for this post.', 'tenup-content-connect' ),
+				__( 'Sorry, you are not allowed to view relationships for this post.', 'wp-content-connect' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -119,7 +119,7 @@ class Relationships extends AbstractPostRoute {
 			if ( ! in_array( $post_type, $post_types, true ) ) {
 				return new \WP_Error(
 					'rest_invalid_post_type',
-					__( 'Invalid post type.', 'tenup-content-connect' ),
+					__( 'Invalid post type.', 'wp-content-connect' ),
 					array( 'status' => 400 )
 				);
 			}

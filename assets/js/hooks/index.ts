@@ -1,2 +1,2 @@
-import './use-relationships';
-import './use-related-entities';
+export * from './use-relationships';
+export * from './use-related-entities';
