@@ -123,6 +123,11 @@ class ClassicEditor {
 		}
 
 		foreach ( $relationships as $rel_key => $relationship ) {
+			// Only surface relationships whose UI is enabled, matching the block editor panel.
+			if ( empty( $relationship['enable_ui'] ) ) {
+				continue;
+			}
+
 			add_meta_box(
 				'wp-content-connect-relationship-' . $rel_key,
 				$relationship['labels']['name'],

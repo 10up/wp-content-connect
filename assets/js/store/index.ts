@@ -27,7 +27,7 @@ function getRelatedEntitiesKey(postId: number, relKey: string): string {
  * @param options The options used to fetch the relationships.
  * @returns A unique key for the relationships.
  */
-function getRelationshipsKey(postId: number, options?: api.GetRelationshipsOptions): string {
+export function getRelationshipsKey(postId: number, options?: api.GetRelationshipsOptions): string {
 	return `relationships-${postId}-${JSON.stringify(options ?? {})}`;
 }
 

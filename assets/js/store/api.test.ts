@@ -56,6 +56,15 @@ describe('getRelatedEntities', () => {
 		expect(path).toContain('rel_key=k');
 		expect(path).toContain('rel_type=post-to-post');
 	});
+
+	it('rethrows and logs when the request fails', async () => {
+		mockApiFetch.mockRejectedValue(new Error('boom'));
+
+		await expect(
+			getRelatedEntities(7, { rel_key: 'k', rel_type: 'post-to-post' }),
+		).rejects.toThrow('boom');
+		expect(console.error).toHaveBeenCalled();
+	});
 });
 
 describe('getAllRelatedEntities', () => {
@@ -91,6 +100,27 @@ describe('getAllRelatedEntities', () => {
 		expect(mockApiFetch).toHaveBeenCalledTimes(1);
 		expect(result).toEqual([]);
 	});
+
+	it('defaults to a single page when the total-pages header is absent', async () => {
+		mockApiFetch.mockResolvedValueOnce({
+			json: jest.fn().mockResolvedValue([{ id: 1, name: 'a', type: 'post', uuid: 'u1' }]),
+			headers: { get: jest.fn().mockReturnValue(null) },
+		});
+
+		const result = await getAllRelatedEntities(9, { rel_key: 'k', rel_type: 'post-to-post' });
+
+		expect(mockApiFetch).toHaveBeenCalledTimes(1);
+		expect(result).toHaveLength(1);
+	});
+
+	it('rethrows and logs when a page request fails', async () => {
+		mockApiFetch.mockRejectedValue(new Error('boom'));
+
+		await expect(
+			getAllRelatedEntities(9, { rel_key: 'k', rel_type: 'post-to-post' }),
+		).rejects.toThrow('boom');
+		expect(console.error).toHaveBeenCalled();
+	});
 });
 
 describe('updateRelatedEntities', () => {
@@ -105,5 +135,14 @@ describe('updateRelatedEntities', () => {
 		expect(args.path).toContain(`${CONTENT_CONNECT_ENDPOINT}/post/3/related`);
 		expect(args.path).toContain('rel_key=mykey');
 		expect(args.path).toContain('rel_type=post-to-post');
+	});
+
+	it('rethrows and logs when the request fails', async () => {
+		mockApiFetch.mockRejectedValue(new Error('boom'));
+
+		await expect(updateRelatedEntities(3, 'mykey', 'post-to-post', [11])).rejects.toThrow(
+			'boom',
+		);
+		expect(console.error).toHaveBeenCalled();
 	});
 });

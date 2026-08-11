@@ -14,7 +14,7 @@ import { select, dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { RelationshipManager } from './components/RelationshipManager';
-import { store, persistContentConnectChanges } from './store';
+import { store, persistContentConnectChanges, getRelationshipsKey } from './store';
 import { ContentConnectRelationship } from './store/types';
 
 /**
@@ -66,13 +66,14 @@ const registerPanels = () => {
 		Object.values(relationshipsMap).forEach((rel) => {
 			relationships[rel.rel_key] = rel;
 		});
-		dispatch(store).setRelationships(postId, relationships);
+		// Key must match what the store selectors/persist layer compose from the
+		// post ID, otherwise persistContentConnectChanges() can't find them on save.
+		dispatch(store).setRelationships(getRelationshipsKey(postId), relationships);
 	}
 
 	// Hook into form submission to persist relationships before save
 	postForm.addEventListener('submit', async (event) => {
 		const dirtyEntityIds = select(store).getDirtyEntityIds();
-		console.log('dirtyEntityIds', dirtyEntityIds);
 
 		// Only intercept if there are unsaved relationship changes
 		if (dirtyEntityIds.length > 0) {

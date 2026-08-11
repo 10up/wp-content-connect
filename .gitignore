@@ -2,6 +2,7 @@
 test-results/
 tests/e2e/.auth/
 tests/e2e/test-results/
+coverage/
 
 # Version Control
 .svn

@@ -38,7 +38,7 @@ class BlockEditorTest extends ContentConnectTestCase {
 		$block_editor = new BlockEditor();
 		$block_editor->enqueue_block_editor_assets();
 
-		$this->assertTrue( wp_script_is( 'wp-content-connect', 'enqueued' ) );
-		$this->assertTrue( wp_style_is( 'wp-content-connect', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'wp-content-connect-block-editor', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'wp-content-connect-admin-styles', 'enqueued' ) );
 	}
 }
