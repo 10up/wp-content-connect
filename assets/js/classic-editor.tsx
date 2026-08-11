@@ -55,7 +55,7 @@ const registerPanels = () => {
 					key={relationshipData.rel_key}
 					postId={postId}
 					relationship={relationshipData}
-				/>
+				/>,
 			);
 		}
 	});
@@ -71,6 +71,29 @@ const registerPanels = () => {
 		dispatch(store).setRelationships(getRelationshipsKey(postId), relationships);
 	}
 
+	// Set while we are intentionally saving so the beforeunload guard below does
+	// not warn on the navigation our own submit triggers.
+	let isSaving = false;
+
+	// Warn before leaving with unsaved Content Connect changes. The block editor
+	// gets this for free by dirtying the editor store (_content_connect_edit_lock);
+	// the classic screen has no such store, so we mirror it with a beforeunload
+	// guard driven by the same dirty state.
+	window.addEventListener('beforeunload', (event) => {
+		if (isSaving) {
+			return;
+		}
+
+		if (select(store).getDirtyEntityIds().length === 0) {
+			return;
+		}
+
+		// Triggers the browser's native "Leave site? Changes you made may not be
+		// saved." prompt. The returnValue text is ignored by modern browsers.
+		event.preventDefault();
+		event.returnValue = '';
+	});
+
 	// Hook into form submission to persist relationships before save
 	postForm.addEventListener('submit', async (event) => {
 		const dirtyEntityIds = select(store).getDirtyEntityIds();
@@ -79,6 +102,10 @@ const registerPanels = () => {
 		if (dirtyEntityIds.length > 0) {
 			event.preventDefault();
 			event.stopPropagation();
+
+			// Saving now: let the post-persist form submit navigate without the
+			// beforeunload guard prompting.
+			isSaving = true;
 
 			try {
 				await persistContentConnectChanges();
@@ -89,6 +116,6 @@ const registerPanels = () => {
 			}
 		}
 	});
-}
+};
 
 domReady(registerPanels);
