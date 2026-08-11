@@ -99,6 +99,12 @@ export class ContentConnectPage {
 	 *
 	 * Since WordPress no longer renders `data-name` on PluginDocumentSettingPanel,
 	 * we expand all collapsed sidebar panels, then verify the target manager is visible.
+	 *
+	 * The plugin's PluginDocumentSettingPanel fills mount asynchronously, after the
+	 * relationships REST request resolves, and they mount collapsed. A single
+	 * expand pass can therefore run before the panels exist and miss them entirely,
+	 * so we poll: on each attempt, expand every currently-collapsed panel and check
+	 * whether the target manager has become visible. This survives the async mount.
 	 */
 	async expandRelationshipPanel(relKey: string): Promise<void> {
 		const manager = this.getRelationshipManager(relKey);
@@ -107,22 +113,26 @@ export class ContentConnectPage {
 		if (await manager.isVisible()) return;
 
 		const sidebar = this.page.locator('.interface-interface-skeleton__sidebar');
+		const closedToggleSelector =
+			'.components-panel__body:not(.is-opened) .components-panel__body-toggle';
 
-		// Expand all collapsed panels at once for speed
-		const closedToggles = sidebar.locator(
-			'.components-panel__body:not(.is-opened) .components-panel__body-toggle'
-		);
-		const count = await closedToggles.count();
-		for (let i = 0; i < count; i++) {
-			// Always click the first closed toggle since previous ones become opened
-			const toggle = sidebar.locator(
-				'.components-panel__body:not(.is-opened) .components-panel__body-toggle'
-			).first();
-			if ((await toggle.count()) === 0) break;
-			await toggle.click();
-		}
+		await expect
+			.poll(
+				async () => {
+					// Expand every currently-collapsed panel. Re-query each time
+					// since expanding one removes it from the collapsed set.
+					const count = await sidebar.locator(closedToggleSelector).count();
+					for (let i = 0; i < count; i++) {
+						const toggle = sidebar.locator(closedToggleSelector).first();
+						if ((await toggle.count()) === 0) break;
+						await toggle.click();
+					}
 
-		await manager.waitFor({ state: 'visible', timeout: TIMEOUTS.PANEL_VISIBLE });
+					return manager.isVisible();
+				},
+				{ timeout: TIMEOUTS.PANEL_VISIBLE }
+			)
+			.toBe(true);
 	}
 
 	getContentPicker(relKey: string): Locator {
