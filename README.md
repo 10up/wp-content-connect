@@ -2,7 +2,16 @@
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
 
-[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v6.7%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.0%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+
+## Requirements
+
+- WordPress 6.8 or later
+- PHP 7.4 or later
+
+## Overview
+
+WP Content Connect defines and manages post-to-post and post-to-user relationships. Relationships are edited in both the **Block Editor** (a relationships panel in the document sidebar) and the **Classic Editor** (relationship meta boxes), and are exposed through a REST API and a set of PHP helper functions. See [REST API](#rest-api), [Helper Functions](#helper-functions), and [Customizing the Block Editor UI](#customizing-the-block-editor-ui).
 
 ## Installation and Usage
 
@@ -20,7 +29,7 @@ or directly in `composer.json`:
 
 ```
   "require": {
-    "10up/wp-content-connect": "^1.6.0"
+    "10up/wp-content-connect": "^2.0.0"
   }
 ```
 
@@ -39,17 +48,17 @@ Alternatively, if you prefer to have composer install it as a plugin, you may re
       "package": {
         "name": "10up/wp-content-connect",
         "type": "wordpress-plugin",
-        "version": "1.6.0",
+        "version": "2.0.0",
         "source": {
           "url": "https://github.com/10up/wp-content-connect.git",
           "type": "git",
-          "reference": "1.6.0"
+          "reference": "2.0.0"
         }
       }
     }
   ],
   "require": {
-    "10up/wp-content-connect": "^1.5",
+    "10up/wp-content-connect": "^2.0",
     "composer/installers": "^1.7"
   },
   "extra": {
@@ -87,11 +96,12 @@ Args expects options for the `from` and `to` sides of the relationship as top le
 
 - `enable_ui` (Bool) - Should the default UI be enabled for the current side of this relationship
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
+- `max_items` (Int) - Maximum number of items that can be selected for the current side of this relationship. Defaults to `100`.
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
 #### Return Value
 
-This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToPost` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToPost` specific to this relationship. The object can then be used to manage related items manually, if required. See the [Manually Managing Relationships](#manually-managing-relationships) section below.
 
 Example:
 
@@ -138,11 +148,12 @@ Args expects options for the `from` (post type) side of the relationship as a to
 
 - `enable_ui` (Bool) - Should the default UI be enabled for the current side of this relationship
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
+- `max_items` (Int) - Maximum number of items that can be selected for the current side of this relationship. Defaults to `100`.
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
 #### Return Value
 
-This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToUser` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToUser` specific to this relationship. The object can then be used to manage related items manually, if required. See the [Manually Managing Relationships](#manually-managing-relationships) section below.
 
 Example:
 
@@ -474,6 +485,36 @@ User ID 1 has 5 posts that need to be stored in the following order: 4, 2, 7, 9,
 // $relationship is the return value from ->define_post_to_user()
 $relationship->save_user_to_post_sort_data( 1, array( 4, 2, 7, 9, 8 ) );
 ```
+
+## REST API
+
+Content Connect registers a set of `content-connect/v2` REST endpoints used by the editor UIs. They are also available for your own integrations. All endpoints are capability-gated (`edit_posts` / `edit_post`).
+
+- `GET /content-connect/v2/relationships` — List registered relationships. Query args: `rel_type` (`post-to-post` | `post-to-user`), `filter_by` (`key` | `post_type` | `from` | `to` | `any`), `filter_value`.
+- `GET /content-connect/v2/post/<id>/relationships` — Relationships defined for a post. Query args: `rel_type` (`any` | `post-to-post` | `post-to-user`), `post_type`, `context` (`view` | `embed`).
+- `GET /content-connect/v2/post/<id>/related` — Related posts/users for a post. Supports pagination (`page`, `per_page`, `X-WP-Total` / `X-WP-TotalPages` headers), `order`, and `orderby` (including `relationship`). Requires `rel_key` and `rel_type`.
+- `POST /content-connect/v2/post/<id>/related` — Replace the full set of related items with `related_ids`.
+- `PUT /content-connect/v2/post/<id>/related` — Add a single related item (`related_id`).
+- `DELETE /content-connect/v2/post/<id>/related` — Remove a single related item (`related_id`).
+
+Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links.
+
+> The legacy `POST /content-connect/v1/search` endpoint is **deprecated** as of 2.0.0. Use the v2 endpoints above.
+
+## Helper Functions
+
+Content Connect ships namespaced helper functions in `TenUp\ContentConnect\Helpers` for reading relationship data without touching the database directly:
+
+- `get_plugin()` — The plugin instance.
+- `get_registry()` — The relationship registry instance.
+- `get_related_ids_by_name( $post_id, $relationship_name )` — Related post IDs for a post by relationship name, across post types.
+- `get_post_to_post_relationships_by( $field = 'any', $value = '' )` — Post-to-post relationships filtered by `key`, `post_type`, `from`, `to`, or `any`.
+- `get_post_to_user_relationships_by( $field = 'any', $value = '' )` — Post-to-user relationships filtered by `key`, `post_type`, or `any`.
+- `get_post_relationships_data( $post, $rel_type = 'any', $other_post_type = false, $context = 'view' )` — Combined relationship data for a post.
+- `get_post_to_post_relationships_data( $post, $other_post_type = false, $context = 'view' )` — Post-to-post relationship data for a post.
+- `get_post_to_user_relationships_data( $post, $context = 'view' )` — Post-to-user relationship data for a post.
+
+Pass `$context = 'embed'` to include the actual related posts/users in the returned data (defaults to `'view'` for performance).
 
 ## Customizing the Block Editor UI
 
