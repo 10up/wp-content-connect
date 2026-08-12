@@ -593,4 +593,31 @@ class SearchTest extends ContentConnectTestCase {
 		$this->assertArrayHasKey( 'name', $results['data'][0] );
 		$this->assertTrue( $filter_ran );
 	}
+
+	/**
+	 * Tests that the search endpoint requires the edit_posts capability.
+	 *
+	 * A logged-in user with a valid nonce but without edit_posts (e.g. a
+	 * subscriber) must be rejected.
+	 *
+	 * @return void
+	 */
+	public function test_requires_edit_posts_capability() {
+		$subscriber_id = $this->factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		$request = new \WP_REST_Request( 'POST', '/content-connect/v1/search' );
+		$request->set_body_params(
+			array(
+				'object_type' => 'post',
+				'post_type'   => 'post',
+				'search'      => 'test',
+				'nonce'       => wp_create_nonce( 'content-connect-search' ),
+			)
+		);
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 403, $response->get_status() );
+	}
 }

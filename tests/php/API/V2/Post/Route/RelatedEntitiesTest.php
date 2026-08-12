@@ -722,5 +722,140 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$desc = wp_list_pluck( rest_do_request( $request )->get_data(), 'id' );
 		$this->assertSame( array( $later, $earlier ), $desc );
 	}
+
+	/**
+	 * Tests that adding a related post the current user cannot read is denied.
+	 *
+	 * A user who can edit the source post but lacks read access to the related
+	 * post (e.g. another user's private post) must not be able to relate it.
+	 *
+	 * @return void
+	 */
+	public function test_put_denies_relating_a_post_the_user_cannot_read() {
+		$author_id = $this->factory()->user->create( array( 'role' => 'author' ) );
+
+		$source_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+
+		// Private post owned by another user; the author cannot read it.
+		$private_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'private',
+				'post_author' => $this->user_id,
+			)
+		);
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-farside-read' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-farside-read' );
+
+		wp_set_current_user( $author_id );
+
+		$request = new \WP_REST_Request( 'PUT', "/content-connect/v2/post/{$source_id}/related" );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'related_id', $private_id );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_cannot_relate', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Tests that adding a related user without the list_users capability is denied.
+	 *
+	 * @return void
+	 */
+	public function test_put_denies_relating_a_user_without_list_users_capability() {
+		$author_id = $this->factory()->user->create( array( 'role' => 'author' ) );
+
+		$source_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+
+		$target_user_id = $this->factory()->user->create( array( 'role' => 'subscriber' ) );
+
+		$registry = get_registry();
+		$registry->define_post_to_user( 'post', 'test-farside-users' );
+		$rel_key = $registry->get_relationship_key( 'post', 'user', 'test-farside-users' );
+
+		wp_set_current_user( $author_id );
+
+		$request = new \WP_REST_Request( 'PUT', "/content-connect/v2/post/{$source_id}/related" );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-user' );
+		$request->set_param( 'related_id', $target_user_id );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_cannot_relate', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Tests that a bulk update silently excludes related posts the user cannot read.
+	 *
+	 * Unreadable IDs must not be stored or returned, preventing cross-object
+	 * information disclosure through the write response.
+	 *
+	 * @return void
+	 */
+	public function test_post_excludes_related_posts_the_user_cannot_read() {
+		$author_id = $this->factory()->user->create( array( 'role' => 'author' ) );
+
+		$source_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+
+		$readable_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+			)
+		);
+
+		$private_id = $this->factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'private',
+				'post_author' => $this->user_id,
+			)
+		);
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-farside-bulk' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-farside-bulk' );
+
+		wp_set_current_user( $author_id );
+
+		$request = new \WP_REST_Request( 'POST', "/content-connect/v2/post/{$source_id}/related" );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'related_ids', array( $readable_id, $private_id ) );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$ids = wp_list_pluck( $data, 'id' );
+		$this->assertContains( $readable_id, $ids );
+		$this->assertNotContains( $private_id, $ids );
+	}
 }
 
