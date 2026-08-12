@@ -57,8 +57,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array  $items        Post objects.
-	 * @param string $relationship Relationship name.
+	 * @param array                                            $items        Post objects.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_post_items( $items, $relationship ) {
@@ -77,8 +77,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array  $items        User objects.
-	 * @param string $relationship Relationship name.
+	 * @param array                                            $items        User objects.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_user_items( $items, $relationship ) {
@@ -97,8 +97,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int|\WP_Post $item         Post object or ID.
-	 * @param string       $relationship Relationship name.
+	 * @param int|\WP_Post                                     $item         Post object or ID.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_post_item( $item, $relationship ) {
@@ -114,7 +114,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 			'type' => $item->post_type,
 		);
 
-		/** This filter is documented in includes/UI/MetaBox.php */
+		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 		/** This filter is documented in includes/Helpers.php */
@@ -136,8 +136,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int|\WP_User $item         User object or ID.
-	 * @param string       $relationship Relationship name.
+	 * @param int|\WP_User                                     $item         User object or ID.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_user_item( $item, $relationship ) {
@@ -161,7 +161,7 @@ abstract class AbstractPostRoute extends AbstractRoute {
 			'type' => 'user',
 		);
 
-		/** This filter is documented in includes/UI/MetaBox.php */
+		/** This filter is documented in includes/Helpers.php */
 		$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 		/** This filter is documented in includes/Helpers.php */

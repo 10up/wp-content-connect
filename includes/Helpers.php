@@ -361,7 +361,14 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_data' 
 					$query_args['orderby'] = 'relationship';
 				}
 
-				/** This filter is documented in includes/UI/PostToPost.php */
+				/**
+				 * Filters the Post UI query args.
+				 *
+				 * @since 1.6.0
+				 *
+				 * @param array    $query_args The \WP_Query args.
+				 * @param \WP_Post $post       The post object.
+				 */
 				$query_args = apply_filters( 'tenup_content_connect_post_ui_query_args', $query_args, $post );
 
 				$query = new \WP_Query( $query_args );
@@ -376,7 +383,14 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_data' 
 						'name' => $queried_post->post_title,
 					);
 
-					/** This filter is documented in includes/UI/PostToPost.php */
+					/**
+					 * Filters the final post item data.
+					 *
+					 * @since 1.3.0
+					 *
+					 * @param array                                            $item_data    The post item data.
+					 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+					 */
 					$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
 
 					/**
@@ -481,7 +495,14 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_data' 
 					$query_args['orderby'] = 'relationship';
 				}
 
-				/** This filter is documented in includes/UI/PostToUser.php */
+				/**
+				 * Filters the Post UI user query args.
+				 *
+				 * @since 1.6.0
+				 *
+				 * @param array    $query_args The \WP_User_Query args.
+				 * @param \WP_Post $post       The post object.
+				 */
 				$query_args = apply_filters( 'tenup_content_connect_post_ui_user_query_args', $query_args, $post );
 
 				$query = new \WP_User_Query( $query_args );
@@ -496,7 +517,14 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_data' 
 						'name' => $queried_user->display_name,
 					);
 
-					/** This filter is documented in includes/UI/PostToUser.php */
+					/**
+					 * Filters the final user item data.
+					 *
+					 * @since 1.3.0
+					 *
+					 * @param array                                            $item_data    The user item data.
+					 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+					 */
 					$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
 
 					/**
