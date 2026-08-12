@@ -1,8 +1,3 @@
-.phpunit.result.cache
-test-results/
-tests/e2e/.auth/
-tests/e2e/test-results/
-
 # Version Control
 .svn
 
@@ -33,6 +28,13 @@ sassdoc
 scss-lint-report.xml
 config.codekit
 artifacts/
+.phpunit.result.cache
+test-results/
+tests/e2e/.auth/
+tests/e2e/test-results/
+coverage/
+.playwright-mcp
 
 /assets/js/content-connect.js
 /assets/js/content-connect.min.js
+

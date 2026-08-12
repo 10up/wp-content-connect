@@ -74,6 +74,7 @@ function register_content_types(): void {
 	PostTypes\Person::register();
 	PostTypes\Course::register();
 	PostTypes\Campus::register();
+	PostTypes\Department::register();
 	Taxonomies\Person_Role::register();
 }
 add_action( 'init', __NAMESPACE__ . '\\register_content_types', 5 );
@@ -99,10 +100,16 @@ function define_relationships(): void {
 		array( 'university', 'course', 'courses', 'Related Courses', true, false ),
 		array( 'campus', 'person', 'people', 'Related People', true, true ),
 		array( 'course', 'person', 'instructors', 'Course Instructors', true, true ),
+		// Classic-editor relationship: the "from" (department) shows the meta-box UI;
+		// the "to" (city) UI stays off so it never surfaces on the block-editor city screen.
+		array( 'department', 'city', 'cities', 'Related Cities', true, false, false ),
 	);
 
 	foreach ( $post_to_post_relationships as $relationship ) {
 		list( $from, $to, $name, $label, $from_sortable, $to_sortable ) = $relationship;
+
+		// Optional 7th element controls the "to" side UI (defaults to enabled).
+		$to_enable_ui = $relationship[6] ?? true;
 
 		try {
 			$registry->define_post_to_post(
@@ -116,7 +123,7 @@ function define_relationships(): void {
 						'labels'    => array( 'name' => $label ),
 					),
 					'to'   => array(
-						'enable_ui' => true,
+						'enable_ui' => $to_enable_ui,
 						'sortable'  => $to_sortable,
 						'labels'    => array( 'name' => $label ),
 					),

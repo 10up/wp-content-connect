@@ -29,6 +29,7 @@ class Data_Generator {
 		'person'     => 20,
 		'course'     => 10,
 		'campus'     => 6,
+		'department' => 3,
 	);
 
 	/**
@@ -42,6 +43,7 @@ class Data_Generator {
 		'person'     => 'Person',
 		'course'     => 'Course',
 		'campus'     => 'Campus',
+		'department' => 'Department',
 	);
 
 	/**
@@ -93,6 +95,7 @@ class Data_Generator {
 		'person'     => array(),
 		'course'     => array(),
 		'campus'     => array(),
+		'department' => array(),
 	);
 
 	/**
@@ -187,6 +190,7 @@ class Data_Generator {
 			'person'     => array(),
 			'course'     => array(),
 			'campus'     => array(),
+			'department' => array(),
 		);
 		$this->user_ids = array();
 	}
@@ -339,6 +343,7 @@ class Data_Generator {
 		$p = $this->post_ids['person'];
 		$o = $this->post_ids['course'];
 		$m = $this->post_ids['campus'];
+		$d = $this->post_ids['department'];
 
 		$wiring = array(
 			// from,       to,       name,          pairs (from_index => [to_indexes]).
@@ -347,6 +352,9 @@ class Data_Generator {
 			array( 'university', 'course', 'courses', $u, $o, array( 0 => array( 0, 1 ), 2 => array( 2 ) ) ),
 			array( 'campus', 'person', 'people', $m, $p, array( 0 => array( 0, 1, 2 ), 1 => array( 3 ) ) ),
 			array( 'course', 'person', 'instructors', $o, $p, array( 0 => array( 4, 5 ), 1 => array( 6 ) ) ),
+			// Department 1 pre-wired to City 1 (classic-editor "load existing" case);
+			// departments 2-3 stay empty for the classic-editor "save new" case.
+			array( 'department', 'city', 'cities', $d, $c, array( 0 => array( 0 ) ) ),
 		);
 
 		foreach ( $wiring as $entry ) {

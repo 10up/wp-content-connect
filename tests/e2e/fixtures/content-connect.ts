@@ -17,6 +17,7 @@ export interface TestPostIds {
 	person: number[];
 	course: number[];
 	campus: number[];
+	department: number[];
 }
 
 export interface TestData {
@@ -63,6 +64,34 @@ export class ContentConnectPage {
 
 	getRelationshipManager(relKey: string): Locator {
 		return this.page.locator(`.content-connect-relationship-manager-${relKey}`);
+	}
+
+	/**
+	 * Opens a post in the CLASSIC editor (wp-admin/post.php) and waits for the
+	 * Content Connect relationship manager to mount inside its meta box.
+	 */
+	async gotoClassicEditor(postId: number, relKey: string): Promise<void> {
+		await this.page.goto(`/wp-admin/post.php?post=${postId}&action=edit`);
+		await this.getRelationshipManager(relKey).waitFor({
+			state: 'visible',
+			timeout: TIMEOUTS.PANEL_VISIBLE,
+		});
+	}
+
+	/**
+	 * Clicks the classic editor's Update/Publish button and waits for the save
+	 * to round-trip (Content Connect intercepts the submit, persists, then the
+	 * form submits and the page reloads back onto the edit screen).
+	 */
+	async saveClassicPost(): Promise<void> {
+		await Promise.all([
+			// The edit URL already matches "action=edit" before saving, so wait for
+			// the post-save "message=" marker that only appears after the redirect.
+			this.page.waitForURL( /post\.php\?post=\d+&action=edit&message=\d+/, {
+				timeout: TIMEOUTS.PANEL_VISIBLE,
+			} ),
+			this.page.locator('#publish, #save-post').first().click(),
+		]);
 	}
 
 	/**

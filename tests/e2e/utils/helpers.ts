@@ -31,6 +31,7 @@ const TITLE_PREFIX: Record<string, string> = {
 	person: 'Person',
 	course: 'Course',
 	campus: 'Campus',
+	department: 'Department',
 };
 
 /**
