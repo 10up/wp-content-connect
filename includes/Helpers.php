@@ -194,6 +194,134 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_by' ) 
 	}
 endif;
 
+if ( ! function_exists( __NAMESPACE__ . '\\get_related_post_item_data' ) ) :
+	/**
+	 * Prepares the item data for a related post.
+	 *
+	 * Produces the canonical item shape shared by the editor UIs and the REST API,
+	 * and applies the `tenup_content_connect_final_post` and
+	 * `tenup_content_connect_post_item_data` filters.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int|\WP_Post                                     $post         Post object or ID.
+	 * @param  \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @return array The prepared post item data.
+	 */
+	function get_related_post_item_data( $post, $relationship ) {
+
+		if ( is_numeric( $post ) ) {
+			$post = get_post( $post );
+		}
+
+		$item_data = array(
+			'ID'   => $post->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
+			'id'   => $post->ID,
+			'name' => $post->post_title,
+			'type' => $post->post_type,
+		);
+
+		/**
+		 * Filters the final post item data.
+		 *
+		 * @since 1.3.0
+		 *
+		 * @param array                                            $item_data    The post item data.
+		 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+		 */
+		$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
+
+		/**
+		 * Filters the post item data.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array                                            $item_data    The post item data.
+		 * @param \WP_Post                                         $post         The post object.
+		 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+		 */
+		$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $post, $relationship );
+
+		if ( empty( $item_data['type'] ) ) { // Required for the 10up Content Picker component.
+			$item_data['type'] = $post->post_type;
+		}
+
+		if ( empty( $item_data['uuid'] ) ) { // Required for the 10up Content Picker component.
+			$item_data['uuid'] = wp_generate_uuid4();
+		}
+
+		return $item_data;
+	}
+endif;
+
+if ( ! function_exists( __NAMESPACE__ . '\\get_related_user_item_data' ) ) :
+	/**
+	 * Prepares the item data for a related user.
+	 *
+	 * Produces the canonical item shape shared by the editor UIs and the REST API,
+	 * and applies the `tenup_content_connect_final_user` and
+	 * `tenup_content_connect_user_item_data` filters.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int|\WP_User                                     $user         User object or ID.
+	 * @param  \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @return array The prepared user item data.
+	 */
+	function get_related_user_item_data( $user, $relationship ) {
+
+		if ( is_numeric( $user ) ) {
+			$user = get_user_by( 'ID', $user );
+		}
+
+		$item_name = $user->display_name;
+
+		if ( empty( $item_name ) ) {
+			$item_name = array( $user->first_name, $user->last_name );
+			$item_name = array_filter( $item_name );
+			$item_name = implode( ' ', $item_name );
+		}
+
+		$item_data = array(
+			'ID'   => $user->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
+			'id'   => $user->ID,
+			'name' => $item_name,
+			'type' => 'user',
+		);
+
+		/**
+		 * Filters the final user item data.
+		 *
+		 * @since 1.3.0
+		 *
+		 * @param array                                            $item_data    The user item data.
+		 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+		 */
+		$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
+
+		/**
+		 * Filters the user item data.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array                                            $item_data    The user item data.
+		 * @param \WP_User                                         $user         The user object.
+		 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+		 */
+		$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $user, $relationship );
+
+		if ( empty( $item_data['type'] ) ) { // Required for the 10up Content Picker component.
+			$item_data['type'] = 'user';
+		}
+
+		if ( empty( $item_data['uuid'] ) ) { // Required for the 10up Content Picker component.
+			$item_data['uuid'] = wp_generate_uuid4();
+		}
+
+		return $item_data;
+	}
+endif;
+
 if ( ! function_exists( __NAMESPACE__ . '\\get_post_relationships_data' ) ) :
 	/**
 	 * Retrieves relationships (post-to-post and post-to-user) for a given post.
@@ -390,33 +518,7 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_data' 
 
 				$related_posts = array();
 				foreach ( $queried_posts as $queried_post ) {
-
-					$item_data = array(
-						'ID'   => $queried_post->ID,
-						'name' => $queried_post->post_title,
-					);
-
-					/**
-					 * Filters the final post item data.
-					 *
-					 * @since 1.3.0
-					 *
-					 * @param array                                            $item_data    The post item data.
-					 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
-					 */
-					$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
-
-					/**
-					 * Filters the post item data.
-					 *
-					 * @since 2.0.0
-					 * @param array    $item_data The item data.
-					 * @param \WP_Post $post      The post object.
-					 * @param Relationship $relationship The relationship object.
-					 */
-					$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $queried_post, $relationship );
-
-					$related_posts[] = $item_data;
+					$related_posts[] = get_related_post_item_data( $queried_post, $relationship );
 				}
 
 				$relationship_data['related'] = $related_posts;
@@ -524,33 +626,7 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_user_relationships_data' 
 
 				$related_users = array();
 				foreach ( $queried_users as $queried_user ) {
-
-					$item_data = array(
-						'ID'   => $queried_user->ID,
-						'name' => $queried_user->display_name,
-					);
-
-					/**
-					 * Filters the final user item data.
-					 *
-					 * @since 1.3.0
-					 *
-					 * @param array                                            $item_data    The user item data.
-					 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
-					 */
-					$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
-
-					/**
-					 * Filters the user item data.
-					 *
-					 * @since 2.0.0
-					 * @param array        $item_data The item data.
-					 * @param \WP_User     $user      The user object.
-					 * @param Relationship $relationship The relationship object.
-					 */
-					$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $queried_user, $relationship );
-
-					$related_users[] = $item_data;
+					$related_users[] = get_related_user_item_data( $queried_user, $relationship );
 				}
 
 				$relationship_data['related'] = $related_users;
