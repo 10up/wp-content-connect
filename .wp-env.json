@@ -1,6 +1,8 @@
 {
 	"core": "WordPress/WordPress#master",
 	"phpVersion": "8.2",
+	"port": 8912,
+	"testsPort": 8913,
 	"plugins": [
 		".",
 		"./tests/plugin/content-connect-example-data"
@@ -11,9 +13,5 @@
 	"config": {
 		"WP_DEBUG": true,
 		"SCRIPT_DEBUG": true
-	},
-	"lifecycleScripts": {
-		"afterStart": "wp-env run tests-cli wp content-connect-example generate"
 	}
 }
-
