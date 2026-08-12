@@ -234,28 +234,41 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_relationships_data' ) ) :
 			return array();
 		}
 
-		if ( 'post-to-user' === $rel_type ) {
-			return get_post_to_user_relationships_data( $post, $context );
+		switch ( $rel_type ) {
+			case 'post-to-user':
+				$relationship_data = get_post_to_user_relationships_data( $post, $context );
+				break;
+			case 'post-to-post':
+				$relationship_data = get_post_to_post_relationships_data( $post, $other_post_type, $context );
+				break;
+			case 'any':
+				if ( ! empty( $other_post_type ) ) {
+					$relationship_data = get_post_to_post_relationships_data( $post, $other_post_type, $context );
+				} else {
+					$relationship_data = array_merge(
+						get_post_to_post_relationships_data( $post, $other_post_type, $context ),
+						get_post_to_user_relationships_data( $post, $context )
+					);
+				}
+				break;
+			default:
+				$relationship_data = array();
+				break;
 		}
 
-		if ( 'post-to-post' === $rel_type ) {
-			return get_post_to_post_relationships_data( $post, $other_post_type, $context );
-		}
-
-		if ( 'any' !== $rel_type ) {
-			return array();
-		}
-
-		if ( ! empty( $other_post_type ) ) {
-			return get_post_to_post_relationships_data( $post, $other_post_type, $context );
-		}
-
-		$relationship_data = array_merge(
-			get_post_to_post_relationships_data( $post, $other_post_type, $context ),
-			get_post_to_user_relationships_data( $post, $context )
-		);
-
-		return $relationship_data;
+		/**
+		 * Filters the relationship data assembled for a post.
+		 *
+		 * @since 1.0.0
+		 * @since 2.0.0 $rel_type, $other_post_type, and $context arguments were added.
+		 *
+		 * @param array        $relationship_data The assembled relationship data, keyed by relationship key.
+		 * @param \WP_Post     $post              The post object.
+		 * @param string       $rel_type          The relationship type: 'any', 'post-to-post', or 'post-to-user'.
+		 * @param string|false $other_post_type   Post type used to filter post-to-post relationships, or false.
+		 * @param string       $context           The response context: 'view' or 'embed'.
+		 */
+		return apply_filters( 'tenup_content_connect_post_relationship_data', $relationship_data, $post, $rel_type, $other_post_type, $context );
 	}
 endif;
 
