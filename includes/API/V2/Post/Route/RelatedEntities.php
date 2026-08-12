@@ -525,8 +525,8 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param  int                                                                                          $related_id   The related entity ID.
-	 * @param  \WP_Post                                                                                     $post         The source post.
+	 * @param  int                                                                                           $related_id   The related entity ID.
+	 * @param  \WP_Post                                                                                      $post         The source post.
 	 * @param  \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
 	 * @return true|\WP_Error True if valid, WP_Error otherwise.
 	 */
@@ -548,6 +548,15 @@ class RelatedEntities extends AbstractPostRoute {
 					'rest_invalid_related_id',
 					__( 'Related user does not exist.', 'wp-content-connect' ),
 					array( 'status' => 400 )
+				);
+			}
+
+			// The current user must be able to view users before relating one.
+			if ( ! current_user_can( 'list_users' ) ) {
+				return new \WP_Error(
+					'rest_cannot_relate',
+					__( 'Sorry, you are not allowed to relate this user.', 'wp-content-connect' ),
+					array( 'status' => 403 )
 				);
 			}
 
@@ -575,9 +584,9 @@ class RelatedEntities extends AbstractPostRoute {
 		}
 
 		// Source and target must be on opposite sides of the relationship.
-		$post_is_from = $post->post_type === $relationship->from;
-		$other_is_to  = in_array( $related_post->post_type, (array) $relationship->to, true );
-		$post_is_to   = in_array( $post->post_type, (array) $relationship->to, true );
+		$post_is_from  = $post->post_type === $relationship->from;
+		$other_is_to   = in_array( $related_post->post_type, (array) $relationship->to, true );
+		$post_is_to    = in_array( $post->post_type, (array) $relationship->to, true );
 		$other_is_from = $related_post->post_type === $relationship->from;
 
 		if ( ! ( ( $post_is_from && $other_is_to ) || ( $post_is_to && $other_is_from ) ) ) {
@@ -585,6 +594,16 @@ class RelatedEntities extends AbstractPostRoute {
 				'rest_invalid_related_post_type',
 				__( 'Related post type is not part of this relationship.', 'wp-content-connect' ),
 				array( 'status' => 400 )
+			);
+		}
+
+		// The current user must be able to read the related post before relating it,
+		// so relationships cannot be written against posts the user cannot access.
+		if ( ! current_user_can( 'read_post', $related_post->ID ) ) {
+			return new \WP_Error(
+				'rest_cannot_relate',
+				__( 'Sorry, you are not allowed to relate this post.', 'wp-content-connect' ),
+				array( 'status' => 403 )
 			);
 		}
 
@@ -739,26 +758,10 @@ class RelatedEntities extends AbstractPostRoute {
 		$related_ids = array_filter( $related_ids );
 		$related_ids = array_values( array_unique( $related_ids ) );
 
-		$valid_ids   = array();
-		$allowed_types = array_merge( array( $relationship->from ), (array) $relationship->to );
+		$valid_ids = array();
 
 		foreach ( $related_ids as $related_id ) {
-			$related_post = get_post( $related_id );
-
-			if ( ! $related_post ) {
-				continue;
-			}
-
-			if ( ! in_array( $related_post->post_type, $allowed_types, true ) ) {
-				continue;
-			}
-
-			$post_is_from  = $post->post_type === $relationship->from;
-			$other_is_to   = in_array( $related_post->post_type, (array) $relationship->to, true );
-			$post_is_to    = in_array( $post->post_type, (array) $relationship->to, true );
-			$other_is_from = $related_post->post_type === $relationship->from;
-
-			if ( ! ( ( $post_is_from && $other_is_to ) || ( $post_is_to && $other_is_from ) ) ) {
+			if ( is_wp_error( $this->validate_related_id( $related_id, $post, $relationship ) ) ) {
 				continue;
 			}
 
@@ -802,10 +805,12 @@ class RelatedEntities extends AbstractPostRoute {
 		$related_ids = array_values( array_unique( $related_ids ) );
 
 		$valid_ids = array();
+
 		foreach ( $related_ids as $related_id ) {
-			if ( ! get_userdata( $related_id ) ) {
+			if ( is_wp_error( $this->validate_related_id( $related_id, $post, $relationship ) ) ) {
 				continue;
 			}
+
 			$valid_ids[] = (int) $related_id;
 		}
 
