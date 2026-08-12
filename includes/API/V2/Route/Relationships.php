@@ -105,12 +105,14 @@ class Relationships extends AbstractRoute {
 					$prepared_relationships[ $rel_key ]['from']        = array(
 						'object_type' => $relationship->from,
 						'labels'      => $relationship->from_labels,
+						'max_items'   => $relationship->from_max_items,
 						'sortable'    => $relationship->from_sortable,
 						'enable_ui'   => $relationship->enable_from_ui,
 					);
 					$prepared_relationships[ $rel_key ]['to']          = array(
 						'object_types' => (array) $relationship->to,
 						'labels'       => $relationship->to_labels,
+						'max_items'    => $relationship->to_max_items,
 						'sortable'     => $relationship->to_sortable,
 						'enable_ui'    => $relationship->enable_to_ui,
 					);

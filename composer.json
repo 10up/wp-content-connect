@@ -25,8 +25,7 @@
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
-            "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration",
-            "TenUp\\ContentConnect\\Tests\\Unit\\": "tests/unit"
+            "TenUp\\ContentConnect\\Tests\\": "tests/php"
         },
         "files": [
             "includes/Helpers.php"
@@ -34,7 +33,6 @@
     },
     "require-dev": {
         "10up/phpcs-composer": "^3.0",
-        "10up/wp_mock": "^1.1",
         "phpcompatibility/php-compatibility": "dev-develop as 9.99.99",
         "phpunit/phpunit": "^9.0",
         "yoast/phpunit-polyfills": "^4.0"
