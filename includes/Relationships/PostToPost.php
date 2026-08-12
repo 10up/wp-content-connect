@@ -26,15 +26,15 @@ class PostToPost extends Relationship {
 		}
 
 		$to = (array) $to;
-		foreach( $to as $to_post_type ) {
+		foreach ( $to as $to_post_type ) {
 			if ( ! post_type_exists( $to_post_type ) ) {
 				throw new \Exception( esc_html( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" ) );
 			}
 		}
 
 		$this->from = $from;
-		$this->to = $to;
-		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
+		$this->to   = $to;
+		$this->id   = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
 
 		parent::__construct( $name, $args );
 	}
@@ -49,7 +49,7 @@ class PostToPost extends Relationship {
 	public function get_related_object_ids( $post_id, $order_by_relationship = false ) {
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
-		$db = $table->get_db();
+		$db    = $table->get_db();
 
 		$table_name = esc_sql( $table->get_table_name() );
 
@@ -60,17 +60,20 @@ class PostToPost extends Relationship {
 		}
 
 		if ( $post_type == $this->from ) {
-			$where_post_types = array_map( function( $value ) {
-				return "'" . esc_sql( $value ) . "'";
-			}, $this->to );
+			$where_post_types = array_map(
+				function ( $value ) {
+					return "'" . esc_sql( $value ) . "'";
+				},
+				$this->to
+			);
 			$where_post_types = implode( ', ', $where_post_types );
-			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type IN ({$where_post_types})", $post_id, $this->name );
+			$query            = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type IN ({$where_post_types})", $post_id, $this->name );
 		} else {
 			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $this->from );
 		}
 
 		if ( $order_by_relationship ) {
-			$query .= " ORDER BY p2p.order = 0, p2p.order ASC";
+			$query .= ' ORDER BY p2p.order = 0, p2p.order ASC';
 		}
 
 		$objects = $db->get_results( $query );
@@ -95,16 +98,25 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
+			array(
+				'id1'  => $pid1,
+				'id2'  => $pid2,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 		$table->replace(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
+			array(
+				'id1'  => $pid2,
+				'id2'  => $pid1,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 
 		/**
 		 * Fires after a relationship has been added
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -120,16 +132,25 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
+			array(
+				'id1'  => $pid1,
+				'id2'  => $pid2,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 		$table->delete(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
+			array(
+				'id1'  => $pid2,
+				'id2'  => $pid1,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 
 		/**
 		 * Fires after a relationship has been deleted
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -152,18 +173,19 @@ class PostToPost extends Relationship {
 		$current_ids = $this->get_related_object_ids( $post_id );
 
 		$delete_ids = array_diff( $current_ids, $related_ids );
-		$add_ids = array_diff( $related_ids, $current_ids );
+		$add_ids    = array_diff( $related_ids, $current_ids );
 
-		foreach( $delete_ids as $delete ) {
+		foreach ( $delete_ids as $delete ) {
 			$this->delete_relationship( $post_id, $delete );
 		}
 
-		foreach( $add_ids as $add ) {
+		foreach ( $add_ids as $add ) {
 			$this->add_relationship( $post_id, $add );
 		}
 
 		/**
 		 * Fires after a relationship has been replaced
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -193,21 +215,21 @@ class PostToPost extends Relationship {
 
 		$data = array();
 
-		foreach( $ordered_ids as $id ) {
-			$order++;
+		foreach ( $ordered_ids as $id ) {
+			++$order;
 
 			$data[] = array(
-				'id1' => $id,
-				'id2' => $object_id,
-				'name' => $this->name,
-				'order' => $order
+				'id1'   => $id,
+				'id2'   => $object_id,
+				'name'  => $this->name,
+				'order' => $order,
 			);
 		}
 
 		$fields = array(
-			'id1' => '%d',
-			'id2' => '%d',
-			'name' => '%s',
+			'id1'   => '%d',
+			'id2'   => '%d',
+			'name'  => '%s',
 			'order' => '%d',
 		);
 
@@ -284,5 +306,4 @@ class PostToPost extends Relationship {
 
 		return (bool) $this->to_sortable;
 	}
-
 }
