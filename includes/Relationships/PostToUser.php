@@ -254,4 +254,71 @@ class PostToUser extends Relationship {
 		$table->replace_bulk( $fields, $data );
 	}
 
+	/**
+	 * Returns the object type of the entities related through this relationship.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string Always 'user' for post-to-user relationships.
+	 */
+	public function get_object_type() {
+		return 'user';
+	}
+
+	/**
+	 * Returns the IDs related to the given object for this relationship.
+	 *
+	 * Uniform accessor used by callers that manage post-to-post and post-to-user
+	 * relationships through the same interface.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int  $object_id             The source post ID.
+	 * @param  bool $order_by_relationship Whether to order by the stored relationship order.
+	 * @return array The related user IDs.
+	 */
+	public function get_related_ids( $object_id, $order_by_relationship = false ) {
+		return $this->get_related_user_ids( $object_id, $order_by_relationship );
+	}
+
+	/**
+	 * Replaces the related IDs for the given object with the provided set.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int   $object_id   The source post ID.
+	 * @param  int[] $related_ids The related user IDs to store.
+	 * @return void
+	 */
+	public function replace_related_ids( $object_id, $related_ids ) {
+		$this->replace_post_to_user_relationships( $object_id, $related_ids );
+	}
+
+	/**
+	 * Saves the sort order of the related IDs for the given object.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int   $object_id   The source post ID.
+	 * @param  int[] $ordered_ids The related user IDs in the desired order.
+	 * @return void
+	 */
+	public function save_related_sort_data( $object_id, $ordered_ids ) {
+		$this->save_post_to_user_sort_data( $object_id, $ordered_ids );
+	}
+
+	/**
+	 * Determines whether the relationship is sortable from the given post's side.
+	 *
+	 * Users are always managed from the post ("from") side of the relationship.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  \WP_Post $post The source post.
+	 * @return bool Whether the relationship is sortable.
+	 */
+	public function is_sortable_from( \WP_Post $post ) {
+		return (bool) $this->from_sortable;
+	}
+
 }

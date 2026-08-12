@@ -147,10 +147,7 @@ class RelatedEntities extends AbstractPostRoute {
 			return $relationship;
 		}
 
-		$rel_type = $request->get_param( 'rel_type' );
-
-		$prepared_items = array();
-		if ( 'post-to-user' === $rel_type ) {
+		if ( 'user' === $relationship->get_object_type() ) {
 			$prepared_items = $this->get_related_users( $post, $request, $relationship );
 		} else {
 			$prepared_items = $this->get_related_posts( $post, $request, $relationship );
@@ -257,14 +254,7 @@ class RelatedEntities extends AbstractPostRoute {
 			return $relationship;
 		}
 
-		$rel_type = $request->get_param( 'rel_type' );
-
-		$prepared_items = array();
-		if ( 'post-to-user' === $rel_type ) {
-			$prepared_items = $this->update_related_users( $post, $request, $relationship );
-		} else {
-			$prepared_items = $this->update_related_posts( $post, $request, $relationship );
-		}
+		$prepared_items = $this->update_related( $post, $request, $relationship );
 
 		if ( is_wp_error( $prepared_items ) ) {
 			return $prepared_items;
@@ -338,10 +328,7 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$relationship->add_relationship( $post->ID, $related_id );
 
-		$rel_type = $request->get_param( 'rel_type' );
-
-		$prepared_items = array();
-		if ( 'post-to-user' === $rel_type ) {
+		if ( 'user' === $relationship->get_object_type() ) {
 			$prepared_items = $this->get_related_users( $post, $request, $relationship );
 		} else {
 			$prepared_items = $this->get_related_posts( $post, $request, $relationship );
@@ -398,10 +385,7 @@ class RelatedEntities extends AbstractPostRoute {
 
 		$relationship->delete_relationship( $post->ID, (int) $related_id );
 
-		$rel_type = $request->get_param( 'rel_type' );
-
-		$prepared_items = array();
-		if ( 'post-to-user' === $rel_type ) {
+		if ( 'user' === $relationship->get_object_type() ) {
 			$prepared_items = $this->get_related_users( $post, $request, $relationship );
 		} else {
 			$prepared_items = $this->get_related_posts( $post, $request, $relationship );
@@ -542,7 +526,7 @@ class RelatedEntities extends AbstractPostRoute {
 			);
 		}
 
-		if ( $relationship instanceof \TenUp\ContentConnect\Relationships\PostToUser ) {
+		if ( 'user' === $relationship->get_object_type() ) {
 			if ( ! get_userdata( $related_id ) ) {
 				return new \WP_Error(
 					'rest_invalid_related_id',
@@ -743,15 +727,19 @@ class RelatedEntities extends AbstractPostRoute {
 	}
 
 	/**
-	 * Update posts related to a post.
+	 * Replaces the set of related entities for a post.
+	 *
+	 * Handles both post-to-post and post-to-user relationships through the
+	 * relationship object's uniform interface.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post         $post    The post object.
-	 * @param \WP_REST_Request $request The request object.
-	 * @return array
+	 * @param \WP_Post                                         $post         The post object.
+	 * @param \WP_REST_Request                                 $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @return array The prepared related items.
 	 */
-	protected function update_related_posts( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
+	protected function update_related( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
 
 		$related_ids = $request->get_param( 'related_ids' );
 		$related_ids = array_map( 'absint', (array) $related_ids );
@@ -768,62 +756,20 @@ class RelatedEntities extends AbstractPostRoute {
 			$valid_ids[] = (int) $related_id;
 		}
 
-		$relationship->replace_relationships( $post->ID, $valid_ids );
+		$relationship->replace_related_ids( $post->ID, $valid_ids );
 
-		$is_sortable = false;
-		if ( $post->post_type === $relationship->from ) {
-			$is_sortable = $relationship->from_sortable;
-		} else {
-			$is_sortable = $relationship->to_sortable;
-		}
+		$is_sortable = $relationship->is_sortable_from( $post );
 
 		if ( $is_sortable ) {
-			$relationship->save_sort_data( $post->ID, $valid_ids );
+			$relationship->save_related_sort_data( $post->ID, $valid_ids );
 		}
 
-		$items = $relationship->get_related_object_ids( $post->ID, $is_sortable );
+		$items = $relationship->get_related_ids( $post->ID, $is_sortable );
 
-		$prepared_items = $this->prepare_post_items( $items, $relationship );
-
-		return $prepared_items;
-	}
-
-	/**
-	 * Update users related to a post.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param \WP_Post         $post    The post object.
-	 * @param \WP_REST_Request $request The request object.
-	 * @return array
-	 */
-	protected function update_related_users( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
-
-		$related_ids = $request->get_param( 'related_ids' );
-		$related_ids = array_map( 'absint', (array) $related_ids );
-		$related_ids = array_filter( $related_ids );
-		$related_ids = array_values( array_unique( $related_ids ) );
-
-		$valid_ids = array();
-
-		foreach ( $related_ids as $related_id ) {
-			if ( is_wp_error( $this->validate_related_id( $related_id, $post, $relationship ) ) ) {
-				continue;
-			}
-
-			$valid_ids[] = (int) $related_id;
+		if ( 'user' === $relationship->get_object_type() ) {
+			return $this->prepare_user_items( $items, $relationship );
 		}
 
-		$relationship->replace_post_to_user_relationships( $post->ID, $valid_ids );
-
-		if ( $relationship->from_sortable ) {
-			$relationship->save_post_to_user_sort_data( $post->ID, $valid_ids );
-		}
-
-		$items = $relationship->get_related_user_ids( $post->ID, $relationship->from_sortable );
-
-		$prepared_items = $this->prepare_user_items( $items, $relationship );
-
-		return $prepared_items;
+		return $this->prepare_post_items( $items, $relationship );
 	}
 }
