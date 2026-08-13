@@ -9,15 +9,14 @@ test.describe('Post-to-User Relationships', () => {
 
 		await ccPage.expandRelationshipPanel('university_user_administrators');
 
-		const manager = ccPage.getRelationshipManager('university_user_administrators');
-		await expect(manager).toBeVisible({ timeout: TIMEOUTS.PANEL_VISIBLE });
+		const selectedItems = ccPage.getSelectedItems('university_user_administrators');
 
-		// Casey Long is not an administrator of University 1, so it is not
-		// excluded from the ContentPicker search results.
-		await ccPage.searchAndWaitForResults('university_user_administrators', 'Casey');
+		// Casey Long is not an administrator of University 1, so it is selectable
+		// from the ContentPicker search results. Assert against the (stable) selected
+		// list rather than the search dropdown, which renders unreliably in CI.
+		await ccPage.searchAndSelectItem('university_user_administrators', 'Casey');
 
-		const result = ccPage.getSearchResultByText('university_user_administrators', 'Casey');
-		await expect(result).toBeVisible({ timeout: TIMEOUTS.PANEL_VISIBLE });
+		await expect(selectedItems.filter({ hasText: 'Casey' })).toHaveCount(1, { timeout: TIMEOUTS.SEARCH_RESULTS });
 	});
 
 	test('can search users by display name', async ({ admin, editor, page, testData }) => {
@@ -28,10 +27,14 @@ test.describe('Post-to-User Relationships', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		await ccPage.expandRelationshipPanel('university_user_administrators');
-		await ccPage.searchAndWaitForResults('university_user_administrators', 'Farah Quinn');
 
-		const result = ccPage.getSearchResultByText('university_user_administrators', 'Farah Quinn');
-		await expect(result).toBeVisible({ timeout: TIMEOUTS.PANEL_VISIBLE });
+		const selectedItems = ccPage.getSelectedItems('university_user_administrators');
+
+		// Assert against the (stable) selected list rather than the search dropdown,
+		// which renders unreliably in CI.
+		await ccPage.searchAndSelectItem('university_user_administrators', 'Farah Quinn');
+
+		await expect(selectedItems.filter({ hasText: 'Farah Quinn' })).toHaveCount(1, { timeout: TIMEOUTS.SEARCH_RESULTS });
 	});
 
 	test('can add a user to the administrators relationship', async ({ admin, editor, page, testData }) => {

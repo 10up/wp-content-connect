@@ -1,4 +1,6 @@
-import { chromium, FullConfig } from '@playwright/test';
+import { request } from '@playwright/test';
+import type { FullConfig } from '@playwright/test';
+import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { execSync } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -62,27 +64,16 @@ async function globalSetup(config: FullConfig): Promise<void> {
 		console.warn('Warning: Could not fetch test data IDs.');
 	}
 
-	// Create browser and authenticate
-	const browser = await chromium.launch();
-	const context = await browser.newContext();
-	const page = await context.newPage();
-
-	// Login to WordPress admin
-	console.log('Logging in to WordPress admin...');
-	await page.goto(`${baseURL}/wp-login.php`);
-
-	await page.fill('#user_login', 'admin');
-	await page.fill('#user_pass', 'password');
-	await page.click('#wp-submit');
-
-	// Wait for dashboard to load
-	await page.waitForURL('**/wp-admin/**');
+	// Authenticate with WordPress via RequestUtils (REST/cookie based) and persist
+	// the storage state the `admin`/`editor` fixtures load. This is more reliable
+	// than driving the wp-login.php form in a browser, whose submit can fail to
+	// navigate on a fresh context.
+	console.log('Authenticating with WordPress...');
+	const requestContext = await request.newContext({ baseURL });
+	const requestUtils = new RequestUtils(requestContext, { storageStatePath });
+	await requestUtils.setupRest();
+	await requestContext.dispose();
 	console.log('Login successful!');
-
-	// Save authentication state
-	await context.storageState({ path: storageStatePath });
-
-	await browser.close();
 }
 
 export default globalSetup;
