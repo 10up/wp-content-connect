@@ -7,6 +7,18 @@ use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
 class REST {
 
 	/**
+	 * Per-request cache of relationship data, keyed by post type.
+	 *
+	 * In the `view` context the relationship set depends only on the post type,
+	 * so it can be reused across every post of that type in a collection response.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var array<string, array>
+	 */
+	private $relationships_by_type = array();
+
+	/**
 	 * Setup the REST module.
 	 *
 	 * @since 2.0.0
@@ -43,7 +55,13 @@ class REST {
 			return $response;
 		}
 
-		$relationships_data = get_post_relationships_data( $post->ID );
+		// The relationship set is the same for every post of a given type in the
+		// view context, so compute it once per type per request.
+		if ( ! isset( $this->relationships_by_type[ $post->post_type ] ) ) {
+			$this->relationships_by_type[ $post->post_type ] = get_post_relationships_data( $post->ID );
+		}
+
+		$relationships_data = $this->relationships_by_type[ $post->post_type ];
 
 		if ( empty( $relationships_data ) ) {
 			return $response;

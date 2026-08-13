@@ -645,10 +645,12 @@ class RelatedEntities extends AbstractPostRoute {
 		if ( $total_items < 1 && $page > 1 ) {
 			// On an out-of-bounds page the relationship_query JOIN can leave found_posts at 0,
 			// so re-run without the paged LIMIT to get an accurate total for pagination headers.
+			// Only the count is needed, so fetch a single row of IDs rather than full posts.
 			unset( $query_args['paged'] );
+			$query_args['fields']         = 'ids';
+			$query_args['posts_per_page'] = 1;
 
-			$count_query = new \WP_Query();
-			$count_query->query( $query_args );
+			$count_query = new \WP_Query( $query_args );
 			$total_items = $count_query->found_posts;
 		}
 
