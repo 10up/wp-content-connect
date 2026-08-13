@@ -67,6 +67,22 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 */
 	protected function prepare_post_items( $items, $relationship ) {
 
+		// Prime the post cache in a single query so preparing each item does not
+		// trigger a get_post() query per item (the write path passes IDs).
+		$post_ids = array_filter(
+			array_map(
+				static function ( $item ) {
+					return $item instanceof \WP_Post ? $item->ID : (int) $item;
+				},
+				$items
+			)
+		);
+
+		if ( ! empty( $post_ids ) ) {
+			// Only the post objects are needed (ID, title, type); skip term/meta caches.
+			_prime_post_caches( $post_ids, false, false );
+		}
+
 		$prepared_items = array();
 
 		foreach ( $items as $item ) {
@@ -86,6 +102,21 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 * @return array
 	 */
 	protected function prepare_user_items( $items, $relationship ) {
+
+		// Prime the user cache (objects + meta) in a single query so preparing
+		// each item does not trigger a get_user_by() query per item.
+		$user_ids = array_filter(
+			array_map(
+				static function ( $item ) {
+					return $item instanceof \WP_User ? $item->ID : (int) $item;
+				},
+				$items
+			)
+		);
+
+		if ( ! empty( $user_ids ) ) {
+			cache_users( $user_ids );
+		}
 
 		$prepared_items = array();
 
