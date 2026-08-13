@@ -240,7 +240,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
 	 */
-	public function update_items( $request ) {
+	public function update_items( \WP_REST_Request $request ) {
 
 		$post = $this->get_post( $request['id'] );
 
@@ -273,7 +273,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
-	public function update_items_permissions_check( $request ) {
+	public function update_items_permissions_check( \WP_REST_Request $request ) {
 
 		$post_id = $request->get_param( 'id' );
 
@@ -296,7 +296,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
 	 */
-	public function add_item( $request ) {
+	public function add_item( \WP_REST_Request $request ) {
 
 		$post = $this->get_post( $request['id'] );
 
@@ -347,7 +347,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
-	public function add_item_permissions_check( $request ) {
+	public function add_item_permissions_check( \WP_REST_Request $request ) {
 		return $this->update_items_permissions_check( $request );
 	}
 
@@ -359,7 +359,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
 	 */
-	public function delete_item( $request ) {
+	public function delete_item( \WP_REST_Request $request ) {
 
 		$post = $this->get_post( $request['id'] );
 
@@ -404,7 +404,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
-	public function delete_item_permissions_check( $request ) {
+	public function delete_item_permissions_check( \WP_REST_Request $request ) {
 		return $this->update_items_permissions_check( $request );
 	}
 
@@ -415,7 +415,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @param mixed            $value   The value of the 'orderby' request parameter.
 	 * @param \WP_REST_Request $request The request object.
-	 * @return array
+	 * @return true|\WP_Error True if valid, WP_Error otherwise.
 	 */
 	public function validate_orderby_request_arg( $value, \WP_REST_Request $request ) {
 		$rel_type = $request->get_param( 'rel_type' );
@@ -599,8 +599,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post         $post    The post object.
-	 * @param \WP_REST_Request $request The request object.
+	 * @param \WP_Post                                         $post         The post object.
+	 * @param \WP_REST_Request                                 $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
 	 * @return array<string, mixed> Associative array containing:
 	 *                              - 'items' (array) The related posts.
 	 *                              - 'total' (int) The total number of posts found.
@@ -671,8 +672,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post         $post    The post object.
-	 * @param \WP_REST_Request $request The request object.
+	 * @param \WP_Post                                         $post         The post object.
+	 * @param \WP_REST_Request                                 $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
 	 * @return array<string, mixed> Associative array containing:
 	 *                              - 'items' (array) The related users.
 	 *                              - 'total' (int) The total number of users found.

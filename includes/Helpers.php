@@ -136,6 +136,8 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_by' ) 
 				case 'any':
 					$post_to_post_relationships[ $key ] = $relationship;
 					break;
+				default:
+					break;
 			}
 		}
 

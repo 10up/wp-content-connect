@@ -23,6 +23,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	/**
 	 * Retrieves the default params for a post route.
 	 *
+	 * @since 2.0.0
+	 *
 	 * @return array
 	 */
 	public function get_route_params() {
