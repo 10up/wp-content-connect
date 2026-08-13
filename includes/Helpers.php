@@ -498,6 +498,7 @@ if ( ! function_exists( __NAMESPACE__ . '\\get_post_to_post_relationships_data' 
 					),
 					'update_post_meta_cache' => false,
 					'update_post_term_cache' => false,
+					'no_found_rows'          => true,
 				);
 
 				if ( ! empty( $relationship_data['sortable'] ) ) {
