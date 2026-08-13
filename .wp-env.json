@@ -1,5 +1,5 @@
 {
-	"core": "WordPress/WordPress#master",
+	"core": "WordPress/WordPress#7.0.3",
 	"phpVersion": "8.2",
 	"plugins": [
 		".",
@@ -11,9 +11,5 @@
 	"config": {
 		"WP_DEBUG": true,
 		"SCRIPT_DEBUG": true
-	},
-	"lifecycleScripts": {
-		"afterStart": "wp-env run tests-cli wp content-connect-example generate"
 	}
 }
-

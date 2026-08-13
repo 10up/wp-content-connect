@@ -50,6 +50,10 @@ class Search {
 			return false;
 		}
 
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return false;
+		}
+
 		$nonce = $request->get_param( 'nonce' );
 
 		// If the user got the nonce, they were on the proper edit page

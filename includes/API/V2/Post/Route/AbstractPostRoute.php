@@ -3,6 +3,8 @@
 namespace TenUp\ContentConnect\API\V2\Post\Route;
 
 use TenUp\ContentConnect\API\V2\AbstractRoute;
+use function TenUp\ContentConnect\Helpers\get_related_post_item_data;
+use function TenUp\ContentConnect\Helpers\get_related_user_item_data;
 
 /**
  * Abstract class for post REST API routes.
@@ -20,6 +22,8 @@ abstract class AbstractPostRoute extends AbstractRoute {
 
 	/**
 	 * Retrieves the default params for a post route.
+	 *
+	 * @since 2.0.0
 	 *
 	 * @return array
 	 */
@@ -57,11 +61,27 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array  $items        Post objects.
-	 * @param string $relationship Relationship name.
+	 * @param array                                            $items        Post objects.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_post_items( $items, $relationship ) {
+
+		// Prime the post cache in a single query so preparing each item does not
+		// trigger a get_post() query per item (the write path passes IDs).
+		$post_ids = array_filter(
+			array_map(
+				static function ( $item ) {
+					return $item instanceof \WP_Post ? $item->ID : (int) $item;
+				},
+				$items
+			)
+		);
+
+		if ( ! empty( $post_ids ) ) {
+			// Only the post objects are needed (ID, title, type); skip term/meta caches.
+			_prime_post_caches( $post_ids, false, false );
+		}
 
 		$prepared_items = array();
 
@@ -77,11 +97,26 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array  $items        User objects.
-	 * @param string $relationship Relationship name.
+	 * @param array                                            $items        User objects.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_user_items( $items, $relationship ) {
+
+		// Prime the user cache (objects + meta) in a single query so preparing
+		// each item does not trigger a get_user_by() query per item.
+		$user_ids = array_filter(
+			array_map(
+				static function ( $item ) {
+					return $item instanceof \WP_User ? $item->ID : (int) $item;
+				},
+				$items
+			)
+		);
+
+		if ( ! empty( $user_ids ) ) {
+			cache_users( $user_ids );
+		}
 
 		$prepared_items = array();
 
@@ -97,38 +132,12 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int|\WP_Post $item         Post object or ID.
-	 * @param string       $relationship Relationship name.
+	 * @param int|\WP_Post                                     $item         Post object or ID.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_post_item( $item, $relationship ) {
-
-		if ( is_numeric( $item ) ) {
-			$item = get_post( $item );
-		}
-
-		$item_data = array(
-			'ID'   => $item->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
-			'id'   => $item->ID,
-			'name' => $item->post_title,
-			'type' => $item->post_type,
-		);
-
-		/** This filter is documented in includes/UI/MetaBox.php */
-		$item_data = apply_filters( 'tenup_content_connect_final_post', $item_data, $relationship );
-
-		/** This filter is documented in includes/Helpers.php */
-		$item_data = apply_filters( 'tenup_content_connect_post_item_data', $item_data, $item, $relationship );
-
-		if ( empty( $item_data['type'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['type'] = $item->post_type;
-		}
-
-		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['uuid'] = wp_generate_uuid4();
-		}
-
-		return $item_data;
+		return get_related_post_item_data( $item, $relationship );
 	}
 
 	/**
@@ -136,45 +145,11 @@ abstract class AbstractPostRoute extends AbstractRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int|\WP_User $item         User object or ID.
-	 * @param string       $relationship Relationship name.
+	 * @param int|\WP_User                                     $item         User object or ID.
+	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship Relationship object.
 	 * @return array
 	 */
 	protected function prepare_user_item( $item, $relationship ) {
-
-		if ( is_numeric( $item ) ) {
-			$item = get_user_by( 'ID', $item );
-		}
-
-		$item_name = $item->display_name;
-
-		if ( empty( $item_name ) ) {
-			$item_name = array( $item->first_name, $item->last_name );
-			$item_name = array_filter( $item_name );
-			$item_name = implode( ' ', $item_name );
-		}
-
-		$item_data = array(
-			'ID'   => $item->ID, // Kept for backwards compatibility with filters that expected the legacy `ID` key.
-			'id'   => $item->ID,
-			'name' => $item_name,
-			'type' => 'user',
-		);
-
-		/** This filter is documented in includes/UI/MetaBox.php */
-		$item_data = apply_filters( 'tenup_content_connect_final_user', $item_data, $relationship );
-
-		/** This filter is documented in includes/Helpers.php */
-		$item_data = apply_filters( 'tenup_content_connect_user_item_data', $item_data, $item, $relationship );
-
-		if ( empty( $item_data['type'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['type'] = 'user';
-		}
-
-		if ( empty( $item_data['uuid'] ) ) { // This is required for the 10up Content Picker component.
-			$item_data['uuid'] = wp_generate_uuid4();
-		}
-
-		return $item_data;
+		return get_related_user_item_data( $item, $relationship );
 	}
 }

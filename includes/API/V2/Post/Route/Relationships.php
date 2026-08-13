@@ -18,19 +18,14 @@ class Relationships extends AbstractPostRoute {
 	 */
 	public function register_routes() {
 
+		$params = $this->get_route_params();
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/relationships',
 			array(
 				'args' => array(
-					'id'        => array(
-						'description'       => __( 'The current post ID.', 'wp-content-connect' ),
-						'type'              => 'integer',
-						'sanitize_callback' => 'absint',
-						'validate_callback' => 'rest_validate_request_arg',
-						'required'          => true,
-						'minimum'           => 1,
-					),
+					'id'        => $params['id'],
 					'rel_type'  => array(
 						'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
 						'type'              => 'string',

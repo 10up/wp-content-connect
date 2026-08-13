@@ -2,6 +2,8 @@
 
 namespace TenUp\ContentConnect\UI;
 
+use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
+
 /**
  * Class BlockEditor
  *
@@ -24,6 +26,22 @@ class BlockEditor {
 	 * @since 2.0.0
 	 */
 	public function enqueue_block_editor_assets() {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return;
+		}
+
+		// Skip loading the bundle for post types that have no registered relationships.
+		$relationships = get_post_relationships_data( $post );
+
+		if ( empty( $relationships ) ) {
+			return;
+		}
 
 		if ( file_exists( CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php' ) ) {
 			$asset_info = require CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php';

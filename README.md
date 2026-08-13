@@ -2,7 +2,16 @@
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
 
-[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v6.7%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.0%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+
+## Requirements
+
+- WordPress 6.8 or later
+- PHP 7.4 or later
+
+## Overview
+
+WP Content Connect defines and manages post-to-post and post-to-user relationships. Relationships are edited in both the **Block Editor** (a relationships panel in the document sidebar) and the **Classic Editor** (relationship meta boxes), and are exposed through a REST API and a set of PHP helper functions. See [REST API](#rest-api), [Helper Functions](#helper-functions), and [Customizing the Block Editor UI](#customizing-the-block-editor-ui).
 
 ## Installation and Usage
 
@@ -20,7 +29,7 @@ or directly in `composer.json`:
 
 ```
   "require": {
-    "10up/wp-content-connect": "^1.6.0"
+    "10up/wp-content-connect": "^2.0.0"
   }
 ```
 
@@ -39,17 +48,17 @@ Alternatively, if you prefer to have composer install it as a plugin, you may re
       "package": {
         "name": "10up/wp-content-connect",
         "type": "wordpress-plugin",
-        "version": "1.6.0",
+        "version": "2.0.0",
         "source": {
           "url": "https://github.com/10up/wp-content-connect.git",
           "type": "git",
-          "reference": "1.6.0"
+          "reference": "2.0.0"
         }
       }
     }
   ],
   "require": {
-    "10up/wp-content-connect": "^1.5",
+    "10up/wp-content-connect": "^2.0",
     "composer/installers": "^1.7"
   },
   "extra": {
@@ -87,11 +96,12 @@ Args expects options for the `from` and `to` sides of the relationship as top le
 
 - `enable_ui` (Bool) - Should the default UI be enabled for the current side of this relationship
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
+- `max_items` (Int) - Maximum number of items that can be selected for the current side of this relationship. Defaults to `100`.
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
 #### Return Value
 
-This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToPost` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToPost` specific to this relationship. The object can then be used to manage related items manually, if required. See the [Manually Managing Relationships](#manually-managing-relationships) section below.
 
 Example:
 
@@ -138,11 +148,12 @@ Args expects options for the `from` (post type) side of the relationship as a to
 
 - `enable_ui` (Bool) - Should the default UI be enabled for the current side of this relationship
 - `sortable` (Bool) - Should the relationship be sortable for the current side of this relationship
+- `max_items` (Int) - Maximum number of items that can be selected for the current side of this relationship. Defaults to `100`.
 - `labels` (Array) - Labels used in the UI for the relationship. Currently only expects one value, `name` (String)
 
 #### Return Value
 
-This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToUser` specific to this relationship. The object can then be used to manage related items manually, if required. See the <@TODO insert link> section below.
+This method returns an instance of `\TenUp\ContentConnect\Relationships\PostToUser` specific to this relationship. The object can then be used to manage related items manually, if required. See the [Manually Managing Relationships](#manually-managing-relationships) section below.
 
 Example:
 
@@ -229,6 +240,7 @@ For example, this is fine:
 ```
 
 while this will not work (orderby will be ignored):
+
 ```php
 'relationship_query' => array(
     array(
@@ -236,9 +248,9 @@ while this will not work (orderby will be ignored):
         'name' => 'related',
     ),
     array(
-		'related_to_post' => 15,
-		'name' => 'related',
-	),
+  'related_to_post' => 15,
+  'name' => 'related',
+ ),
 ),
 'orderby' => 'relationship',
 ```
@@ -474,6 +486,270 @@ User ID 1 has 5 posts that need to be stored in the following order: 4, 2, 7, 9,
 $relationship->save_user_to_post_sort_data( 1, array( 4, 2, 7, 9, 8 ) );
 ```
 
+## REST API
+
+Content Connect registers a set of `content-connect/v2` REST endpoints used by the editor UIs. They are also available for your own integrations. All endpoints are capability-gated (`edit_posts` / `edit_post`).
+
+- `GET /content-connect/v2/relationships` — List registered relationships. Query args: `rel_type` (`post-to-post` | `post-to-user`), `filter_by` (`key` | `post_type` | `from` | `to` | `any`), `filter_value`.
+- `GET /content-connect/v2/post/<id>/relationships` — Relationships defined for a post. Query args: `rel_type` (`any` | `post-to-post` | `post-to-user`), `post_type`, `context` (`view` | `embed`).
+- `GET /content-connect/v2/post/<id>/related` — Related posts/users for a post. Supports pagination (`page`, `per_page`, `X-WP-Total` / `X-WP-TotalPages` headers), `order`, and `orderby` (including `relationship`). Requires `rel_key` and `rel_type`.
+- `POST /content-connect/v2/post/<id>/related` — Replace the full set of related items with `related_ids`.
+- `PUT /content-connect/v2/post/<id>/related` — Add a single related item (`related_id`).
+- `DELETE /content-connect/v2/post/<id>/related` — Remove a single related item (`related_id`).
+
+Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links.
+
+> The legacy `POST /content-connect/v1/search` endpoint is **deprecated** as of 2.0.0. Use the v2 endpoints above.
+
+## Helper Functions
+
+Content Connect ships namespaced helper functions in `TenUp\ContentConnect\Helpers` for reading relationship data without touching the database directly:
+
+- `get_plugin()` — The plugin instance.
+- `get_registry()` — The relationship registry instance.
+- `get_related_ids_by_name( $post_id, $relationship_name )` — Related post IDs for a post by relationship name, across post types.
+- `get_post_to_post_relationships_by( $field = 'any', $value = '' )` — Post-to-post relationships filtered by `key`, `post_type`, `from`, `to`, or `any`.
+- `get_post_to_user_relationships_by( $field = 'any', $value = '' )` — Post-to-user relationships filtered by `key`, `post_type`, or `any`.
+- `get_post_relationships_data( $post, $rel_type = 'any', $other_post_type = false, $context = 'view' )` — Combined relationship data for a post.
+- `get_post_to_post_relationships_data( $post, $other_post_type = false, $context = 'view' )` — Post-to-post relationship data for a post.
+- `get_post_to_user_relationships_data( $post, $context = 'view' )` — Post-to-user relationship data for a post.
+
+Pass `$context = 'embed'` to include the actual related posts/users in the returned data (defaults to `'view'` for performance).
+
+## Customizing the Block Editor UI
+
+Content Connect provides WordPress JavaScript filters that allow you to customize the search results and picked items display in the Block Editor. These filters are context-aware and receive relationship information, enabling both global and per-relationship customization.
+
+### Available Filters
+
+#### `contentConnect.searchResultFilter`
+
+Customizes how search results are displayed in the ContentPicker component. This filter receives the default filter function and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.searchResultFilter',
+  'your-plugin/namespace',
+  (defaultFilter, context) => {
+    // Return a custom filter function
+  }
+);
+```
+
+**Context Object:**
+
+```typescript
+{
+  rel_key: string; // The relationship key
+  rel_type: string; // 'post-to-post' or 'post-to-user'
+  postId: number | null; // Current post ID
+  mode: 'post' | 'user'; // Content search mode
+}
+```
+
+#### `contentConnect.pickedItemFilter`
+
+Customizes how picked items are displayed in the ContentPicker component list. This filter receives the default filter function and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'your-plugin/namespace',
+  (defaultFilter, context) => {
+    // Return a custom filter function
+  }
+);
+```
+
+#### `contentConnect.pickedItemPreviewComponent`
+
+Customizes the React component used to render picked items in the ContentPicker component list. This filter receives the default filter and a context object containing relationship information.
+
+**Filter:**
+
+```javascript
+addFilter(
+  'contentConnect.pickedItemPreviewComponent',
+  'your-plugin/namespace',
+  (defaultComponent, context) => {
+    // Return a custom React component
+  }
+);
+```
+
+### Usage Examples
+
+#### Global Customization
+
+Apply the same customization to all relationships:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/customize-search-results',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}`,
+      };
+    };
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/customize-picked-items',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}`,
+      };
+    };
+  }
+);
+```
+
+#### Per-Relationship Customization
+
+Customize behavior based on the relationship key or type:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/customize-specific-relationship',
+  (defaultFilter, context) => {
+    // Only customize for a specific relationship
+    if (context.rel_key === 'my-specific-relationship') {
+      return (item, result) => {
+        return {
+          ...item,
+          url: '',
+          info: `<strong>Special:</strong> ${result.id}`,
+        };
+      };
+    }
+    // Return default for other relationships
+    return defaultFilter;
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/customize-picked-items-by-type',
+  (defaultFilter, context) => {
+    // Customize based on relationship type
+    if (context.rel_type === 'post-to-user') {
+      return (item, result) => {
+        return {
+          ...item,
+          url: '',
+          info: `User: ${result.name || result.username}`,
+        };
+      };
+    }
+    return defaultFilter;
+  }
+);
+```
+
+#### Accessing Additional REST API Fields
+
+To display additional fields from the REST API, you may need to register them first in PHP:
+
+```php
+add_action('rest_api_init', function() {
+    register_rest_field('search-result', 'excerpt', array(
+        'get_callback' => function($post) {
+            return get_the_excerpt($post['id']);
+        },
+        'update_callback' => null,
+        'schema' => null,
+    ));
+});
+```
+
+Then use them in your filter:
+
+```javascript
+addFilter(
+  'contentConnect.searchResultFilter',
+  'my-project/add-excerpt',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      // result.excerpt is a string from the REST API search endpoint
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}<br>${result.excerpt || ''}`,
+      };
+    };
+  }
+);
+
+addFilter(
+  'contentConnect.pickedItemFilter',
+  'my-project/add-excerpt-to-picked',
+  (defaultFilter, context) => {
+    return (item, result) => {
+      // result.excerpt.rendered is from getEntityRecord (core WordPress entity)
+      return {
+        ...item,
+        url: '',
+        info: `<strong>ID:</strong> ${result.id}<br>${result.excerpt?.rendered || ''}`,
+      };
+    };
+  }
+);
+```
+
+#### Custom Preview Component
+
+Customize the React component used to render picked items:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+import { __experimentalText as Text } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
+
+addFilter(
+  'contentConnect.pickedItemPreviewComponent',
+  'my-project/custom-preview',
+  (defaultComponent, context) => {
+    return ({ item }) => {
+      const decodedTitle = decodeEntities(item.title);
+      return (
+        <Text
+          truncate={false}
+          title={decodedTitle}
+          aria-label={decodedTitle}
+        >
+          {decodedTitle}
+        </Text>
+      );
+    };
+  }
+);
+```
+
+### Best Practices
+
+1. **Return Plain Functions**: Filter callbacks should return plain functions, not React hooks. The component handles memoization internally. For `pickedItemPreviewComponent`, return a React component function.
+2. **Check Context**: Use the context object to conditionally apply customizations based on relationship key, type, or post ID
+3. **Return Default When Appropriate**: If your filter doesn't apply to a specific context, return the `defaultFilter` or `defaultComponent` to maintain default behavior
+4. **Type Safety**: Use TypeScript types when available to ensure type safety
+
 ## Support Level
 
 **Stable:** 10up is not planning to develop any new features for this, but will still respond to bug reports and security concerns. We welcome PRs, but any that include new features should be small and easy to integrate and should not include breaking changes. We otherwise intend to keep this tested up to the most recent version of WordPress.
@@ -485,7 +761,6 @@ A complete listing of all notable changes to WP Content Connect are documented i
 ## Contributing
 
 Please read [CODE_OF_CONDUCT.md](https://github.com/10up/wp-content-connect/blob/develop/CODE_OF_CONDUCT.md) for details on our code of conduct, [CONTRIBUTING.md](https://github.com/10up/wp-content-connect/blob/develop/CONTRIBUTING.md) for details on the process for submitting pull requests to us, and [CREDITS.md](https://github.com/10up/wp-content-connect/blob/develop/CREDITS.md) for a listing of maintainers of, contributors to, and libraries used by WP Content Connect.
-
 
 ## Like what you see?
 
