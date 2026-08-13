@@ -166,8 +166,18 @@ export class ContentConnectPage {
 	async searchAndWaitForResults(relKey: string, searchTerm: string): Promise<void> {
 		const searchInput = this.getContentPickerSearchInput(relKey);
 		await searchInput.fill(searchTerm);
-		await this.getContentPickerResults(relKey).first()
-			.waitFor({ state: 'visible', timeout: TIMEOUTS.SEARCH_RESULTS });
+
+		// The Content Picker debounces the query, fetches, and re-renders, so the
+		// result list briefly empties between the initial (unfiltered) list and the
+		// filtered results. Waiting for the first result can pass on that stale list
+		// and then miss the specific match during the re-render window. Poll for the
+		// result matching the search term instead, re-querying until it renders.
+		await expect
+			.poll(
+				() => this.getSearchResultByText(relKey, searchTerm).isVisible(),
+				{ timeout: TIMEOUTS.PANEL_VISIBLE }
+			)
+			.toBe(true);
 	}
 
 	async removeFirstSelectedItem(relKey: string): Promise<void> {
