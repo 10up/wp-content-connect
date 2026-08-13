@@ -20,7 +20,7 @@ function extractJSON(output: string): any {
 }
 
 async function globalSetup(config: FullConfig): Promise<void> {
-	const baseURL = config.projects[0].use.baseURL ?? 'http://localhost:8913';
+	const baseURL = config.projects[0].use.baseURL ?? 'http://localhost:8889';
 
 	// Ensure auth directory exists
 	const authDir = path.dirname(storageStatePath);

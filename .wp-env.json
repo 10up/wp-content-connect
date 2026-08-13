@@ -1,8 +1,6 @@
 {
 	"core": "WordPress/WordPress#7.0.3",
 	"phpVersion": "8.2",
-	"port": 8912,
-	"testsPort": 8913,
 	"plugins": [
 		".",
 		"./tests/plugin/content-connect-example-data"

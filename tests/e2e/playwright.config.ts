@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as path from 'path';
 
-const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8913';
+const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8889';
 const storageStatePath = path.join(__dirname, '.auth/admin.json');
 
 export default defineConfig({
