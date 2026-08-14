@@ -100,7 +100,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 
 		return {
 			...query,
-			orderByRelationship: orderByRelationship && selectedRelationship.sortable,
+			orderByRelationship: (orderByRelationship ?? true) && selectedRelationship.sortable,
 			relationshipQuery: [
 				{
 					name: selectedRelationship.rel_name,
@@ -132,7 +132,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 			showRelated: false,
 			sourcePost: undefined,
 			relationshipKey: undefined,
-			orderByRelationship: true,
+			orderByRelationship: undefined,
 		});
 	};
 
@@ -219,14 +219,14 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				)}
 				{showRelated && selectedRelationship?.sortable && (
 					<ToolsPanelItem
-						hasValue={() => !!orderByRelationship}
+						hasValue={() => orderByRelationship !== undefined}
 						label={__('Order by relationship', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ orderByRelationship: undefined })}
 					>
 						<ToggleControl
 							__nextHasNoMarginBottom
 							label={__('Order by relationship', 'tenup-content-connect')}
-							checked={orderByRelationship}
+							checked={orderByRelationship ?? true}
 							onChange={onOrderByRelationshipChange}
 							help={__(
 								'If enabled, the order of the posts will be determined by the selected relationship. This supersedes any other ordering.',
@@ -255,7 +255,6 @@ registerBlockExtension('core/query', {
 		},
 		orderByRelationship: {
 			type: 'boolean',
-			default: true,
 		},
 	},
 	classNameGenerator: () => '',
