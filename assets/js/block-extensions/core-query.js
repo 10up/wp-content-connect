@@ -15,6 +15,7 @@ import {
 	Notice,
 	SelectControl,
 	BaseControl,
+	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -165,11 +166,21 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 					onDeselect={() => resetAll()}
 					isShownByDefault
 				>
-					<ToggleControl
-						label={__('Only show related entities', 'tenup-content-connect')}
-						checked={showRelated}
-						onChange={onShowRelatedChange}
-					/>
+					<VStack spacing={4}>
+						<ToggleControl
+							label={__('Only show related entities', 'tenup-content-connect')}
+							checked={showRelated}
+							onChange={onShowRelatedChange}
+						/>
+						{showRelated && !hasRelationships && (
+							<Notice spokenMessage={null} status="warning" isDismissible={false}>
+								{__(
+									'No relationships exist for the selected post type or post. Try selecting a different post or post type.',
+									'tenup-content-connect',
+								)}
+							</Notice>
+						)}
+					</VStack>
 				</ToolsPanelItem>
 				{showRelated && (
 					<ToolsPanelItem
@@ -189,32 +200,22 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						</BaseControl>
 					</ToolsPanelItem>
 				)}
-				{showRelated && (hasMultipleRelationships || !hasRelationships) && (
+				{showRelated && hasMultipleRelationships && (
 					<ToolsPanelItem
 						hasValue={() => !!relationshipKey}
 						label={__('Relationship', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ relationshipKey: undefined })}
 						isShownByDefault
 					>
-						{hasMultipleRelationships && (
-							<SelectControl
-								options={relationshipsOptions}
-								value={relationshipKey}
-								label={relationshipsControlLabel}
-								onChange={onRelationshipChange}
-								help={relationshipsControlHelp}
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-							/>
-						)}
-						{!hasRelationships && (
-							<Notice spokenMessage={null} status="warning" isDismissible={false}>
-								{__(
-									'No relationships exist for the selected post type or post. Try selecting a different post or post type.',
-									'tenup-content-connect',
-								)}
-							</Notice>
-						)}
+						<SelectControl
+							options={relationshipsOptions}
+							value={relationshipKey}
+							label={relationshipsControlLabel}
+							onChange={onRelationshipChange}
+							help={relationshipsControlHelp}
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+						/>
 					</ToolsPanelItem>
 				)}
 				{showRelated && selectedRelationship?.sortable && (
