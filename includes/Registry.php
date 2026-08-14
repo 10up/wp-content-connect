@@ -147,7 +147,6 @@ class Registry {
 		$key = $this->get_relationship_key( $from, $to, $name );
 
 		$this->post_post_relationships[ $key ] = new PostToPost( $from, $to, $name, $args );
-		$this->post_post_relationships[ $key ]->setup();
 
 		$relationship = $this->post_post_relationships[ $key ];
 
@@ -199,7 +198,7 @@ class Registry {
 	 *
 	 * @param string $post_type Post type.
 	 * @param string $name      Relationship name.
-	 * @return @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
+	 * @return bool|Relationship Returns relationship object if relationship exists, otherwise false.
 	 */
 	public function get_post_to_user_relationship( $post_type, $name ) {
 		$key = $this->get_relationship_key( $post_type, 'user', $name );
@@ -217,7 +216,7 @@ class Registry {
 	 * @param array  $args      Optional. Array of options for the relationship.
 	 *
 	 * @throws \Exception If a relationship already exists between users and the post type with the same name.
-
+	 *
 	 * @return Relationship
 	 */
 	public function define_post_to_user( $post_type, $name, $args = array() ) {
@@ -229,7 +228,6 @@ class Registry {
 		$key = $this->get_relationship_key( $post_type, 'user', $name );
 
 		$this->post_user_relationships[ $key ] = new PostToUser( $post_type, $name, $args );
-		$this->post_user_relationships[ $key ]->setup();
 
 		$relationship = $this->post_user_relationships[ $key ];
 

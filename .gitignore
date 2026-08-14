@@ -27,5 +27,14 @@ npm-debug.log
 sassdoc
 scss-lint-report.xml
 config.codekit
+artifacts/
+.phpunit.result.cache
+test-results/
+tests/e2e/.auth/
+tests/e2e/test-results/
+coverage/
+.playwright-mcp
 
-/dist/
+/assets/js/content-connect.js
+/assets/js/content-connect.min.js
+

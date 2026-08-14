@@ -1,9 +1,9 @@
 === WP Content Connect ===
 Contributors:      10up, cmmarslender, s3rgiosan, jeffpaul
 Tags:
-Requires at least: 6.5
-Tested up to:      6.7
-Stable tag:        1.6.0
+Requires at least: 6.8
+Tested up to:      7.0
+Stable tag:        2.0.0
 Requires PHP:      7.4
 License:           GPL-3.0-or-later
 License URI:       https://spdx.org/licenses/GPL-3.0-or-later.html

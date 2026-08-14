@@ -25,8 +25,7 @@
     "autoload": {
         "psr-4": {
             "TenUp\\ContentConnect\\": "includes",
-            "TenUp\\ContentConnect\\Tests\\Integration\\": "tests/integration",
-            "TenUp\\ContentConnect\\Tests\\Unit\\": "tests/unit"
+            "TenUp\\ContentConnect\\Tests\\": "tests/php"
         },
         "files": [
             "includes/Helpers.php"
@@ -35,12 +34,37 @@
     "require-dev": {
         "10up/phpcs-composer": "^3.0",
         "phpcompatibility/php-compatibility": "dev-develop as 9.99.99",
-        "phpunit/phpunit": "^12.0"
+        "phpunit/phpunit": "^9.0",
+        "yoast/phpunit-polyfills": "^4.0"
     },
     "config": {
+        "sort-packages": true,
         "allow-plugins": {
             "composer/installers": true,
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "archive": {
+        "exclude": [
+            "/node_modules",
+            "/tests",
+            "/.github",
+            "/.git*",
+            "/.claude",
+            ".DS_Store",
+            "/.phpunit.result.cache",
+            "/release",
+            "/artifacts",
+            "/bin",
+            "/docs",
+            "/run-tests.sh",
+            "/phpunit*.xml",
+            "/.wp-env.json",
+            "/.nvmrc",
+            "/build.js",
+            "/CONTRIBUTING.md",
+            "/CODE_OF_CONDUCT.md",
+            "/CREDITS.md"
+        ]
     }
 }

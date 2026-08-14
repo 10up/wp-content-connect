@@ -29,7 +29,7 @@ class Relationships extends AbstractRoute {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(
 						'rel_type'     => array(
-							'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
+							'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'post-to-post',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -37,7 +37,7 @@ class Relationships extends AbstractRoute {
 							'enum'              => array( 'post-to-post', 'post-to-user' ),
 						),
 						'filter_by'    => array(
-							'description'       => __( 'The criteria to filter relationships by.', 'tenup-content-connect' ),
+							'description'       => __( 'The criteria to filter relationships by.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => 'any',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -45,7 +45,7 @@ class Relationships extends AbstractRoute {
 							'enum'              => array( 'key', 'post_type', 'from', 'to', 'any' ),
 						),
 						'filter_value' => array(
-							'description'       => __( 'The value to use with the selected filter.', 'tenup-content-connect' ),
+							'description'       => __( 'The value to use with the selected filter.', 'wp-content-connect' ),
 							'type'              => 'string',
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -60,7 +60,7 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Retrieves a collection of relationships by type.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -110,11 +110,11 @@ class Relationships extends AbstractRoute {
 						'enable_ui'   => $relationship->enable_from_ui,
 					);
 					$prepared_relationships[ $rel_key ]['to']          = array(
-						'object_type' => $relationship->to,
-						'labels'      => $relationship->to_labels,
-						'max_items'   => $relationship->to_max_items,
-						'sortable'    => $relationship->to_sortable,
-						'enable_ui'   => $relationship->enable_to_ui,
+						'object_types' => (array) $relationship->to,
+						'labels'       => $relationship->to_labels,
+						'max_items'    => $relationship->to_max_items,
+						'sortable'     => $relationship->to_sortable,
+						'enable_ui'    => $relationship->enable_to_ui,
 					);
 					break;
 			}
@@ -128,18 +128,18 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Checks if a given request has access to retrieve relationships by type.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view relationships for this type.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				__( 'Sorry, you are not allowed to view relationships for this type.', 'wp-content-connect' ),
+				array( 'status' => 403 )
 			);
 		}
 
@@ -149,7 +149,7 @@ class Relationships extends AbstractRoute {
 	/**
 	 * Validates the `filter_by` parameter.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  mixed            $value   The value to validate.
 	 * @param  \WP_REST_Request $request Full details about the request.
@@ -166,11 +166,11 @@ class Relationships extends AbstractRoute {
 
 		$rel_type = $request->get_param( 'rel_type' );
 
-		if ( 'post-to-user' === $rel_type && in_array( $value, array( 'post_type', 'to' ), true ) ) {
+		if ( 'post-to-user' === $rel_type && in_array( $value, array( 'from', 'to' ), true ) ) {
 			return new \WP_Error(
 				'rest_invalid_param',
 				/* translators: %s: filter value */
-				sprintf( __( '%s is not valid for post-to-user relationships', 'tenup-content-connect' ), $value ),
+				sprintf( __( '%s is not valid for post-to-user relationships', 'wp-content-connect' ), $value ),
 				array( 'status' => 400 )
 			);
 		}

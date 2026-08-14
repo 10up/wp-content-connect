@@ -7,9 +7,21 @@ use function TenUp\ContentConnect\Helpers\get_post_relationships_data;
 class REST {
 
 	/**
+	 * Per-request cache of relationship data, keyed by post type.
+	 *
+	 * In the `view` context the relationship set depends only on the post type,
+	 * so it can be reused across every post of that type in a collection response.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var array<string, array>
+	 */
+	private $relationships_by_type = array();
+
+	/**
 	 * Setup the REST module.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'add_links' ) );
@@ -18,7 +30,7 @@ class REST {
 	/**
 	 * Adds links to the REST API responses for post types that support REST.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 */
 	public function add_links() {
 
@@ -31,7 +43,7 @@ class REST {
 	/**
 	 * Prepares the links for the REST API response.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Response $response The response object.
 	 * @param  \WP_Post          $post     The post object.
@@ -39,35 +51,41 @@ class REST {
 	 */
 	public function prepare_links( $response, $post ) {
 
-		$links = $response->get_links();
+		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+			return $response;
+		}
 
-		$relationships_data = get_post_relationships_data( $post->ID );
+		// The relationship set is the same for every post of a given type in the
+		// view context, so compute it once per type per request.
+		if ( ! isset( $this->relationships_by_type[ $post->post_type ] ) ) {
+			$this->relationships_by_type[ $post->post_type ] = get_post_relationships_data( $post->ID );
+		}
+
+		$relationships_data = $this->relationships_by_type[ $post->post_type ];
 
 		if ( empty( $relationships_data ) ) {
 			return $response;
 		}
 
-		$links['content-connect:relationships'] = [
-			'relationships' => array(
-				'href' => rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) ),
-			),
-		];
+		$response->add_link(
+			'content-connect:relationships',
+			rest_url( sprintf( '/content-connect/v2/post/%d/relationships', $post->ID ) )
+		);
 
 		foreach ( $relationships_data as $relationship ) {
-			$links['content-connect:related'][] = array(
-				'relationship' => $relationship['rel_name'],
-				'href'         => rest_url(
+			$response->add_link(
+				'content-connect:related',
+				rest_url(
 					sprintf(
 						'/content-connect/v2/post/%1$d/related/?rel_key=%2$s&rel_type=%3$s',
 						$post->ID,
-						$relationship['rel_key'],
+						rawurlencode( $relationship['rel_key'] ),
 						$relationship['rel_type']
 					)
 				),
+				array( 'relationship' => $relationship['rel_name'] )
 			);
 		}
-
-		$response->add_links( $links );
 
 		return $response;
 	}

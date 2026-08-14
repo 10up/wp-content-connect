@@ -1,0 +1,15 @@
+{
+	"core": "WordPress/WordPress#7.0.3",
+	"phpVersion": "8.2",
+	"plugins": [
+		".",
+		"./tests/plugin/content-connect-example-data"
+	],
+	"mappings": {
+		"wp-content/plugins/wp-content-connect": "."
+	},
+	"config": {
+		"WP_DEBUG": true,
+		"SCRIPT_DEBUG": true
+	}
+}

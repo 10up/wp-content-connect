@@ -1,6 +1,13 @@
 export type ContentConnectRelatedEntity = {
-	id: number;
+	// The REST API returns a numeric ID, but the ContentPicker component and
+	// persistence layer may surface it as a string, so allow both.
+	id: number | string;
 	name: string;
+	// Object type of the entity (post type slug, or 'user'). Required by the
+	// 10up ContentPicker component.
+	type: string;
+	// Unique identifier used by the 10up ContentPicker component.
+	uuid: string;
 };
 
 // This is the shape the response from the `/content-connect/v2/post/${postId}/related?rel_key=${relKey}` endpoint returns
@@ -35,10 +42,22 @@ export type ContentConnectUpdateRelationshipsBody = {
 
 export type ContentConnectState = {
 	relationships: {
-		[postId: number]: ContentConnectRelationships;
+		[key: string]: ContentConnectRelationships;
 	};
 	relatedEntities: {
 		[key: string]: ContentConnectRelatedEntities;
 	};
 	dirtyEntityIds: Set<number>;
+};
+
+export type Term = {
+	count: number;
+	description: string;
+	id: number;
+	link: string;
+	meta: Record<string, unknown>;
+	name: string;
+	parent: number;
+	slug: string;
+	taxonomy: string;
 };

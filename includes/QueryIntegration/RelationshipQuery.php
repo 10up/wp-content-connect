@@ -65,7 +65,7 @@ class RelationshipQuery {
 
 	public function __construct( $relationship_query, $post_type = '' ) {
 		$this->relationship_query = $relationship_query;
-		$this->post_type = ! empty( $post_type ) ? $post_type : 'post';
+		$this->post_type          = ! empty( $post_type ) ? $post_type : 'post';
 
 		$this->parse_query();
 	}
@@ -78,7 +78,7 @@ class RelationshipQuery {
 
 		if ( $this->has_valid_segments() ) {
 			$this->where = $this->generate_where_clause();
-			$this->join = $this->generate_join_clause();
+			$this->join  = $this->generate_join_clause();
 		}
 	}
 
@@ -87,13 +87,13 @@ class RelationshipQuery {
 	 */
 	public function format_segments() {
 		// Check for any top level keys that should be moved into a nested segment
-		$valid_keys = array(
+		$valid_keys  = array(
 			'related_to_post',
 			'related_to_user',
 			'name',
 		);
 		$new_segment = array();
-		foreach( $valid_keys as $key ) {
+		foreach ( $valid_keys as $key ) {
 			if ( isset( $this->relationship_query[ $key ] ) ) {
 				$new_segment[ $key ] = $this->relationship_query[ $key ];
 				unset( $this->relationship_query[ $key ] );
@@ -103,10 +103,10 @@ class RelationshipQuery {
 			$this->segments[] = $new_segment;
 		}
 
-		foreach( $this->relationship_query as $key => $segment ) {
+		foreach ( $this->relationship_query as $key => $segment ) {
 			if ( is_array( $segment ) && $this->is_valid_segment( $segment ) ) {
 				$this->segments[] = $segment;
-			} else if ( strtolower( $key ) == 'relation' ) {
+			} elseif ( strtolower( $key ) == 'relation' ) {
 				$this->relation = in_array( strtolower( $segment ), array( 'and', 'or' ) ) ? strtoupper( $segment ) : 'AND';
 			}
 		}
@@ -144,7 +144,7 @@ class RelationshipQuery {
 			return false;
 		}
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			if ( $this->is_valid_segment( $segment ) ) {
 				return true;
 			}
@@ -164,24 +164,24 @@ class RelationshipQuery {
 
 		$where_parts = array();
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
 				if ( $relationship instanceof PostToPost ) {
 					$where_parts[] = $wpdb->prepare( "(p2p{$wherecount}.id2 = %d and p2p{$wherecount}.name = %s)", $segment['related_to_post'], $segment['name'] );
-				} else if ( $relationship instanceof PostToUser ) {
+				} elseif ( $relationship instanceof PostToUser ) {
 					$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.user_id = %d and p2u{$wherecount}.name = %s)", $segment['related_to_user'], $segment['name'] );
 				}
 
 				// Only increment counter no "AND" relations, when we are joining a table for each segment
 				if ( $this->relation === 'AND' ) {
-					$wherecount++;
+					++$wherecount;
 				}
 			}
 		}
 
 		if ( ! empty( $where_parts ) ) {
-			$where = " and (" . implode( " {$this->relation} ", $where_parts ) . ")";
+			$where = ' and (' . implode( " {$this->relation} ", $where_parts ) . ')';
 		}
 
 		return $where;
@@ -198,7 +198,7 @@ class RelationshipQuery {
 
 		$join_parts = array();
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
 				if ( $relationship instanceof PostToPost ) {
@@ -208,7 +208,7 @@ class RelationshipQuery {
 						// Track that we've joined the p2p table
 						$this->p2p_join = true;
 					}
-				} else if ( $relationship instanceof PostToUser ) {
+				} elseif ( $relationship instanceof PostToUser ) {
 					if ( $this->relation === 'AND' || $this->p2u_join === false ) {
 						$join_parts[] = " left join {$wpdb->prefix}post_to_user as p2u{$joincount} on {$wpdb->posts}.ID = p2u{$joincount}.post_id";
 
@@ -219,7 +219,7 @@ class RelationshipQuery {
 
 				// Only increment counter no "AND" relations, when we are joining a table for each segment
 				if ( $this->relation === 'AND' ) {
-					$joincount++;
+					++$joincount;
 				}
 			}
 		}
@@ -258,5 +258,4 @@ class RelationshipQuery {
 
 		return $relationship;
 	}
-
 }

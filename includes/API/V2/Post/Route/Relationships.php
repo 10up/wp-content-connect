@@ -18,21 +18,16 @@ class Relationships extends AbstractPostRoute {
 	 */
 	public function register_routes() {
 
+		$params = $this->get_route_params();
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/relationships',
 			array(
 				'args' => array(
-					'id'        => array(
-						'description'       => __( 'The current post ID.', 'tenup-content-connect' ),
-						'type'              => 'integer',
-						'sanitize_callback' => 'absint',
-						'validate_callback' => 'rest_validate_request_arg',
-						'required'          => true,
-						'minLength'         => 1,
-					),
+					'id'        => $params['id'],
 					'rel_type'  => array(
-						'description'       => __( 'The relationship type to filter relationships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'default'           => 'any',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -40,14 +35,14 @@ class Relationships extends AbstractPostRoute {
 						'enum'              => array( 'any', 'post-to-post', 'post-to-user' ),
 					),
 					'post_type' => array(
-						'description'       => __( 'The post type to filter relationships by.', 'tenup-content-connect' ),
+						'description'       => __( 'The post type to filter relationships by.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'default'           => '',
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => 'rest_validate_request_arg',
 					),
 					'context'   => array(
-						'description'       => __( 'Scope under which the request is made; determines fields present in response.' ),
+						'description'       => __( 'Scope under which the request is made; determines fields present in response.', 'wp-content-connect' ),
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_key',
 						'validate_callback' => 'rest_validate_request_arg',
@@ -66,7 +61,7 @@ class Relationships extends AbstractPostRoute {
 	/**
 	 * Retrieves a collection of relationships for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
@@ -87,22 +82,24 @@ class Relationships extends AbstractPostRoute {
 	/**
 	 * Checks if a given request has access to retrieve relationships for a post.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( \WP_REST_Request $request ) {
 
-		if ( ! is_user_logged_in() ) {
+		$post_id = $request->get_param( 'id' );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view relationships for this post.', 'tenup-content-connect' ),
-				array( 'status' => 401 )
+				__( 'Sorry, you are not allowed to view relationships for this post.', 'wp-content-connect' ),
+				array( 'status' => 403 )
 			);
 		}
 
-		$post = $this->get_post( $request['id'] );
+		$post = $this->get_post( $post_id );
 
 		if ( is_wp_error( $post ) ) {
 			return $post;
@@ -117,7 +114,7 @@ class Relationships extends AbstractPostRoute {
 			if ( ! in_array( $post_type, $post_types, true ) ) {
 				return new \WP_Error(
 					'rest_invalid_post_type',
-					__( 'Invalid post type.', 'tenup-content-connect' ),
+					__( 'Invalid post type.', 'wp-content-connect' ),
 					array( 'status' => 400 )
 				);
 			}

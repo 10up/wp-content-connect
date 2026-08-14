@@ -4,6 +4,14 @@ namespace TenUp\ContentConnect\API\V1;
 
 use TenUp\ContentConnect\Plugin;
 
+/**
+ * Legacy REST API search endpoint.
+ *
+ * @deprecated 2.0.0 Use REST API V2 endpoints instead:
+ *                   - GET /content-connect/v2/relationships
+ *                   - GET /content-connect/v2/post/{id}/relationships
+ *                   - GET/POST/PUT/DELETE /content-connect/v2/post/{id}/related
+ */
 class Search {
 
 	public function setup() {
@@ -39,6 +47,10 @@ class Search {
 		$user = wp_get_current_user();
 
 		if ( 0 === $user->ID ) {
+			return false;
+		}
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
 			return false;
 		}
 
