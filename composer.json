@@ -33,6 +33,7 @@
     },
     "require-dev": {
         "10up/phpcs-composer": "^3.0",
+        "doctrine/instantiator": "^1.5",
         "phpcompatibility/php-compatibility": "dev-develop as 9.99.99",
         "phpunit/phpunit": "^9.0",
         "yoast/phpunit-polyfills": "^4.0"

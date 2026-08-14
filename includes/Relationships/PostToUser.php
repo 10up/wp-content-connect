@@ -212,6 +212,11 @@ class PostToUser extends Relationship {
 		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 		$table->replace_bulk( $fields, $data );
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_user_ids, $this->name, 'post-to-user' );
 	}
 
 	/**
@@ -252,6 +257,11 @@ class PostToUser extends Relationship {
 		/** @var \TenUp\ContentConnect\Tables\PostToUser $table */
 		$table = Plugin::instance()->get_table( 'p2u' );
 		$table->replace_bulk( $fields, $data );
+
+		/**
+		 * This action is documented in PostToPost.php
+		 */
+		do_action( 'tenup-content-connect-update-relationships-order', $user_id, $ordered_post_ids, $this->name, 'user-to-post' );
 	}
 
 	/**
