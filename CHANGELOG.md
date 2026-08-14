@@ -31,6 +31,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 - Block Editor UI integration with automatic relationship panels in the Document Settings sidebar (props [@fabiankaegy](https://github.com/fabiankaegy), [@barryceelen](https://github.com/barryceelen), [@s3rgiosan](https://github.com/s3rgiosan) via [#94](https://github.com/10up/wp-content-connect/pull/94)).
 - WordPress JavaScript filter hooks `contentConnect.searchResultFilter`, `contentConnect.pickedItemFilter`, and `contentConnect.pickedItemPreviewComponent` for customizing the Block Editor UI, with relationship context awareness (props [@s3rgiosan](https://github.com/s3rgiosan) via [#104](https://github.com/10up/wp-content-connect/pull/104)).
 - WordPress 7.0 compatibility; set WordPress minimum supported version to 6.8 (props [@mphillips](https://github.com/mphillips) via [#120](https://github.com/10up/wp-content-connect/pull/120)).
+- WordPress Playground blueprint (`.github/blueprints/blueprint.json`) for a one-click, zero-install plugin demo (props [@s3rgiosan](https://github.com/s3rgiosan) via [#122](https://github.com/10up/wp-content-connect/pull/122)).
 
 ### Changed
 
