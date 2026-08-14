@@ -2,8 +2,6 @@
 
 namespace TenUp\ContentConnect\QueryIntegration;
 
-use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_data;
-
 class QueryBlockIntegration {
 
 	/**
