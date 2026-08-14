@@ -5,20 +5,13 @@ namespace TenUp\ContentConnect\QueryIntegration;
 class QueryBlockIntegration {
 
 	/**
-	 * The block with its attributes before it gets rendered.
-	 *
-	 * @var array
-	 */
-	public $parsed_block;
-
-	/**
 	 * Setup the Query block integration module.
 	 *
 	 * @since 1.7.0
 	 */
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
-		add_action( 'pre_render_block', array( $this, 'modify_query_loop_query' ), 10, 2 );
+		add_filter( 'query_loop_block_query_vars', array( $this, 'modify_query_loop_query' ), 10, 2 );
 	}
 
 	/**
@@ -54,7 +47,7 @@ class QueryBlockIntegration {
 	 */
 	public function rest_post_query( $args, $request ) {
 
-		if ( isset( $request['relationshipQuery'] ) ) {
+		if ( isset( $request['relationshipQuery'] ) && is_array( $request['relationshipQuery'] ) ) {
 			$args['relationship_query'] = $request['relationshipQuery'];
 		}
 
@@ -70,59 +63,22 @@ class QueryBlockIntegration {
 	/**
 	 * Modifies the query loop arguments when the block is rendered on the front end.
 	 *
-	 * @since 1.7.0
-	 *
-	 * @param  string $block_content The block content.
-	 * @param  array  $block         The block object.
-	 * @return string
-	 */
-	public function modify_query_loop_query( $block_content, $block ) {
-
-		if ( ! $this->is_query_block( $block ) ) {
-			return $block_content;
-		}
-
-		$this->parsed_block = $block;
-
-		add_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) );
-
-		return $block_content;
-	}
-
-	/**
-	 * Applies custom query modifications based on block attributes, then removes itself.
+	 * Reads the relationship attributes from the block's own query context, so each
+	 * Query Loop on the page is handled independently.
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  array $query_args Array containing parameters for `WP_Query`.
-	 * @return array
+	 * @param  array     $query_args Array containing parameters for `WP_Query`.
+	 * @param  \WP_Block $block      The block being rendered.
+	 * @return array Modified query arguments.
 	 */
-	public function get_query_by_attributes_once( $query_args ) {
-		if ( has_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) ) ) {
-			remove_filter( 'query_loop_block_query_vars', array( $this, 'get_query_by_attributes_once' ) );
-		}
+	public function modify_query_loop_query( $query_args, $block ) {
 
-		return $this->get_query_by_attributes( $query_args, $this->parsed_block );
-	}
+		$query_attrs = ( isset( $block->context['query'] ) && is_array( $block->context['query'] ) )
+			? $block->context['query']
+			: array();
 
-	/**
-	 * Generates a modified query based on the block attributes.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param  array $query_args Array containing parameters for `WP_Query`.
-	 * @param  array $block      The block being rendered.
-	 * @return array
-	 */
-	public function get_query_by_attributes( $query_args, $block ) {
-
-		if ( ! $this->is_query_block( $block ) ) {
-			return $query_args;
-		}
-
-		$query_attrs = $block['attrs']['query'] ?? [];
-
-		if ( ! empty( $query_attrs['relationshipQuery'] ) ) {
+		if ( ! empty( $query_attrs['relationshipQuery'] ) && is_array( $query_attrs['relationshipQuery'] ) ) {
 			$query_args['relationship_query'] = $query_attrs['relationshipQuery'];
 		}
 
@@ -131,17 +87,5 @@ class QueryBlockIntegration {
 		}
 
 		return $query_args;
-	}
-
-	/**
-	 * Determines if a given block is a Query Loop block.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param  array $block The block object.
-	 * @return bool
-	 */
-	public function is_query_block( $block ) {
-		return ! empty( $block['blockName'] ) && 'core/query' === $block['blockName'];
 	}
 }
