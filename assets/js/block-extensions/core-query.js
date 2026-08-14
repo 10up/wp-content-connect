@@ -5,7 +5,8 @@
  * External dependencies
  */
 import { v4 as uuidv4 } from 'uuid';
-import { registerBlockExtension, ContentPicker } from '@10up/block-components';
+import { ContentPicker } from '@10up/block-components/components/content-picker';
+import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 
 /**
  * WordPress dependencies
