@@ -4,7 +4,6 @@
 /**
  * External dependencies
  */
-import { v4 as uuidv4 } from 'uuid';
 import { ContentPicker } from '@10up/block-components/components/content-picker';
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 
@@ -35,7 +34,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 	const { query, showRelated, relationshipKey, sourcePost, orderByRelationship } = attributes;
 	const { postType: queriedPostType } = query;
 
-	const { postTypes, relationships, hasRelationships, currentPostId, currentPostType } =
+	const { postTypes, relationships, hasRelationships, hasMultipleRelationships, currentPostId } =
 		useSelect(
 			(select) => {
 				const { getPostTypes } = select(coreStore);
@@ -45,7 +44,6 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 				);
 
 				const currentPostId = select(editorStore).getCurrentPostId();
-				const currentPostType = select(editorStore).getCurrentPostType();
 
 				const postRelationships = select(store).getRelationships(
 					sourcePost?.[0]?.id || currentPostId,
@@ -60,8 +58,8 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 					postTypes: filteredPostTypes,
 					relationships: filteredRelationships,
 					hasRelationships: filteredRelationships.length > 0,
+					hasMultipleRelationships: filteredRelationships.length > 1,
 					currentPostId,
-					currentPostType,
 				};
 			},
 			[queriedPostType, sourcePost?.length],
@@ -142,16 +140,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 		if (!value) {
 			resetAll();
 		} else {
-			setAttributes({
-				showRelated: value,
-				sourcePost: [
-					{
-						id: currentPostId,
-						type: currentPostType,
-						uuid: uuidv4(),
-					},
-				],
-			});
+			setAttributes({ showRelated: value });
 		}
 	};
 
@@ -187,7 +176,6 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						hasValue={() => !!sourcePost}
 						label={__('Source post', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ sourcePost: undefined })}
-						isShownByDefault
 					>
 						<BaseControl help={sourcePostControlHelp}>
 							<ContentPicker
@@ -201,14 +189,14 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						</BaseControl>
 					</ToolsPanelItem>
 				)}
-				{showRelated && (
+				{showRelated && (hasMultipleRelationships || !hasRelationships) && (
 					<ToolsPanelItem
 						hasValue={() => !!relationshipKey}
 						label={__('Relationship', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ relationshipKey: undefined })}
 						isShownByDefault
 					>
-						{hasRelationships && (
+						{hasMultipleRelationships && (
 							<SelectControl
 								options={relationshipsOptions}
 								value={relationshipKey}
@@ -216,6 +204,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 								onChange={onRelationshipChange}
 								help={relationshipsControlHelp}
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 							/>
 						)}
 						{!hasRelationships && (
