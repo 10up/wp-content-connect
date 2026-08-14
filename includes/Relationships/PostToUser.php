@@ -216,7 +216,7 @@ class PostToUser extends Relationship {
 		/**
 		 * This action is documented in PostToPost.php
 		 */
-		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, $this->name, 'post-to-user' );
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_user_ids, $this->name, 'post-to-user' );
 	}
 
 	/**
