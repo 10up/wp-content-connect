@@ -19,7 +19,7 @@
       "step": "installPlugin",
       "pluginData": {
         "resource": "url",
-        "url": "https://github.com/10up/wp-content-connect/archive/refs/tags/2.0.0-beta.2.zip"
+        "url": "https://github.com/10up/wp-content-connect/archive/refs/heads/develop.zip"
       },
       "options": {
         "activate": true,
