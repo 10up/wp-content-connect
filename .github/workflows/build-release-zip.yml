@@ -46,7 +46,9 @@ jobs:
 
     - name: Install node dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
-      run: npm ci --no-optional
+      # sharp 0.35+ ships its native binary as an optional dependency, and the
+      # build step needs it for image minification, so optional deps must install.
+      run: npm ci
 
     - name: Install composer dependencies
       run: composer install --no-dev -o
