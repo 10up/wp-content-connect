@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { ContentPicker } from '@10up/block-components';
+import { ContentPicker } from '@10up/block-components/components/content-picker';
 import type { WP_REST_API_Search_Result, WP_REST_API_User } from 'wp-types';
 
 /**

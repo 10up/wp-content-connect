@@ -35,7 +35,7 @@
     "test:e2e:reset": "wp-env run tests-cli wp content-connect-example delete --yes && wp-env run tests-cli wp content-connect-example generate"
   },
   "dependencies": {
-    "@10up/block-components": "^1.22.1",
+    "@10up/block-components": "^1.22.4",
     "10up-toolkit": "^7.0.0"
   },
   "10up-toolkit": {
