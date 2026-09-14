@@ -48,11 +48,11 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@wordpress/api-fetch": "^7.18.0",
-    "@wordpress/e2e-test-utils-playwright": "^1.39.0",
+    "@wordpress/e2e-test-utils-playwright": "^2.0.0",
     "@wordpress/data": "^10.18.0",
     "@wordpress/edit-post": "^8.18.0",
     "@wordpress/editor": "^14.18.0",
-    "@wordpress/env": "^10.39.0",
+    "@wordpress/env": "^11.15.0",
     "@wordpress/html-entities": "^4.18.0",
     "@wordpress/url": "^4.18.0",
     "core-js": "^3.38.0",
