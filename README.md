@@ -750,6 +750,12 @@ addFilter(
 3. **Return Default When Appropriate**: If your filter doesn't apply to a specific context, return the `defaultFilter` or `defaultComponent` to maintain default behavior
 4. **Type Safety**: Use TypeScript types when available to ensure type safety
 
+## Frequently Asked Questions
+
+### Where do I report security bugs found in this plugin?
+
+Please report security bugs found in the source code of the undefined plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/4ee25f03-13bc-45ee-8f73-8ee063370dc8). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 ## Support Level
 
 **Stable:** 10up is not planning to develop any new features for this, but will still respond to bug reports and security concerns. We welcome PRs, but any that include new features should be small and easy to integrate and should not include breaking changes. We otherwise intend to keep this tested up to the most recent version of WordPress.
