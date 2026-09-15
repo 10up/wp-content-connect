@@ -254,17 +254,17 @@ register(store);
  * @returns Promise that resolves when all changes are persisted.
  */
 export async function persistContentConnectChanges() {
-	const dirtyEntityIds = select(STORE_NAME).getDirtyEntityIds();
+	const dirtyEntityIds = select(store).getDirtyEntityIds();
 
 	// Process each dirty post
 	await Promise.all(
 		dirtyEntityIds.map(async (postId) => {
-			const relationships = select(STORE_NAME).getRelationships(postId);
+			const relationships = select(store).getRelationships(postId);
 
 			// Update each relationship for the post
 			await Promise.all(
 				(Object.values(relationships) as Array<{ rel_key: string; rel_type: string }>).map(async (relationship) => {
-					const relatedEntities = select(STORE_NAME).getRelatedEntities(postId, {
+					const relatedEntities = select(store).getRelatedEntities(postId, {
 						rel_key: relationship.rel_key,
 						rel_type: relationship.rel_type,
 					});
@@ -285,7 +285,7 @@ export async function persistContentConnectChanges() {
 	);
 
 	// Clear dirty entities after successful save
-	dispatch(STORE_NAME).clearDirtyEntities();
+	dispatch(store).clearDirtyEntities();
 }
 
 // Add the pre-save hook to persist changes
