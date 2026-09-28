@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Changed
+
+- Bump WordPress "tested up to" version to 7.1 (props [@zamanq](https://github.com/zamanq) via [#133](https://github.com/10up/wp-content-connect/pull/133)).
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes
