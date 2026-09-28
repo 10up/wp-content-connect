@@ -2,7 +2,7 @@
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
 
-[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.0%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.1%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
 
 ## Requirements
 
