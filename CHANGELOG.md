@@ -37,6 +37,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 ### Changed
 
 - Replaced the Vue-based Classic Editor UI with a React-based implementation that shares the Block Editor's components and `@wordpress/data` store, for a consistent experience across both editors (props [@s3rgiosan](https://github.com/s3rgiosan) via [#97](https://github.com/10up/wp-content-connect/pull/97)).
+- Bump WordPress "tested up to" version to 7.1 (props [@zamanq](https://github.com/zamanq) via [#133](https://github.com/10up/wp-content-connect/pull/133)).
 
 ### Deprecated
 
