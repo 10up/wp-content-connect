@@ -171,6 +171,10 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 							label={__('Only show related entities', 'tenup-content-connect')}
 							checked={showRelated}
 							onChange={onShowRelatedChange}
+							help={__(
+								'Show only posts related to the current post, or to the source post if one is selected.',
+								'tenup-content-connect',
+							)}
 						/>
 						{showRelated && !hasRelationships && (
 							<Notice spokenMessage={null} status="warning" isDismissible={false}>
@@ -187,6 +191,7 @@ const BlockEdit = ({ setAttributes, attributes }) => {
 						hasValue={() => !!sourcePost}
 						label={__('Source post', 'tenup-content-connect')}
 						onDeselect={() => setAttributes({ sourcePost: undefined })}
+						isShownByDefault
 					>
 						<BaseControl help={sourcePostControlHelp}>
 							<ContentPicker
