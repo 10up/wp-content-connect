@@ -7,8 +7,10 @@
 
 namespace TenUp\ContentConnect\Tests\CustomRelationships;
 
+use TenUp\ContentConnect\CustomRelationships\Loader;
 use TenUp\ContentConnect\CustomRelationships\PostType;
 use TenUp\ContentConnect\Tests\ContentConnectTestCase;
+use function TenUp\ContentConnect\Helpers\get_plugin;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
 /**
@@ -172,6 +174,46 @@ class PostTypeTest extends ContentConnectTestCase {
 	}
 
 	/**
+	 * Tests that post-to-user custom relationships need no related post types and drop any sent.
+	 *
+	 * @return void
+	 */
+	public function test_post_to_user_ignores_related_types() {
+		$response = $this->create_via_rest(
+			array(
+				'rel_type' => 'post-to-user',
+				'rel_to'   => array( 'tire' ),
+				'rel_name' => 'rest-owners',
+			)
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'car_user_rest-owners', $data['rel_key'] );
+		$this->assertSame( array(), Loader::read_post( $data['id'] )['to'] );
+	}
+
+	/**
+	 * Tests that a post-to-user custom relationship collides with one registered from code.
+	 *
+	 * @return void
+	 */
+	public function test_rejects_post_to_user_key_registered_from_code() {
+		get_registry()->define_post_to_user( 'car', 'rest-owners-taken' );
+
+		$response = $this->create_via_rest(
+			array(
+				'rel_type' => 'post-to-user',
+				'rel_to'   => array(),
+				'rel_name' => 'rest-owners-taken',
+			)
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_relationship_exists', $response->get_data()['code'] );
+	}
+
+	/**
 	 * Tests that identifying fields cannot change after saving, while settings can.
 	 *
 	 * @return void
@@ -216,6 +258,43 @@ class PostTypeTest extends ContentConnectTestCase {
 		$response = rest_do_request( new \WP_REST_Request( 'GET', '/content-connect/v2/custom-relationships/' . $post_id ) );
 
 		$this->assertStringContainsString( 'not_registered', $response->get_data()['registration_error'] );
+	}
+
+	/**
+	 * Tests that a key later taken by code is reported on the custom relationship.
+	 *
+	 * @return void
+	 */
+	public function test_registration_error_reports_key_taken_by_code() {
+		$post_id = $this->create_custom_relationship( array( 'rel_name' => 'rest-taken-later' ) );
+
+		get_registry()->define_post_to_post( 'car', 'tire', 'rest-taken-later' );
+		get_plugin()->get_custom_relationships()->register( get_registry() );
+
+		$response = rest_do_request( new \WP_REST_Request( 'GET', '/content-connect/v2/custom-relationships/' . $post_id ) );
+
+		$this->assertStringContainsString( 'already exists', $response->get_data()['registration_error'] );
+	}
+
+	/**
+	 * Tests that editors can neither update nor delete custom relationships.
+	 *
+	 * @return void
+	 */
+	public function test_editor_cannot_update_or_delete_custom_relationship() {
+		$post_id = $this->create_custom_relationship( array( 'rel_name' => 'rest-editor-locked' ) );
+
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'editor' ) ) );
+
+		$updated = $this->update_via_rest( $post_id, array( 'title' => 'Changed by an editor' ) );
+
+		$delete = new \WP_REST_Request( 'DELETE', '/content-connect/v2/custom-relationships/' . $post_id );
+		$delete->set_param( 'force', true );
+		$deleted = rest_do_request( $delete );
+
+		$this->assertSame( 403, $updated->get_status() );
+		$this->assertSame( 403, $deleted->get_status() );
+		$this->assertNotNull( get_post( $post_id ) );
 	}
 
 	/**

@@ -211,4 +211,33 @@ class LoaderTest extends ContentConnectTestCase {
 
 		$this->assertIsArray( get_option( Loader::OPTION ) );
 	}
+
+	/**
+	 * Tests that changing a custom relationship's meta alone clears the compiled option.
+	 *
+	 * @return void
+	 */
+	public function test_updating_meta_invalidates_option() {
+		$post_id = $this->create_custom_relationship();
+
+		( new Loader() )->compile();
+		update_post_meta( $post_id, 'rel_name', 'renamed' );
+
+		$this->assertFalse( get_option( Loader::OPTION ) );
+	}
+
+	/**
+	 * Tests that meta changes on other post types keep the compiled option.
+	 *
+	 * @return void
+	 */
+	public function test_updating_other_meta_keeps_option() {
+		$this->create_custom_relationship();
+		$other_id = $this->factory()->post->create();
+
+		( new Loader() )->compile();
+		update_post_meta( $other_id, 'rel_name', 'unrelated' );
+
+		$this->assertIsArray( get_option( Loader::OPTION ) );
+	}
 }
