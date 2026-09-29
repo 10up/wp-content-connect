@@ -18,8 +18,18 @@ permissions:
 
 jobs:
   test-e2e:
-    name: Playwright E2E
+    name: Playwright E2E (${{ matrix.wp.name }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        wp:
+          # The core pinned in .wp-env.json, which ships @wordpress/boot.
+          - name: WordPress 7.0
+            core: ''
+          # Without boot, the relationships screen edits in a slide-out panel.
+          - name: WordPress 6.9
+            core: WordPress/WordPress#6.9.9
     steps:
       - name: Check out our repo source code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -64,6 +74,11 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
+      - name: Override the WordPress version
+        if: matrix.wp.core != ''
+        run: |
+          echo '{ "core": "${{ matrix.wp.core }}" }' > .wp-env.override.json
+
       # afterStart in .wp-env.json seeds the example data; global-setup re-seeds idempotently.
       - name: Start wp-env
         run: npm run wp-env:start
@@ -75,6 +90,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
-          name: playwright-results
+          name: playwright-results-${{ matrix.wp.name }}
           path: tests/e2e/test-results/
           retention-days: 7

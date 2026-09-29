@@ -31,6 +31,7 @@ artifacts/
 .phpunit.result.cache
 test-results/
 tests/e2e/.auth/
+.wp-env.override.json
 tests/e2e/test-results/
 coverage/
 .playwright-mcp

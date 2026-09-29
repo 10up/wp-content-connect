@@ -298,6 +298,50 @@ class PostTypeTest extends ContentConnectTestCase {
 	}
 
 	/**
+	 * Tests that the panel settings schema rejects a maximum below 1.
+	 *
+	 * @return void
+	 */
+	public function test_rejects_maximum_items_below_one() {
+		$response = $this->create_via_rest(
+			array(
+				'rel_name'  => 'rest-no-items',
+				'from_args' => array(
+					'enable_ui' => true,
+					'sortable'  => false,
+					'max_items' => 0,
+					'labels'    => array( 'name' => 'Tires' ),
+				),
+			)
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_out_of_bounds', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Tests that the panel settings schema rejects unknown settings.
+	 *
+	 * @return void
+	 */
+	public function test_rejects_unknown_panel_settings() {
+		$response = $this->create_via_rest(
+			array(
+				'rel_name' => 'rest-unknown-setting',
+				'to_args'  => array(
+					'enable_ui' => true,
+					'sortable'  => false,
+					'max_items' => 10,
+					'color'     => 'red',
+				),
+			)
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_additional_properties_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
 	 * Creates a custom relationship through the REST API.
 	 *
 	 * @param  array $meta Meta values, merged over a post-to-post default.

@@ -16,6 +16,20 @@ type CustomRelationshipMeta = {
 	to_args?: Record<string, unknown>;
 };
 
+let bootLayout: boolean | null = null;
+
+/**
+ * Whether the tested WordPress ships `@wordpress/boot` (7.0+), which the screen
+ * uses for its layout. Without it the screen edits in a slide-out panel.
+ */
+const hasBootLayout = (): boolean => {
+	bootLayout ??= wpCli(
+		`eval 'echo file_exists( ABSPATH . WPINC . "/js/dist/script-modules/boot/index.min.asset.php" ) ? "boot:yes" : "boot:no";'`,
+	).includes('boot:yes');
+
+	return bootLayout;
+};
+
 /**
  * Creates a custom relationship directly, bypassing the screen.
  */
@@ -178,6 +192,8 @@ test.describe('Relationships admin screen', () => {
 	});
 
 	test('opens the editor from the URL and closes it', async ({ page }) => {
+		test.skip(!hasBootLayout(), 'The editor is only addressable by URL in the boot layout.');
+
 		await page.goto(`${ADMIN_PAGE}&p=${encodeURIComponent('/?edit=new')}`);
 
 		const panel = editorPanel(page);
@@ -488,6 +504,8 @@ test.describe('Relationships admin screen', () => {
 	});
 
 	test('reports a relationship that no longer exists', async ({ page }) => {
+		test.skip(!hasBootLayout(), 'The editor is only addressable by URL in the boot layout.');
+
 		await page.goto(`${ADMIN_PAGE}&p=${encodeURIComponent('/?edit=999999')}`);
 
 		await expect(page.getByText('This relationship no longer exists.')).toBeVisible({
@@ -519,5 +537,64 @@ test.describe('Relationships admin screen', () => {
 
 		await panel.getByLabel('Maximum items').first().fill('5');
 		await expect(save).toBeEnabled();
+	});
+
+	test('edits in a slide-out panel without the boot layout', async ({ page }) => {
+		test.skip(hasBootLayout(), 'WordPress 7.0+ edits in the boot inspector instead.');
+
+		await page.goto(ADMIN_PAGE);
+		await page.getByRole('button', { name: 'Add new Relationship' }).click();
+
+		const slideOut = page.getByRole('dialog', { name: 'Add relationship' });
+		await expect(slideOut).toBeVisible();
+		await expect(slideOut).toHaveAttribute('aria-modal', 'true');
+		await expect(slideOut.getByRole('form', { name: 'Add relationship' })).toBeVisible();
+
+		await slideOut.getByRole('button', { name: 'Close', exact: true }).click();
+		await expect(slideOut).toHaveCount(0);
+	});
+});
+
+test.describe('Relationships admin screen disabled by constant', () => {
+	test.beforeAll(() => {
+		createCustomRelationship('Kept residents', {
+			rel_from: 'city',
+			rel_to: ['person'],
+			rel_name: 'kept-residents',
+		});
+		wpCli('config set CONTENT_CONNECT_ADMIN_UI false --raw --type=constant');
+	});
+
+	test.afterAll(() => {
+		wpCli('config delete CONTENT_CONNECT_ADMIN_UI --type=constant');
+		wpCli(
+			`eval 'foreach ( get_posts( array( "post_type" => "cc_relationship", "post_status" => "any", "numberposts" => -1, "fields" => "ids" ) ) as $id ) { wp_delete_post( $id, true ); }'`,
+		);
+	});
+
+	test('removes the screen and keeps existing relationships working', async ({
+		admin,
+		editor,
+		page,
+		testData,
+	}) => {
+		const ccPage = new ContentConnectPage(page);
+
+		await page.goto('/wp-admin/options-general.php');
+		await expect(
+			page.locator('#adminmenu a[href="options-general.php?page=content-connect"]'),
+		).toHaveCount(0);
+
+		await page.goto(ADMIN_PAGE);
+		await expect(
+			page.getByText('Sorry, you are not allowed to access this page.'),
+		).toBeVisible();
+
+		await admin.editPost(testData.posts.city[0]);
+		await editor.openDocumentSettingsSidebar();
+		await ccPage.expandRelationshipPanel('city_person_kept-residents');
+		await expect(ccPage.getRelationshipManager('city_person_kept-residents')).toBeVisible({
+			timeout: TIMEOUTS.PANEL_VISIBLE,
+		});
 	});
 });
