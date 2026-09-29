@@ -7,7 +7,9 @@
 
 namespace TenUp\ContentConnect\Tests\API\V2\Route;
 
+use TenUp\ContentConnect\CustomRelationships\PostType;
 use TenUp\ContentConnect\Tests\ContentConnectTestCase;
+use function TenUp\ContentConnect\Helpers\get_plugin;
 use function TenUp\ContentConnect\Helpers\get_registry;
 
 /**
@@ -380,5 +382,63 @@ class RelationshipsTest extends ContentConnectTestCase {
 		$this->assertIsInt( $relationship['to']['max_items'] );
 		$this->assertSame( 100, $relationship['from']['max_items'] );
 		$this->assertSame( 100, $relationship['to']['max_items'] );
+	}
+
+	/**
+	 * Tests that relationships registered from code report the code source.
+	 *
+	 * @return void
+	 */
+	public function test_code_relationships_report_code_source() {
+		get_registry()->define_post_to_post( 'car', 'tire', 'test-source-code' );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
+		$data    = rest_do_request( $request )->get_data();
+
+		$this->assertSame( 'code', $data['car_tire_test-source-code']['source'] );
+		$this->assertNull( $data['car_tire_test-source-code']['post_id'] );
+	}
+
+	/**
+	 * Tests that custom relationships report the custom source and their post ID.
+	 *
+	 * @return void
+	 */
+	public function test_custom_relationships_report_custom_source() {
+		$post_id = wp_insert_post(
+			array(
+				'post_type'   => PostType::POST_TYPE,
+				'post_status' => 'publish',
+				'post_title'  => 'Stored',
+			)
+		);
+		update_post_meta( $post_id, 'rel_type', 'post-to-post' );
+		update_post_meta( $post_id, 'rel_from', 'car' );
+		update_post_meta( $post_id, 'rel_to', array( 'tire' ) );
+		update_post_meta( $post_id, 'rel_name', 'test-source-custom' );
+
+		get_plugin()->get_custom_relationships()->register( get_registry() );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
+		$data    = rest_do_request( $request )->get_data();
+
+		$this->assertSame( 'custom', $data['car_tire_test-source-custom']['source'] );
+		$this->assertSame( $post_id, $data['car_tire_test-source-custom']['post_id'] );
+	}
+
+	/**
+	 * Tests that post-to-user relationships include their post type.
+	 *
+	 * @return void
+	 */
+	public function test_post_to_user_includes_post_type() {
+		get_registry()->define_post_to_user( 'car', 'test-source-user' );
+
+		$request = new \WP_REST_Request( 'GET', '/content-connect/v2/relationships' );
+		$request->set_query_params( array( 'rel_type' => 'post-to-user' ) );
+		$data = rest_do_request( $request )->get_data();
+
+		$this->assertSame( 'car', $data['car_user_test-source-user']['post_type'] );
+		$this->assertSame( 100, $data['car_user_test-source-user']['max_items'] );
 	}
 }

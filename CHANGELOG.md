@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+
+- `source` (`code` or `custom`) and `post_id` fields on `GET /content-connect/v2/relationships` items, and `post_type` and `max_items` on post-to-user items.
+
 ### Changed
 
 - Assets are built with Vite through `@10up/wp-vite-plugins` instead of 10up-toolkit's webpack build. Bundle paths and handles are unchanged.
