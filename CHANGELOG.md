@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Changed
+
+- Bump minimum PHP version to 8.2 and test through PHP 8.5.
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes
