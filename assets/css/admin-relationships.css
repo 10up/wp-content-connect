@@ -6,6 +6,7 @@
 	align-items: center;
 	display: flex;
 	gap: 16px;
+	justify-content: space-between;
 }
 
 .content-connect-admin__title {

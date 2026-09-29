@@ -20,7 +20,7 @@ export function PageHeader({ onAdd }: PageHeaderProps) {
 				<h1 className="content-connect-admin__title">
 					{__('Content Connect', 'wp-content-connect')}
 				</h1>
-				<Button variant="primary" onClick={onAdd} __next40pxDefaultSize>
+				<Button variant="secondary" onClick={onAdd} __next40pxDefaultSize>
 					{__('Add new Relationship', 'wp-content-connect')}
 				</Button>
 			</div>
