@@ -10,6 +10,7 @@ use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
+use TenUp\ContentConnect\UI\AdminScreen;
 use TenUp\ContentConnect\UI\BlockEditor;
 use TenUp\ContentConnect\UI\ClassicEditor;
 
@@ -87,6 +88,7 @@ class Plugin {
 
 		$modules = array(
 			new PostType(),
+			new AdminScreen(),
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
 			new ClassicEditor(),
