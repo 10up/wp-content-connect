@@ -15,8 +15,8 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "10up-toolkit build --watch",
-    "build": "10up-toolkit build",
+    "start": "wp-vite watch",
+    "build": "wp-vite build",
     "format-js": "10up-toolkit format-js",
     "lint-js": "10up-toolkit lint-js",
     "lint-style": "10up-toolkit lint-style",
@@ -38,14 +38,8 @@
     "@10up/block-components": "^1.22.1",
     "10up-toolkit": "^7.0.0"
   },
-  "10up-toolkit": {
-    "entry": {
-      "block-editor": "assets/js/index.ts",
-      "classic-editor": "assets/js/classic-editor.tsx",
-      "admin-styles": "assets/css/admin-styles.css"
-    }
-  },
   "devDependencies": {
+    "@10up/wp-vite-plugins": "^1.0.0-alpha.3",
     "@playwright/test": "^1.40.0",
     "@wordpress/api-fetch": "^7.18.0",
     "@wordpress/e2e-test-utils-playwright": "^2.0.0",
@@ -56,6 +50,12 @@
     "@wordpress/html-entities": "^4.18.0",
     "@wordpress/url": "^4.18.0",
     "core-js": "^3.38.0",
-    "node-wp-i18n": "^1.2.7"
+    "node-wp-i18n": "^1.2.7",
+    "vite": "^8.3.1"
+  },
+  "overrides": {
+    "postcss-mixins": {
+      "sugarss": "^5.0.1"
+    }
   }
 }

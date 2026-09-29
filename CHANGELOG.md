@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Changed
+
+- Assets are built with Vite through `@10up/wp-vite-plugins` instead of 10up-toolkit's webpack build. Bundle paths and handles are unchanged.
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes
