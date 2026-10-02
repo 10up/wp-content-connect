@@ -62,4 +62,37 @@ test.describe('Classic Editor', () => {
 		await expect(reloadedItems.first()).toBeVisible({ timeout: TIMEOUTS.PANEL_VISIBLE });
 		await expect(reloadedItems.filter({ hasText: 'City 2' })).toHaveCount(1);
 	});
+
+	test('publishes a new post when a relationship is added before publishing', async ({ page }) => {
+		const ccPage = new ContentConnectPage(page);
+
+		await page.goto('/wp-admin/post-new.php?post_type=department');
+		await ccPage.getRelationshipManager(REL_KEY).waitFor({
+			state: 'visible',
+			timeout: TIMEOUTS.PANEL_VISIBLE,
+		});
+
+		await page.locator('#title').fill('Department Publish Check');
+
+		await ccPage.searchAndSelectItem(REL_KEY, 'City 3');
+		await expect(ccPage.getSelectedItems(REL_KEY).filter({ hasText: 'City 3' })).toHaveCount(1, {
+			timeout: TIMEOUTS.SEARCH_RESULTS,
+		});
+
+		// The interceptor resubmits the form after persisting; the clicked
+		// Publish button must still reach post.php or the post saves as a draft.
+		await Promise.all([
+			page.waitForURL(/post\.php\?post=\d+&action=edit&message=\d+/, {
+				timeout: TIMEOUTS.PANEL_VISIBLE,
+			}),
+			page.locator('#publish').click(),
+		]);
+
+		await expect(page.locator('#message')).toContainText('Post published.');
+		await expect(page.locator('#original_post_status')).toHaveValue('publish');
+
+		const reloadedItems = ccPage.getSelectedItems(REL_KEY);
+		await expect(reloadedItems.first()).toBeVisible({ timeout: TIMEOUTS.PANEL_VISIBLE });
+		await expect(reloadedItems.filter({ hasText: 'City 3' })).toHaveCount(1);
+	});
 });
