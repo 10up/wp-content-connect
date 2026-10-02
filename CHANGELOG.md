@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+
+- PHPStan static analysis and a PHPCompatibility check for PHP 8.2–8.5, run in CI.
+
+### Changed
+
+- Bump minimum PHP version to 8.2 and test through PHP 8.5.
+- Update the PHPCS toolchain so the 10up ruleset and PHPCompatibilityWP sniffs install correctly.
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes

@@ -20,7 +20,7 @@ class DeletedItems {
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $p2p_table */
 		$p2p_table = Plugin::instance()->get_table( 'p2p' );
 
-		/** @var \TenUp\ContentConnect\Tables\PostToUser $p2p_table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $p2u_table */
 		$p2u_table = Plugin::instance()->get_table( 'p2u' );
 
 		$p2p_table->delete(
@@ -44,7 +44,7 @@ class DeletedItems {
 	 * @param $user_id
 	 */
 	public function deleted_user( $user_id ) {
-		/** @var \TenUp\ContentConnect\Tables\PostToUser $p2p_table */
+		/** @var \TenUp\ContentConnect\Tables\PostToUser $p2u_table */
 		$p2u_table = Plugin::instance()->get_table( 'p2u' );
 
 		$p2u_table->delete(

@@ -36,7 +36,7 @@ class REST {
 
 		$post_types = get_post_types( array( 'show_in_rest' => true ), 'names' );
 		foreach ( $post_types as $post_type ) {
-			add_action( "rest_prepare_{$post_type}", array( $this, 'prepare_links' ), 10, 2 );
+			add_filter( "rest_prepare_{$post_type}", array( $this, 'prepare_links' ), 10, 2 );
 		}
 	}
 
