@@ -1,0 +1,1 @@
+var{__:e}=window.wp.i18n,t={title:()=>e(`Content Connect`,`wp-content-connect`),inspector:({search:e})=>!!(e.edit||e.duplicate)};export{t as route};

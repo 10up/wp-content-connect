@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Settings → Content Connect admin screen to create, edit, disable and delete relationships without code, list relationships registered from code, and copy any relationship as PHP. Disable it with the `CONTENT_CONNECT_ADMIN_UI` constant or the `tenup_content_connect_enable_admin_ui` filter.
+- `source` (`code` or `custom`) and `post_id` fields on `GET /content-connect/v2/relationships` items, and `post_type` and `max_items` on post-to-user items.
+
+### Changed
+
+- Assets are built with Vite through `@10up/wp-vite-plugins` instead of 10up-toolkit's webpack build. Bundle paths and handles are unchanged.
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes

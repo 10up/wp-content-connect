@@ -182,6 +182,37 @@ Relationships can optionally support sortable related items. Order can be stored
 
 Since you can manage this relationship from both post types in the relationship, if you added a tire from the car page, and you had relationship data previously stored on the tire, the NEW car in the relationship will still show up in query results, at the very end (after all of your other pre-ordered data).
 
+## Managing Relationships in the Admin
+
+Administrators can create, edit, disable and delete relationships under **Settings → Content Connect**, without writing code. Each relationship sets:
+
+- the post type it starts from and, for post-to-post, the related post types
+- a name, which identifies stored connections and cannot change once saved
+- the editor panel on each side: whether it shows, its title, whether items can be reordered, and the maximum number of items
+- bidirectionality: whether related posts also get a panel
+
+Relationships registered from code are listed read-only. Any relationship can be copied as the equivalent `define_post_to_post()` / `define_post_to_user()` PHP, to move it into code.
+
+Relationships created in the admin, called custom relationships, are stored as posts of the private `cc_relationship` post type and registered on `tenup-content-connect-init` at priority 100, after relationships registered from code at the default priority. A custom relationship whose key is already registered from code, or whose post type is no longer registered, is skipped and shown as inactive. The `GET /content-connect/v2/relationships` endpoint tells them apart through each item's `source`: `code` or `custom`, with the post's ID in `post_id`.
+
+Deleting a relationship keeps the connections already made between content. They come back if the same relationship is created again.
+
+### Disabling the admin screen
+
+The screen is enabled by default. Disable it with a constant:
+
+```php
+define( 'CONTENT_CONNECT_ADMIN_UI', false );
+```
+
+Or with a filter:
+
+```php
+add_filter( 'tenup_content_connect_enable_admin_ui', '__return_false' );
+```
+
+The constant takes precedence over the filter. With the screen disabled, relationships already created in the admin keep working.
+
 ## Query Integration
 
 Querying for relationships is enabled via a new `relationship_query` parameter for `WP_Query`. The format for `relationship_query` is very similar to `tax_query`.
@@ -496,6 +527,7 @@ Content Connect registers a set of `content-connect/v2` REST endpoints used by t
 - `POST /content-connect/v2/post/<id>/related` — Replace the full set of related items with `related_ids`.
 - `PUT /content-connect/v2/post/<id>/related` — Add a single related item (`related_id`).
 - `DELETE /content-connect/v2/post/<id>/related` — Remove a single related item (`related_id`).
+- `/content-connect/v2/custom-relationships` — Standard post endpoints for the relationships created in the admin, restricted to users with `manage_options`. Available while the admin screen is enabled.
 
 Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links.
 

@@ -3,11 +3,14 @@
 namespace TenUp\ContentConnect;
 
 use TenUp\ContentConnect\API;
+use TenUp\ContentConnect\CustomRelationships\Loader;
+use TenUp\ContentConnect\CustomRelationships\PostType;
 use TenUp\ContentConnect\QueryIntegration\UserQueryIntegration;
 use TenUp\ContentConnect\QueryIntegration\WPQueryIntegration;
 use TenUp\ContentConnect\Relationships\DeletedItems;
 use TenUp\ContentConnect\Tables\PostToPost;
 use TenUp\ContentConnect\Tables\PostToUser;
+use TenUp\ContentConnect\UI\AdminScreen;
 use TenUp\ContentConnect\UI\BlockEditor;
 use TenUp\ContentConnect\UI\ClassicEditor;
 
@@ -22,6 +25,13 @@ class Plugin {
 	 * @var Registry
 	 */
 	public $registry;
+
+	/**
+	 * Loader for the custom relationships created in the admin UI.
+	 *
+	 * @var Loader
+	 */
+	protected $custom_relationships;
 
 	/**
 	 * The single instance of the class.
@@ -47,6 +57,17 @@ class Plugin {
 		return $this->registry;
 	}
 
+	/**
+	 * Returns the loader for the custom relationships created in the admin UI.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return Loader
+	 */
+	public function get_custom_relationships() {
+		return $this->custom_relationships;
+	}
+
 	public function get_table( $table ) {
 		if ( isset( $this->tables[ $table ] ) ) {
 			return $this->tables[ $table ];
@@ -62,7 +83,12 @@ class Plugin {
 		$this->registry = new Registry();
 		$this->registry->setup();
 
+		$this->custom_relationships = new Loader();
+		$this->custom_relationships->setup();
+
 		$modules = array(
+			new PostType(),
+			new AdminScreen(),
 			new WPQueryIntegration(),
 			new UserQueryIntegration(),
 			new ClassicEditor(),
