@@ -107,6 +107,20 @@ const registerPanels = () => {
 			// beforeunload guard prompting.
 			isSaving = true;
 
+			// HTMLFormElement.submit() omits the clicked button from the POST, so
+			// post.php would treat Publish/Update as a plain draft save. Carry the
+			// submitter's name/value over as a hidden field.
+			const { submitter } = event as SubmitEvent;
+			if (submitter instanceof HTMLButtonElement || submitter instanceof HTMLInputElement) {
+				if (submitter.name) {
+					const submitterField = document.createElement('input');
+					submitterField.type = 'hidden';
+					submitterField.name = submitter.name;
+					submitterField.value = submitter.value;
+					postForm.appendChild(submitterField);
+				}
+			}
+
 			try {
 				await persistContentConnectChanges();
 				postForm.submit();
