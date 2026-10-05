@@ -1,0 +1,15 @@
+parameters:
+	level: 2
+	phpVersion:
+		min: 80200
+		max: 80599
+	paths:
+		- content-connect.php
+		- autoload.php
+		- includes
+	dynamicConstantNames:
+		- CONTENT_CONNECT_VERSION
+		- CONTENT_CONNECT_URL
+		- CONTENT_CONNECT_PATH
+	bootstrapFiles:
+		- tests/phpstan/constants.php
