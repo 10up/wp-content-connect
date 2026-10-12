@@ -474,7 +474,7 @@ class RelatedEntities extends AbstractPostRoute {
 	 * @since 2.0.0
 	 *
 	 * @param  \WP_REST_Request $request Full details about the request.
-	 * @return \TenUp\ContentConnect\Relationships\Relationship|\WP_Error
+	 * @return \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser|\WP_Error
 	 */
 	protected function resolve_relationship( \WP_REST_Request $request ) {
 
@@ -599,9 +599,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post                                         $post         The post object.
-	 * @param \WP_REST_Request                                 $request      The request object.
-	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @param \WP_Post                                                                                      $post         The post object.
+	 * @param \WP_REST_Request                                                                              $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
 	 * @return array<string, mixed> Associative array containing:
 	 *                              - 'items' (array) The related posts.
 	 *                              - 'total' (int) The total number of posts found.
@@ -674,9 +674,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post                                         $post         The post object.
-	 * @param \WP_REST_Request                                 $request      The request object.
-	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @param \WP_Post                                                                                      $post         The post object.
+	 * @param \WP_REST_Request                                                                              $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
 	 * @return array<string, mixed> Associative array containing:
 	 *                              - 'items' (array) The related users.
 	 *                              - 'total' (int) The total number of users found.
@@ -738,9 +738,9 @@ class RelatedEntities extends AbstractPostRoute {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_Post                                         $post         The post object.
-	 * @param \WP_REST_Request                                 $request      The request object.
-	 * @param \TenUp\ContentConnect\Relationships\Relationship $relationship The relationship object.
+	 * @param \WP_Post                                                                                      $post         The post object.
+	 * @param \WP_REST_Request                                                                              $request      The request object.
+	 * @param \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
 	 * @return array The prepared related items.
 	 */
 	protected function update_related( \WP_Post $post, \WP_REST_Request $request, $relationship ) {

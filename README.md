@@ -7,7 +7,7 @@
 ## Requirements
 
 - WordPress 6.8 or later
-- PHP 7.4 or later
+- PHP 8.2 or later (tested through PHP 8.5)
 
 ## Overview
 
