@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Read-only Abilities API abilities `content-connect/get-relationships`, `content-connect/get-post-relationships`, and `content-connect/get-related-items`, exposed over REST and MCP, registered on WordPress 6.9+ only (props [@s3rgiosan](https://github.com/s3rgiosan)).
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes

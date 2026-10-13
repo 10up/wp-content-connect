@@ -27,32 +27,43 @@ class Relationships extends AbstractRoute {
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args'                => array(
-						'rel_type'     => array(
-							'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
-							'type'              => 'string',
-							'default'           => 'post-to-post',
-							'sanitize_callback' => 'sanitize_text_field',
-							'validate_callback' => 'rest_validate_request_arg',
-							'enum'              => array( 'post-to-post', 'post-to-user' ),
-						),
-						'filter_by'    => array(
-							'description'       => __( 'The criteria to filter relationships by.', 'wp-content-connect' ),
-							'type'              => 'string',
-							'default'           => 'any',
-							'sanitize_callback' => 'sanitize_text_field',
-							'validate_callback' => array( $this, 'validate_filter_by' ),
-							'enum'              => array( 'key', 'post_type', 'from', 'to', 'any' ),
-						),
-						'filter_value' => array(
-							'description'       => __( 'The value to use with the selected filter.', 'wp-content-connect' ),
-							'type'              => 'string',
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_text_field',
-							'validate_callback' => 'rest_validate_request_arg',
-						),
-					),
+					'args'                => $this->get_collection_params(),
 				),
+			),
+		);
+	}
+
+	/**
+	 * Retrieves the query params for the relationships collection.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	public function get_collection_params() {
+		return array(
+			'rel_type'     => array(
+				'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'post-to-post',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
+				'enum'              => array( 'post-to-post', 'post-to-user' ),
+			),
+			'filter_by'    => array(
+				'description'       => __( 'The criteria to filter relationships by. "from" and "to" apply to post-to-post relationships only.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'any',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => array( $this, 'validate_filter_by' ),
+				'enum'              => array( 'key', 'post_type', 'from', 'to', 'any' ),
+			),
+			'filter_value' => array(
+				'description'       => __( 'The value to use with the selected filter, such as a relationship key or post type.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
 			),
 		);
 	}

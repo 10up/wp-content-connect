@@ -27,56 +27,7 @@ class RelatedEntities extends AbstractPostRoute {
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args'                => array(
-						'post_status' => array(
-							'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'wp-content-connect' ),
-							'type'              => 'array',
-							'default'           => 'publish',
-							'sanitize_callback' => function ( $value ) {
-								if ( is_array( $value ) ) {
-									return array_map( 'sanitize_text_field', $value );
-								}
-								return sanitize_text_field( $value );
-							},
-							'validate_callback' => 'rest_validate_request_arg',
-							'items'             => array(
-								'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
-								'type' => 'string',
-							),
-						),
-						'page'        => array(
-							'description'       => __( 'Current page of the collection.', 'wp-content-connect' ),
-							'type'              => 'integer',
-							'default'           => 1,
-							'sanitize_callback' => 'absint',
-							'validate_callback' => 'rest_validate_request_arg',
-							'minimum'           => 1,
-						),
-						'per_page'    => array(
-							'description'       => __( 'Maximum number of items to be returned in result set.', 'wp-content-connect' ),
-							'type'              => 'integer',
-							'default'           => 10,
-							'minimum'           => 1,
-							'maximum'           => 100,
-							'sanitize_callback' => 'absint',
-							'validate_callback' => 'rest_validate_request_arg',
-						),
-						'order'       => array(
-							'description'       => __( 'Order sort attribute ascending or descending.', 'wp-content-connect' ),
-							'type'              => 'string',
-							'default'           => 'asc',
-							'enum'              => array( 'asc', 'desc' ),
-							'sanitize_callback' => 'sanitize_text_field',
-							'validate_callback' => 'rest_validate_request_arg',
-						),
-						'orderby'     => array(
-							'description'       => __( 'Sort collection by relationship or object attribute.', 'wp-content-connect' ),
-							'type'              => 'string',
-							'default'           => 'relationship',
-							'sanitize_callback' => 'sanitize_text_field',
-							'validate_callback' => array( $this, 'validate_orderby_request_arg' ),
-						),
-					),
+					'args'                => $this->get_collection_params(),
 				),
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
@@ -121,6 +72,67 @@ class RelatedEntities extends AbstractPostRoute {
 						),
 					),
 				),
+			),
+		);
+	}
+
+	/**
+	 * Retrieves the query params for the related entities collection.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	public function get_collection_params() {
+		return array(
+			'post_status' => array(
+				'description'       => __( 'Limit result set to posts assigned one or more statuses.', 'wp-content-connect' ),
+				'type'              => 'array',
+				'default'           => 'publish',
+				'sanitize_callback' => function ( $value ) {
+					if ( is_array( $value ) ) {
+						return array_map( 'sanitize_text_field', $value );
+					}
+					return sanitize_text_field( $value );
+				},
+				'validate_callback' => 'rest_validate_request_arg',
+				'items'             => array(
+					'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
+					'type' => 'string',
+				),
+			),
+			'page'        => array(
+				'description'       => __( 'Current page of the collection.', 'wp-content-connect' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'sanitize_callback' => 'absint',
+				'validate_callback' => 'rest_validate_request_arg',
+				'minimum'           => 1,
+			),
+			'per_page'    => array(
+				'description'       => __( 'Maximum number of items to be returned in result set.', 'wp-content-connect' ),
+				'type'              => 'integer',
+				'default'           => 10,
+				'minimum'           => 1,
+				'maximum'           => 100,
+				'sanitize_callback' => 'absint',
+				'validate_callback' => 'rest_validate_request_arg',
+			),
+			'order'       => array(
+				'description'       => __( 'Order sort attribute ascending or descending. Ignored when ordering by relationship.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'asc',
+				'enum'              => array( 'asc', 'desc' ),
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
+			),
+			'orderby'     => array(
+				'description'       => __( 'Sort collection by relationship or object attribute. "relationship" keeps the saved sort order. "title" applies to post-to-post relationships and "name" to post-to-user relationships.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'relationship',
+				'enum'              => array( 'relationship', 'date', 'id', 'title', 'name' ),
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => array( $this, 'validate_orderby_request_arg' ),
 			),
 		);
 	}
