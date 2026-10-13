@@ -640,10 +640,29 @@ class RelatedEntities extends AbstractPostRoute {
 		$readable_where = '';
 
 		if ( ! empty( $post_status ) ) {
+			// WP_Query's readable permission only handles explicit private statuses, not drafts or `any`.
 			$readable_where = $this->get_readable_posts_where( (array) $query_args['post_type'], wp_parse_list( $post_status ) );
 		}
 
-		// Limits the query to posts the current user can read, so totals and pagination stay accurate.
+		/**
+		 * Filters the related-post readability restriction before pagination.
+		 *
+		 * Replace the default restriction to support post-specific authorization.
+		 * The returned SQL must include a leading AND and applies to both the
+		 * results and pagination count queries. An empty string adds no restriction.
+		 * This filter runs even when the default restriction is empty.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param string             $readable_where SQL WHERE restriction.
+		 * @param \WP_Post           $post           Source post.
+		 * @param \WP_REST_Request   $request        Related entities request.
+		 * @param \TenUp\ContentConnect\Relationships\PostToPost $relationship Relationship being queried.
+		 * @param array              $query_args     Related posts query arguments.
+		 */
+		$readable_where = apply_filters( 'tenup_content_connect_related_posts_readable_where', $readable_where, $post, $request, $relationship, $query_args );
+
+		// Apply the site's readability restriction before counting and paginating.
 		$filter_readable_posts = static function ( $where, $query ) use ( $readable_where ) {
 			if ( true === $query->get( 'content_connect_readable_only' ) ) {
 				$where .= $readable_where;

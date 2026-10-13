@@ -21,6 +21,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 
 ### Added
 
+- `tenup_content_connect_related_posts_readable_where` filter to replace the related-post readability restriction for custom authorization policies while preserving pagination totals.
 - Helper functions for retrieving relationship data: `get_post_to_post_relationships_by()`, `get_post_to_user_relationships_by()`, `get_post_relationships_data()`, `get_post_to_post_relationships_data()`, and `get_post_to_user_relationships_data()` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#96](https://github.com/10up/wp-content-connect/pull/96)).
 - REST API v2 endpoint `GET /content-connect/v2/relationships` to retrieve all relationships by type, with optional filtering by key, post type, or from/to post types (props [@s3rgiosan](https://github.com/s3rgiosan) via [#95](https://github.com/10up/wp-content-connect/pull/95)).
 - REST API v2 endpoint `GET /content-connect/v2/post/{post_id}/relationships` to retrieve all relationships for a post, with filtering by relationship type, post type, and context (`view`/`embed`) (props [@s3rgiosan](https://github.com/s3rgiosan) via [#95](https://github.com/10up/wp-content-connect/pull/95)).
@@ -53,7 +54,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 
 ### Security
 
-- The `GET /content-connect/v2/post/{post_id}/related` endpoint now returns only related posts the current user can read, so drafts, pending, scheduled, and private posts by other authors are listed only for users with the matching capability (props [@s3rgiosan](https://github.com/s3rgiosan) via [#143](https://github.com/10up/wp-content-connect/pull/143)).
+- The `GET /content-connect/v2/post/{post_id}/related` endpoint now restricts non-public related posts using each target post type's status capabilities and authorship. Sites with post-specific authorization can replace this restriction using `tenup_content_connect_related_posts_readable_where` (props [@s3rgiosan](https://github.com/s3rgiosan) via [#143](https://github.com/10up/wp-content-connect/pull/143)).
 
 ## [1.6.0] - 2025-02-14
 
