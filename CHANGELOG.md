@@ -33,6 +33,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 - WordPress 7.0 compatibility; set WordPress minimum supported version to 6.8 (props [@mphillips](https://github.com/mphillips) via [#120](https://github.com/10up/wp-content-connect/pull/120)).
 - WordPress Playground blueprint (`.github/blueprints/blueprint.json`) for a one-click, zero-install plugin demo (props [@s3rgiosan](https://github.com/s3rgiosan) via [#122](https://github.com/10up/wp-content-connect/pull/122)).
 - `tenup-content-connect-update-relationships-order` action for developers to run logic after relationship order is saved, firing for post-to-post, post-to-user, and user-to-post relationships (props [@ocean90](https://github.com/ocean90) via [#123](https://github.com/10up/wp-content-connect/pull/123)).
+- Query Loop block integration that filters posts by Content Connect relationships, in the editor preview and on the front end (props [@fabiankaegy](https://github.com/fabiankaegy), [@s3rgiosan](https://github.com/s3rgiosan) via [#98](https://github.com/10up/wp-content-connect/pull/98)).
 - PHPStan static analysis and a PHPCompatibility check for PHP 8.2–8.5, run in CI (props [@s3rgiosan](https://github.com/s3rgiosan) via [#135](https://github.com/10up/wp-content-connect/pull/135)).
 
 ### Changed
