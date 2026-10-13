@@ -2,14 +2,20 @@
 
 namespace TenUp\ContentConnect;
 
+use TenUp\ContentConnect\API\V2\Post\Route\RelatedEntities as RelatedEntitiesRoute;
+use TenUp\ContentConnect\API\V2\Post\Route\Relationships as PostRelationshipsRoute;
+use TenUp\ContentConnect\API\V2\Route\Relationships as RelationshipsRoute;
+
 /**
  * Class Abilities
  *
  * Registers read-only Abilities API entries for discovering relationships and
- * related entities. Each ability dispatches to the matching REST API v2 route,
- * so validation, permissions, and response shape come from a single code path.
+ * related entities. Each ability builds its input schema from the matching
+ * REST API v2 route params and dispatches to that route, which runs its own
+ * validation and permission checks. The ability permission callbacks add a
+ * capability check before dispatching.
  *
- * Registration runs only when the Abilities API is available (WordPress 6.9+).
+ * The Abilities API hooks fire only when the API is available (WordPress 6.9+).
  *
  * @package TenUp\ContentConnect
  */
@@ -42,11 +48,6 @@ class Abilities {
 	 * @return void
 	 */
 	public function register_category() {
-
-		if ( ! function_exists( 'wp_register_ability_category' ) ) {
-			return;
-		}
-
 		wp_register_ability_category(
 			self::CATEGORY,
 			array(
@@ -65,43 +66,19 @@ class Abilities {
 	 */
 	public function register_abilities() {
 
-		if ( ! function_exists( 'wp_register_ability' ) ) {
-			return;
-		}
-
 		wp_register_ability(
 			'content-connect/get-relationships',
 			array(
 				'label'               => __( 'Get Relationships', 'wp-content-connect' ),
 				'description'         => __( 'Lists the registered relationship definitions, optionally filtered by key, post type, or the from/to side of post-to-post relationships.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
-				'input_schema'        => array(
-					'type'                 => 'object',
-					'properties'           => array(
-						'rel_type'     => array(
-							'type'        => 'string',
-							'enum'        => array( 'post-to-post', 'post-to-user' ),
-							'default'     => 'post-to-post',
-							'description' => __( 'The relationship type to list.', 'wp-content-connect' ),
-						),
-						'filter_by'    => array(
-							'type'        => 'string',
-							'enum'        => array( 'key', 'post_type', 'from', 'to', 'any' ),
-							'default'     => 'any',
-							'description' => __( 'The criteria to filter relationships by. "from" and "to" apply to post-to-post relationships only.', 'wp-content-connect' ),
-						),
-						'filter_value' => array(
-							'type'        => 'string',
-							'default'     => '',
-							'description' => __( 'The value to match against the selected filter, such as a relationship key or post type.', 'wp-content-connect' ),
-						),
-					),
-					'additionalProperties' => false,
-					'default'              => array(),
+				'input_schema'        => array_merge(
+					self::get_input_schema( ( new RelationshipsRoute() )->get_collection_params() ),
+					array( 'default' => array() )
 				),
 				'output_schema'       => array(
 					'type'  => 'array',
-					'items' => self::get_relationship_schema(),
+					'items' => self::get_relationship_definition_schema(),
 				),
 				'execute_callback'    => array( $this, 'execute_get_relationships' ),
 				'permission_callback' => array( $this, 'can_edit_posts' ),
@@ -115,38 +92,10 @@ class Abilities {
 				'label'               => __( 'Get Post Relationships', 'wp-content-connect' ),
 				'description'         => __( 'Lists the relationships that apply to a post, optionally including the related posts and users for each one.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
-				'input_schema'        => array(
-					'type'                 => 'object',
-					'properties'           => array(
-						'post_id'   => array(
-							'type'        => 'integer',
-							'minimum'     => 1,
-							'description' => __( 'The post ID.', 'wp-content-connect' ),
-						),
-						'rel_type'  => array(
-							'type'        => 'string',
-							'enum'        => array( 'any', 'post-to-post', 'post-to-user' ),
-							'default'     => 'any',
-							'description' => __( 'The relationship type to list.', 'wp-content-connect' ),
-						),
-						'post_type' => array(
-							'type'        => 'string',
-							'default'     => '',
-							'description' => __( 'Limits post-to-post relationships to those connecting to this post type.', 'wp-content-connect' ),
-						),
-						'context'   => array(
-							'type'        => 'string',
-							'enum'        => array( 'view', 'embed' ),
-							'default'     => 'view',
-							'description' => __( '"embed" includes the related posts and users for each relationship.', 'wp-content-connect' ),
-						),
-					),
-					'required'             => array( 'post_id' ),
-					'additionalProperties' => false,
-				),
+				'input_schema'        => self::get_input_schema( self::get_post_input_args( ( new PostRelationshipsRoute() )->get_collection_params() ) ),
 				'output_schema'       => array(
 					'type'  => 'array',
-					'items' => self::get_relationship_schema(),
+					'items' => self::get_post_relationship_schema(),
 				),
 				'execute_callback'    => array( $this, 'execute_get_post_relationships' ),
 				'permission_callback' => array( $this, 'can_edit_input_post' ),
@@ -154,79 +103,25 @@ class Abilities {
 			)
 		);
 
+		$related_route = new RelatedEntitiesRoute();
+		$related_args  = array_merge( $related_route->get_route_params(), $related_route->get_collection_params() );
+
+		// The ability lists published items only, so the status filter is not exposed.
+		unset( $related_args['post_status'] );
+
 		wp_register_ability(
 			'content-connect/get-related-items',
 			array(
 				'label'               => __( 'Get Related Items', 'wp-content-connect' ),
-				'description'         => __( 'Lists the posts or users related to a post through one relationship, with pagination and ordering.', 'wp-content-connect' ),
+				'description'         => __( 'Lists the published posts or the users related to a post through one relationship, with pagination and ordering.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
-				'input_schema'        => array(
-					'type'                 => 'object',
-					'properties'           => array(
-						'post_id'     => array(
-							'type'        => 'integer',
-							'minimum'     => 1,
-							'description' => __( 'The post ID.', 'wp-content-connect' ),
-						),
-						'rel_key'     => array(
-							'type'        => 'string',
-							'minLength'   => 1,
-							'description' => __( 'The relationship key, as returned by content-connect/get-post-relationships.', 'wp-content-connect' ),
-						),
-						'rel_type'    => array(
-							'type'        => 'string',
-							'enum'        => array( 'post-to-post', 'post-to-user' ),
-							'default'     => 'post-to-post',
-							'description' => __( 'The relationship type.', 'wp-content-connect' ),
-						),
-						'post_status' => array(
-							'type'        => 'array',
-							'items'       => array( 'type' => 'string' ),
-							'default'     => array( 'publish' ),
-							'description' => __( 'Post statuses to include for post-to-post relationships. Use "any" for all statuses.', 'wp-content-connect' ),
-						),
-						'page'        => array(
-							'type'        => 'integer',
-							'minimum'     => 1,
-							'default'     => 1,
-							'description' => __( 'Current page of the collection.', 'wp-content-connect' ),
-						),
-						'per_page'    => array(
-							'type'        => 'integer',
-							'minimum'     => 1,
-							'maximum'     => 100,
-							'default'     => 10,
-							'description' => __( 'Maximum number of items to return.', 'wp-content-connect' ),
-						),
-						'order'       => array(
-							'type'        => 'string',
-							'enum'        => array( 'asc', 'desc' ),
-							'default'     => 'asc',
-							'description' => __( 'Sort direction. Ignored when ordering by relationship.', 'wp-content-connect' ),
-						),
-						'orderby'     => array(
-							'type'        => 'string',
-							'enum'        => array( 'relationship', 'date', 'id', 'title', 'name' ),
-							'default'     => 'relationship',
-							'description' => __( 'Sort field. "relationship" keeps the saved sort order. "title" applies to post-to-post, "name" to post-to-user.', 'wp-content-connect' ),
-						),
-					),
-					'required'             => array( 'post_id', 'rel_key' ),
-					'additionalProperties' => false,
-				),
+				'input_schema'        => self::get_input_schema( self::get_post_input_args( $related_args ) ),
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
 						'items'       => array(
 							'type'  => 'array',
-							'items' => array(
-								'type'       => 'object',
-								'properties' => array(
-									'id'   => array( 'type' => 'integer' ),
-									'name' => array( 'type' => 'string' ),
-									'type' => array( 'type' => 'string' ),
-								),
-							),
+							'items' => self::get_item_schema(),
 						),
 						'total'       => array( 'type' => 'integer' ),
 						'total_pages' => array( 'type' => 'integer' ),
@@ -309,7 +204,15 @@ class Abilities {
 			return $response;
 		}
 
-		return array_values( (array) $response->get_data() );
+		$relationships = array_values( (array) $response->get_data() );
+
+		foreach ( $relationships as $index => $relationship ) {
+			if ( isset( $relationship['related'] ) ) {
+				$relationships[ $index ]['related'] = self::prepare_items( (array) $relationship['related'] );
+			}
+		}
+
+		return $relationships;
 	}
 
 	/**
@@ -327,6 +230,8 @@ class Abilities {
 
 		unset( $params['post_id'] );
 
+		$params['post_status'] = 'publish';
+
 		$response = self::dispatch( sprintf( '/content-connect/v2/post/%d/related', $post_id ), $params );
 
 		if ( is_wp_error( $response ) ) {
@@ -336,7 +241,7 @@ class Abilities {
 		$headers = $response->get_headers();
 
 		return array(
-			'items'       => array_values( (array) $response->get_data() ),
+			'items'       => self::prepare_items( (array) $response->get_data() ),
 			'total'       => (int) ( $headers['X-WP-Total'] ?? 0 ),
 			'total_pages' => (int) ( $headers['X-WP-TotalPages'] ?? 0 ),
 		);
@@ -364,13 +269,132 @@ class Abilities {
 	}
 
 	/**
-	 * Builds the output schema for a single relationship entry.
+	 * Builds an ability input schema from REST route args.
+	 *
+	 * Keeps the JSON Schema keywords of each arg and drops the REST-only
+	 * callbacks. Args flagged as required are listed in the schema's
+	 * `required` array.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param  array $args REST route args, keyed by name.
+	 * @return array
+	 */
+	private static function get_input_schema( array $args ) {
+
+		$properties = array();
+		$required   = array();
+
+		foreach ( $args as $name => $arg ) {
+
+			if ( ! empty( $arg['required'] ) ) {
+				$required[] = $name;
+			}
+
+			unset( $arg['required'], $arg['sanitize_callback'], $arg['validate_callback'], $arg['arg_options'] );
+
+			$properties[ $name ] = $arg;
+		}
+
+		$schema = array(
+			'type'                 => 'object',
+			'properties'           => $properties,
+			'additionalProperties' => false,
+		);
+
+		if ( ! empty( $required ) ) {
+			$schema['required'] = $required;
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Renames the `id` route arg to `post_id`.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param  array $args REST route args, keyed by name.
+	 * @return array
+	 */
+	private static function get_post_input_args( array $args ) {
+
+		$post_id_arg = $args['id'];
+
+		unset( $args['id'] );
+
+		return array_merge( array( 'post_id' => $post_id_arg ), $args );
+	}
+
+	/**
+	 * Reduces related items to their ID, name, and type.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param  array $items Related item data from the REST API.
+	 * @return array
+	 */
+	private static function prepare_items( array $items ) {
+		return array_map(
+			static function ( $item ) {
+				return array(
+					'id'   => (int) ( $item['id'] ?? 0 ),
+					'name' => (string) ( $item['name'] ?? '' ),
+					'type' => (string) ( $item['type'] ?? '' ),
+				);
+			},
+			array_values( $items )
+		);
+	}
+
+	/**
+	 * Builds the output schema for a related post or user.
 	 *
 	 * @since 2.1.0
 	 *
 	 * @return array
 	 */
-	private static function get_relationship_schema() {
+	private static function get_item_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'id'   => array( 'type' => 'integer' ),
+				'name' => array( 'type' => 'string' ),
+				'type' => array(
+					'type'        => 'string',
+					'description' => __( 'The post type, or "user" for users.', 'wp-content-connect' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Builds the output schema for the settings of one side of a relationship.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	private static function get_relationship_side_schema() {
+		return array(
+			'labels'    => array( 'type' => 'object' ),
+			'max_items' => array( 'type' => 'integer' ),
+			'sortable'  => array( 'type' => 'boolean' ),
+			'enable_ui' => array( 'type' => 'boolean' ),
+		);
+	}
+
+	/**
+	 * Builds the output schema for a registered relationship definition.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	private static function get_relationship_definition_schema() {
+
+		$side = self::get_relationship_side_schema();
+
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -378,6 +402,62 @@ class Abilities {
 				'rel_type'    => array( 'type' => 'string' ),
 				'rel_name'    => array( 'type' => 'string' ),
 				'object_type' => array( 'type' => 'string' ),
+				'labels'      => $side['labels'],
+				'sortable'    => $side['sortable'],
+				'enable_ui'   => $side['enable_ui'],
+				'from'        => array(
+					'type'        => 'object',
+					'description' => __( 'The "from" side settings. Post-to-post relationships only.', 'wp-content-connect' ),
+					'properties'  => array_merge(
+						array( 'object_type' => array( 'type' => 'string' ) ),
+						$side
+					),
+				),
+				'to'          => array(
+					'type'        => 'object',
+					'description' => __( 'The "to" side settings. Post-to-post relationships only.', 'wp-content-connect' ),
+					'properties'  => array_merge(
+						array(
+							'object_types' => array(
+								'type'  => 'array',
+								'items' => array( 'type' => 'string' ),
+							),
+						),
+						$side
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Builds the output schema for a relationship that applies to a post.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	private static function get_post_relationship_schema() {
+		return array(
+			'type'       => 'object',
+			'properties' => array_merge(
+				array(
+					'rel_key'     => array( 'type' => 'string' ),
+					'rel_type'    => array( 'type' => 'string' ),
+					'rel_name'    => array( 'type' => 'string' ),
+					'object_type' => array( 'type' => 'string' ),
+					'post_type'   => array(
+						'type'        => 'array',
+						'items'       => array( 'type' => 'string' ),
+						'description' => __( 'The related post types. Post-to-post relationships only.', 'wp-content-connect' ),
+					),
+					'related'     => array(
+						'type'        => 'array',
+						'items'       => self::get_item_schema(),
+						'description' => __( 'The related posts or users. Present only when the context is "embed".', 'wp-content-connect' ),
+					),
+				),
+				self::get_relationship_side_schema()
 			),
 		);
 	}

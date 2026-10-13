@@ -176,6 +176,190 @@ class AbilitiesTest extends ContentConnectTestCase {
 	}
 
 	/**
+	 * Tests that get-post-relationships rejects input properties the schema does not declare.
+	 *
+	 * @return void
+	 */
+	public function test_get_post_relationships_rejects_unknown_input() {
+		$result = wp_get_ability( 'content-connect/get-post-relationships' )->execute(
+			array(
+				'post_id' => 1,
+				'unknown' => 'value',
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'ability_invalid_input', $result->get_error_code() );
+	}
+
+	/**
+	 * Tests that get-post-relationships includes the related items with the embed context.
+	 *
+	 * @return void
+	 */
+	public function test_get_post_relationships_embed_includes_related() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'ability-embed' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'ability-embed' );
+
+		$registry->get_post_to_post_relationship_by_key( $rel_key )->add_relationship( 1, 2 );
+
+		$result = wp_get_ability( 'content-connect/get-post-relationships' )->execute(
+			array(
+				'post_id'  => 1,
+				'rel_type' => 'post-to-post',
+				'context'  => 'embed',
+			)
+		);
+
+		$this->assertIsArray( $result );
+
+		$relationships = array_column( $result, null, 'rel_key' );
+
+		$this->assertArrayHasKey( $rel_key, $relationships );
+		$this->assertSame(
+			array(
+				array(
+					'id'   => 2,
+					'name' => get_the_title( 2 ),
+					'type' => 'post',
+				),
+			),
+			$relationships[ $rel_key ]['related']
+		);
+	}
+
+	/**
+	 * Tests that get-related-items returns each item as its ID, name, and type only.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_items_maps_item_fields() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'ability-item-fields' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'ability-item-fields' );
+
+		$registry->get_post_to_post_relationship_by_key( $rel_key )->add_relationship( 1, 2 );
+
+		$result = wp_get_ability( 'content-connect/get-related-items' )->execute(
+			array(
+				'post_id' => 1,
+				'rel_key' => $rel_key,
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'   => 2,
+					'name' => get_the_title( 2 ),
+					'type' => 'post',
+				),
+			),
+			$result['items']
+		);
+	}
+
+	/**
+	 * Tests that get-related-items lists published posts only.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_items_lists_published_posts_only() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'ability-published' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'ability-published' );
+
+		$draft_id   = $this->factory()->post->create( array( 'post_status' => 'draft' ) );
+		$private_id = $this->factory()->post->create( array( 'post_status' => 'private' ) );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( 1, 2 );
+		$relationship->add_relationship( 1, $draft_id );
+		$relationship->add_relationship( 1, $private_id );
+
+		$result = wp_get_ability( 'content-connect/get-related-items' )->execute(
+			array(
+				'post_id' => 1,
+				'rel_key' => $rel_key,
+			)
+		);
+
+		$this->assertSame( array( 2 ), wp_list_pluck( $result['items'], 'id' ) );
+		$this->assertSame( 1, $result['total'] );
+	}
+
+	/**
+	 * Tests that get-related-items does not accept a post status filter.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_items_rejects_post_status_input() {
+		$result = wp_get_ability( 'content-connect/get-related-items' )->execute(
+			array(
+				'post_id'     => 1,
+				'rel_key'     => 'any-key',
+				'post_status' => array( 'draft' ),
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'ability_invalid_input', $result->get_error_code() );
+	}
+
+	/**
+	 * Tests that get-related-items lists the users related to a post.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_items_post_to_user() {
+		$registry = get_registry();
+		$registry->define_post_to_user( 'post', 'ability-p2u' );
+		$rel_key = $registry->get_relationship_key( 'post', 'user', 'ability-p2u' );
+
+		$user_id = $this->factory()->user->create( array( 'display_name' => 'Example User' ) );
+
+		$registry->get_post_to_user_relationship_by_key( $rel_key )->add_relationship( 1, $user_id );
+
+		$result = wp_get_ability( 'content-connect/get-related-items' )->execute(
+			array(
+				'post_id'  => 1,
+				'rel_key'  => $rel_key,
+				'rel_type' => 'post-to-user',
+				'orderby'  => 'name',
+			)
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertSame(
+			array(
+				array(
+					'id'   => $user_id,
+					'name' => 'Example User',
+					'type' => 'user',
+				),
+			),
+			$result['items']
+		);
+		$this->assertSame( 1, $result['total'] );
+	}
+
+	/**
+	 * Tests that the get-related-items input schema comes from the REST route args.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_items_input_schema_matches_route_args() {
+		$schema = wp_get_ability( 'content-connect/get-related-items' )->get_input_schema();
+
+		$this->assertSame( array( 'post_id', 'rel_key' ), $schema['required'] );
+		$this->assertArrayNotHasKey( 'post_status', $schema['properties'] );
+		$this->assertArrayNotHasKey( 'validate_callback', $schema['properties']['orderby'] );
+		$this->assertSame( array( 'relationship', 'date', 'id', 'title', 'name' ), $schema['properties']['orderby']['enum'] );
+		$this->assertFalse( $schema['additionalProperties'] );
+	}
+
+	/**
 	 * Tests that get-related-items surfaces REST errors for unknown relationships.
 	 *
 	 * @return void
