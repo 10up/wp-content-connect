@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "2.0.0",
+  "version": "2.0.0-beta.2",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
@@ -22,7 +22,9 @@
     "lint-style": "10up-toolkit lint-style",
     "test": "10up-toolkit test-unit-jest",
     "makepot": "wpi18n makepot && echo '.pot file updated'",
-    "archive": "mkdir -p release && composer archive --file=release/$npm_package_name --format=zip",
+    "archive": "bin/archive.sh",
+    "changeset": "changeset",
+    "versions:update": "node bin/update-version.mjs",
     "wp-env:start": "wp-env start",
     "wp-env:stop": "wp-env stop",
     "wp-env:clean": "wp-env clean all",
@@ -46,10 +48,11 @@
     }
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@playwright/test": "^1.40.0",
     "@wordpress/api-fetch": "^7.18.0",
-    "@wordpress/e2e-test-utils-playwright": "^2.0.0",
     "@wordpress/data": "^10.18.0",
+    "@wordpress/e2e-test-utils-playwright": "^2.0.0",
     "@wordpress/edit-post": "^8.18.0",
     "@wordpress/editor": "^14.18.0",
     "@wordpress/env": "^11.15.0",

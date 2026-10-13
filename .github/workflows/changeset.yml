@@ -1,0 +1,35 @@
+name: Changeset
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  changeset:
+    name: Require a changeset
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # CI, docs and test-only changes don't need one.
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'no changeset') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install node dependencies
+        run: npm ci --omit=optional
+
+      - name: Check for a changeset
+        run: npx changeset status --since=origin/${{ github.base_ref }}
