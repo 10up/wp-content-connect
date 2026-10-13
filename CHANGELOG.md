@@ -53,7 +53,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 
 ### Security
 
-- The `GET /content-connect/v2/post/{post_id}/related` endpoint now returns only related posts the current user can read, so drafts, pending, scheduled, and private posts by other authors are listed only for users with the matching capability (props [@s3rgiosan](https://github.com/s3rgiosan)).
+- The `GET /content-connect/v2/post/{post_id}/related` endpoint now returns only related posts the current user can read, so drafts, pending, scheduled, and private posts by other authors are listed only for users with the matching capability (props [@s3rgiosan](https://github.com/s3rgiosan) via [#143](https://github.com/10up/wp-content-connect/pull/143)).
 
 ## [1.6.0] - 2025-02-14
 
