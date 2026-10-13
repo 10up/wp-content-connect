@@ -37,7 +37,9 @@ class PluginTest extends ContentConnectTestCase {
 		$this->assertTrue( defined( 'CONTENT_CONNECT_URL' ) );
 		$this->assertTrue( defined( 'CONTENT_CONNECT_PATH' ) );
 
-		$this->assertSame( '2.0.0', CONTENT_CONNECT_VERSION );
+		// The release workflow bumps both, so they must stay in sync.
+		$header = get_file_data( CONTENT_CONNECT_PATH . 'content-connect.php', array( 'Version' => 'Version' ) );
+		$this->assertSame( $header['Version'], CONTENT_CONNECT_VERSION );
 		$this->assertStringEndsWith( '/', CONTENT_CONNECT_URL );
 		$this->assertStringEndsWith( '/', CONTENT_CONNECT_PATH );
 	}
