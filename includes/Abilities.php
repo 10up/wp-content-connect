@@ -48,6 +48,12 @@ class Abilities {
 	 * @return void
 	 */
 	public function register_category() {
+
+		// Lets static analysis see the WordPress 6.9 requirement; the hook fires only on 6.9+.
+		if ( ! function_exists( 'wp_register_ability_category' ) ) {
+			return;
+		}
+
 		wp_register_ability_category(
 			self::CATEGORY,
 			array(
@@ -65,6 +71,11 @@ class Abilities {
 	 * @return void
 	 */
 	public function register_abilities() {
+
+		// Lets static analysis see the WordPress 6.9 requirement; the hook fires only on 6.9+.
+		if ( ! function_exists( 'wp_register_ability' ) ) {
+			return;
+		}
 
 		wp_register_ability(
 			'content-connect/get-relationships',
