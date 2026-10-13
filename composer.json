@@ -77,7 +77,8 @@
             "/build.js",
             "/CONTRIBUTING.md",
             "/CODE_OF_CONDUCT.md",
-            "/CREDITS.md"
+            "/CREDITS.md",
+            "/vite.config.ts"
         ]
     }
 }

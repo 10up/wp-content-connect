@@ -4,6 +4,7 @@ namespace TenUp\ContentConnect\API\V2\Route;
 
 use TenUp\ContentConnect\API\V2\AbstractRoute;
 
+use function TenUp\ContentConnect\Helpers\get_plugin;
 use function TenUp\ContentConnect\Helpers\get_post_to_post_relationships_by;
 use function TenUp\ContentConnect\Helpers\get_post_to_user_relationships_by;
 
@@ -83,19 +84,26 @@ class Relationships extends AbstractRoute {
 		}
 
 		$prepared_relationships = array();
+		$custom_relationships   = get_plugin()->get_custom_relationships();
 
 		foreach ( $relationships as $rel_key => $relationship ) {
+
+			$post_id = $custom_relationships->get_post_id( $rel_key );
 
 			$prepared_relationships[ $rel_key ] = array(
 				'rel_key'  => $rel_key,
 				'rel_type' => $rel_type,
 				'rel_name' => $relationship->name,
+				'source'   => $post_id ? 'custom' : 'code',
+				'post_id'  => $post_id,
 			);
 
 			switch ( $rel_type ) {
 				case 'post-to-user':
 					$prepared_relationships[ $rel_key ]['object_type'] = 'user';
+					$prepared_relationships[ $rel_key ]['post_type']   = $relationship->post_type;
 					$prepared_relationships[ $rel_key ]['labels']      = $relationship->from_labels;
+					$prepared_relationships[ $rel_key ]['max_items']   = $relationship->from_max_items;
 					$prepared_relationships[ $rel_key ]['sortable']    = $relationship->from_sortable;
 					$prepared_relationships[ $rel_key ]['enable_ui']   = $relationship->enable_from_ui;
 					break;
