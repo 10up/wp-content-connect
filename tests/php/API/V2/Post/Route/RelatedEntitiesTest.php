@@ -857,5 +857,174 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 		$this->assertContains( $readable_id, $ids );
 		$this->assertNotContains( $private_id, $ids );
 	}
+
+	/**
+	 * Tests that a contributor cannot list other authors' related drafts or private posts.
+	 *
+	 * @return void
+	 */
+	public function test_get_excludes_unreadable_related_posts_for_contributor() {
+		$fixture = $this->create_mixed_status_fixture();
+
+		wp_set_current_user( $fixture['contributor_id'] );
+
+		$response = $this->get_related_with_status( $fixture, array( 'publish', 'draft', 'private' ) );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertEqualsCanonicalizing( array( $fixture['public_id'], $fixture['own_draft_id'] ), $ids );
+		$this->assertSame( 2, $response->get_headers()['X-WP-Total'] );
+		$this->assertSame( 1, $response->get_headers()['X-WP-TotalPages'] );
+	}
+
+	/**
+	 * Tests that `any` does not expose other authors' related drafts or private posts to a contributor.
+	 *
+	 * @return void
+	 */
+	public function test_get_any_status_excludes_unreadable_related_posts_for_contributor() {
+		$fixture = $this->create_mixed_status_fixture();
+
+		wp_set_current_user( $fixture['contributor_id'] );
+
+		$response = $this->get_related_with_status( $fixture, array( 'any' ) );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertEqualsCanonicalizing( array( $fixture['public_id'], $fixture['own_draft_id'] ), $ids );
+		$this->assertSame( 2, $response->get_headers()['X-WP-Total'] );
+	}
+
+	/**
+	 * Tests that pagination totals only count related posts the contributor can read.
+	 *
+	 * @return void
+	 */
+	public function test_get_pagination_totals_count_only_readable_related_posts() {
+		$fixture = $this->create_mixed_status_fixture();
+
+		wp_set_current_user( $fixture['contributor_id'] );
+
+		$response = $this->get_related_with_status( $fixture, array( 'any' ), 1 );
+		$headers  = $response->get_headers();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 1, $response->get_data() );
+		$this->assertSame( 2, $headers['X-WP-Total'] );
+		$this->assertSame( 2, $headers['X-WP-TotalPages'] );
+	}
+
+	/**
+	 * Tests that editors and administrators still see every requested related post.
+	 *
+	 * @return void
+	 */
+	public function test_get_includes_all_related_posts_for_editor_and_admin() {
+		$fixture  = $this->create_mixed_status_fixture();
+		$expected = array(
+			$fixture['public_id'],
+			$fixture['own_draft_id'],
+			$fixture['other_draft_id'],
+			$fixture['other_private_id'],
+		);
+
+		$editor_id = $this->factory()->user->create( array( 'role' => 'editor' ) );
+
+		foreach ( array( $editor_id, $this->user_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+
+			foreach ( array( array( 'publish', 'draft', 'private' ), array( 'any' ) ) as $post_status ) {
+				$response = $this->get_related_with_status( $fixture, $post_status );
+				$ids      = wp_list_pluck( $response->get_data(), 'id' );
+
+				$this->assertSame( 200, $response->get_status() );
+				$this->assertEqualsCanonicalizing( $expected, $ids );
+				$this->assertSame( 4, $response->get_headers()['X-WP-Total'] );
+			}
+		}
+	}
+
+	/**
+	 * Creates a contributor-owned source post related to posts of several statuses and authors.
+	 *
+	 * @return array<string, mixed> The contributor ID, source post ID, relationship key, and related post IDs.
+	 */
+	private function create_mixed_status_fixture() {
+		$contributor_id = $this->factory()->user->create( array( 'role' => 'contributor' ) );
+		$author_id      = $this->factory()->user->create( array( 'role' => 'author' ) );
+
+		$source_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => $contributor_id,
+			)
+		);
+
+		$public_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+
+		$own_draft_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => $contributor_id,
+			)
+		);
+
+		$other_draft_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => $author_id,
+			)
+		);
+
+		$other_private_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'private',
+				'post_author' => $author_id,
+			)
+		);
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-readable-status' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-readable-status' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+
+		foreach ( array( $public_id, $own_draft_id, $other_draft_id, $other_private_id ) as $related_id ) {
+			$relationship->add_relationship( $source_id, $related_id );
+		}
+
+		return array(
+			'contributor_id'   => $contributor_id,
+			'source_id'        => $source_id,
+			'rel_key'          => $rel_key,
+			'public_id'        => $public_id,
+			'own_draft_id'     => $own_draft_id,
+			'other_draft_id'   => $other_draft_id,
+			'other_private_id' => $other_private_id,
+		);
+	}
+
+	/**
+	 * Requests the related posts of the fixture's source post in the given statuses.
+	 *
+	 * @param  array<string, mixed> $fixture     The fixture returned by create_mixed_status_fixture().
+	 * @param  string[]             $post_status The requested post statuses.
+	 * @param  int                  $per_page    The page size.
+	 * @return \WP_REST_Response
+	 */
+	private function get_related_with_status( array $fixture, array $post_status, $per_page = 10 ) {
+		$request = new \WP_REST_Request( 'GET', "/content-connect/v2/post/{$fixture['source_id']}/related" );
+		$request->set_param( 'rel_key', $fixture['rel_key'] );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'post_status', $post_status );
+		$request->set_param( 'per_page', $per_page );
+
+		return rest_do_request( $request );
+	}
 }
 
