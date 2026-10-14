@@ -637,6 +637,45 @@ class RelatedEntities extends AbstractPostRoute {
 			$query_args['order'] = $order;
 		}
 
+		$readable_where = '';
+
+		if ( ! empty( $post_status ) ) {
+			// WP_Query's readable permission only handles explicit private statuses, not drafts or `any`.
+			$readable_where = $this->get_readable_posts_where( (array) $query_args['post_type'], wp_parse_list( $post_status ) );
+		}
+
+		/**
+		 * Filters the related-post readability restriction before pagination.
+		 *
+		 * Replace the default restriction to support post-specific authorization.
+		 * The returned SQL must include a leading AND and applies to both the
+		 * results and pagination count queries. An empty string adds no restriction.
+		 * This filter runs even when the default restriction is empty.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param string             $readable_where SQL WHERE restriction.
+		 * @param \WP_Post           $post           Source post.
+		 * @param \WP_REST_Request   $request        Related entities request.
+		 * @param \TenUp\ContentConnect\Relationships\PostToPost $relationship Relationship being queried.
+		 * @param array              $query_args     Related posts query arguments.
+		 */
+		$readable_where = apply_filters( 'tenup_content_connect_related_posts_readable_where', $readable_where, $post, $request, $relationship, $query_args );
+
+		// Apply the site's readability restriction before counting and paginating.
+		$filter_readable_posts = static function ( $where, $query ) use ( $readable_where ) {
+			if ( true === $query->get( 'content_connect_readable_only' ) ) {
+				$where .= $readable_where;
+			}
+
+			return $where;
+		};
+
+		if ( '' !== $readable_where ) {
+			$query_args['content_connect_readable_only'] = true;
+			add_filter( 'posts_where', $filter_readable_posts, 10, 2 );
+		}
+
 		$query = new \WP_Query( $query_args );
 
 		$items       = $query->get_posts();
@@ -653,6 +692,8 @@ class RelatedEntities extends AbstractPostRoute {
 			$count_query = new \WP_Query( $query_args );
 			$total_items = $count_query->found_posts;
 		}
+
+		remove_filter( 'posts_where', $filter_readable_posts, 10 );
 
 		if ( empty( $items ) ) {
 			return array(
@@ -775,5 +816,88 @@ class RelatedEntities extends AbstractPostRoute {
 		}
 
 		return $this->prepare_post_items( $items, $relationship );
+	}
+
+	/**
+	 * Builds a WHERE clause that limits the requested statuses to posts the current user can read.
+	 *
+	 * Posts in a public status are readable by everyone. Posts in a private status need the
+	 * post type's `read_private_posts` capability, and posts in any other status (draft,
+	 * pending, future) need `edit_others_posts`. Without that capability, only the current
+	 * user's own posts in that status are included.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  string[] $post_types  The related post types.
+	 * @param  string[] $post_status The requested post statuses, which may include `any`.
+	 * @return string The WHERE clause, or an empty string when the user can read every requested post.
+	 */
+	private function get_readable_posts_where( array $post_types, array $post_status ) {
+		global $wpdb;
+
+		if ( in_array( 'any', $post_status, true ) ) {
+			// Mirrors how WP_Query expands `any`.
+			$post_status = array_merge( $post_status, get_post_stati( array( 'exclude_from_search' => false ) ) );
+		}
+
+		$post_status   = array_unique( $post_status );
+		$user_id       = get_current_user_id();
+		$type_clauses  = array();
+		$is_restricted = false;
+
+		foreach ( $post_types as $post_type ) {
+			$post_type_object = get_post_type_object( $post_type );
+			$all_statuses     = array();
+			$own_statuses     = array();
+
+			foreach ( $post_status as $status ) {
+				$status_object = get_post_status_object( $status );
+
+				if ( ! $status_object ) {
+					continue;
+				}
+
+				if ( $status_object->public ) {
+					$all_statuses[] = $status;
+					continue;
+				}
+
+				$cap = $status_object->private ? 'read_private_posts' : 'edit_others_posts';
+
+				if ( $post_type_object && current_user_can( $post_type_object->cap->$cap ) ) {
+					$all_statuses[] = $status;
+				} else {
+					$own_statuses[] = $status;
+				}
+			}
+
+			if ( ! empty( $own_statuses ) ) {
+				$is_restricted = true;
+			}
+
+			$status_clauses = array();
+
+			if ( ! empty( $all_statuses ) ) {
+				$placeholders     = implode( ', ', array_fill( 0, count( $all_statuses ), '%s' ) );
+				$status_clauses[] = $wpdb->prepare( "{$wpdb->posts}.post_status IN ($placeholders)", $all_statuses ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+
+			if ( ! empty( $own_statuses ) ) {
+				$placeholders     = implode( ', ', array_fill( 0, count( $own_statuses ), '%s' ) );
+				$status_clauses[] = $wpdb->prepare( "({$wpdb->posts}.post_author = %d AND {$wpdb->posts}.post_status IN ($placeholders))", array_merge( array( $user_id ), $own_statuses ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+
+			if ( empty( $status_clauses ) ) {
+				continue;
+			}
+
+			$type_clauses[] = $wpdb->prepare( "({$wpdb->posts}.post_type = %s AND (", $post_type ) . implode( ' OR ', $status_clauses ) . '))';
+		}
+
+		if ( ! $is_restricted ) {
+			return '';
+		}
+
+		return ' AND (' . implode( ' OR ', $type_clauses ) . ')';
 	}
 }
