@@ -2,7 +2,7 @@
 
 > WordPress library that enables direct relationships for posts to posts and posts to users.
 
-[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.1%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/master/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-stable-blue.svg)](#support-level) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v7.1%20tested-success.svg) [![CodeQL](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/10up/wp-content-connect/actions/workflows/github-code-scanning/codeql) [![GPL-3.0-or-later License](https://img.shields.io/github/license/10up/wp-content-connect.svg)](https://github.com/10up/wp-content-connect/blob/trunk/LICENSE)
 
 ## Requirements
 
@@ -71,6 +71,10 @@ Alternatively, if you prefer to have composer install it as a plugin, you may re
 }
 
 ```
+
+### Versions and built assets
+
+The editor JavaScript and CSS in `dist/` are built in CI and are not committed to `develop` or `trunk`. Install a tagged release (with Composer, or the zip attached to each [GitHub release](https://github.com/10up/wp-content-connect/releases)), since tags always include `dist/`. To track the newest build, including prereleases, require `dev-built`. If you install from a source branch, run `npm ci && npm run build` yourself.
 
 ## Defining Relationships
 

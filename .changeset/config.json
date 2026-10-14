@@ -1,0 +1,12 @@
+{
+	"$schema": "https://unpkg.com/@changesets/config@3.0.3/schema.json",
+	"changelog": [ "@changesets/changelog-github", { "repo": "10up/wp-content-connect" } ],
+	"commit": false,
+	"fixed": [],
+	"linked": [],
+	"access": "restricted",
+	"baseBranch": "trunk",
+	"updateInternalDependencies": "patch",
+	"privatePackages": { "version": true, "tag": false },
+	"ignore": []
+}
