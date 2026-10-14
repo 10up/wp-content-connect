@@ -11,7 +11,7 @@
 
 ## Overview
 
-WP Content Connect defines and manages post-to-post and post-to-user relationships. Relationships are edited in both the **Block Editor** (a relationships panel in the document sidebar) and the **Classic Editor** (relationship meta boxes), and are exposed through a REST API and a set of PHP helper functions. See [REST API](#rest-api), [Helper Functions](#helper-functions), and [Customizing the Block Editor UI](#customizing-the-block-editor-ui).
+WP Content Connect defines and manages post-to-post and post-to-user relationships. Relationships are edited in both the **Block Editor** (a relationships panel in the document sidebar) and the **Classic Editor** (relationship meta boxes), and are exposed through a REST API and a set of PHP helper functions. See [REST API](#rest-api), [Abilities](#abilities), [Helper Functions](#helper-functions), and [Customizing the Block Editor UI](#customizing-the-block-editor-ui).
 
 ## Installation and Usage
 
@@ -500,6 +500,25 @@ Content Connect registers a set of `content-connect/v2` REST endpoints used by t
 Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links.
 
 > The legacy `POST /content-connect/v1/search` endpoint is **deprecated** as of 2.0.0. Use the v2 endpoints above.
+
+## Abilities
+
+On WordPress 6.9 and later, Content Connect registers read-only abilities in the `content-connect` category of the [Abilities API](https://developer.wordpress.org/apis/abilities/). They run over REST under `wp-abilities/v1` and are public to MCP clients. Every ability requires `edit_posts`, and the post-scoped ones also require `edit_post` on the post. On WordPress 6.8 nothing is registered.
+
+- `content-connect/get-relationships` — Registered relationship definitions, filterable by type, key, post type, or from/to side.
+- `content-connect/get-post-relationships` — The relationships that apply to a post. `context: embed` includes the related posts and users.
+- `content-connect/get-related-items` — One page of the posts or users related to a post through one relationship, with `total` and `total_pages`.
+- `content-connect/get-related-query-block` — Query Loop (`core/query`) markup that lists the posts related to a post through one post-to-post relationship.
+
+### Displaying related content
+
+Related posts on the site should come from a Query Loop filtered by the relationship. The read abilities return related IDs so an agent can inspect a relationship. Copying those IDs into a hand-picked list, such as a post picker block or a list of links, makes a snapshot that goes stale when the relationship changes. An agent adding related posts to a post should:
+
+1. Call `content-connect/get-post-relationships` for the post to find the relationship's `rel_key`.
+2. Call `content-connect/get-related-query-block` with the `post_id` and `rel_key`, and insert the returned `markup` into that post's content.
+3. Change the Query Loop's inner blocks to fit the design, and leave its `query` attribute as returned.
+
+A hand-picked list is the right choice only when an editor wants a curated selection that is not the relationship itself.
 
 ## Helper Functions
 
