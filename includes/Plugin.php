@@ -111,6 +111,32 @@ class Plugin {
 		}
 
 		add_action( 'init', array( $this, 'init' ), 100 );
+
+		// Source checkouts (e.g. Composer's dev-develop) have no dist/, and the editor UI silently doesn't load without it.
+		if ( ! file_exists( CONTENT_CONNECT_PATH . 'dist/js/block-editor.asset.php' ) ) {
+			add_action( 'admin_notices', array( $this, 'missing_build_notice' ) );
+		}
+	}
+
+	/**
+	 * Tells admins the editor UI is missing because the plugin's assets haven't been built.
+	 *
+	 * @return void
+	 */
+	public function missing_build_notice() {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+
+		wp_admin_notice(
+			sprintf(
+				/* translators: 1: dist/, 2: npm run build */
+				esc_html__( 'WP Content Connect is missing its built assets (%1$s), so the relationship panels won\'t appear in the editor. Install a tagged release, or run %2$s in the plugin directory.', 'wp-content-connect' ),
+				'<code>dist/</code>',
+				'<code>npm run build</code>'
+			),
+			array( 'type' => 'error' )
+		);
 	}
 
 	/**

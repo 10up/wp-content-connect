@@ -19,8 +19,10 @@ on:
     branches: [develop, trunk]
   workflow_dispatch:
 
+# One group for both branches: develop and trunk runs both push to `built`, and
+# trunk's merge-back pushes to develop, so parallel runs would reject each other.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
@@ -34,16 +36,18 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Commits this workflow pushes must not start another release.
-    if: |
-      github.event.head_commit.message != 'chore: apply changesets' &&
-      github.event.head_commit.message != 'chore: merge trunk into develop'
+    # No guard against the workflow's own pushes: they don't trigger runs with
+    # GITHUB_TOKEN, and if they do with an App token, a re-run finds no new
+    # changesets and stops.
     env:
       IS_TRUNK: ${{ github.ref_name == 'trunk' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          # The branch tip, not the pushed commit: a queued run may start after
+          # an earlier run has pushed to the same branch.
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Check for changesets
@@ -65,6 +69,9 @@ jobs:
       - name: Apply changesets
         id: version
         if: steps.changesets.outputs.pending == 'true'
+        env:
+          # changelog-github looks up each changeset's PR and author.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           npm ci
           BEFORE=$(node -p "require('./package.json').version")
@@ -154,7 +161,7 @@ jobs:
             # Changesets merged to develop after the release was cut make the
             # version files conflict. trunk's are authoritative; changesets that
             # only exist on develop stay and go into the next prerelease.
-            for file in package.json package-lock.json CHANGELOG.md content-connect.php includes/Plugin.php readme.txt wp-content-connect.pot; do
+            for file in package.json wp-content-connect.pot $(node bin/update-version.mjs --list); do
               git checkout --theirs -- "$file" && git add "$file"
             done
             git rm -q --ignore-unmatch .changeset/pre.json

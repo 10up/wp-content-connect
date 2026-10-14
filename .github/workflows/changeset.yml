@@ -14,8 +14,8 @@ jobs:
     name: Require a changeset
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # CI, docs and test-only changes don't need one.
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'no changeset') }}
+    # CI, docs and test-only changes don't need one, and neither do Dependabot's updates.
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'no changeset') && github.actor != 'dependabot[bot]' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

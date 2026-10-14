@@ -19,3 +19,5 @@
 /CODE_OF_CONDUCT.md export-ignore
 /CONTRIBUTING.md export-ignore
 /CREDITS.md export-ignore
+# Source for dist/, which is all the plugin loads.
+/assets export-ignore
