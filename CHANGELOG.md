@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 ### Added
 
 - Read-only Abilities API abilities `content-connect/get-relationships`, `content-connect/get-post-relationships`, and `content-connect/get-related-items`, exposed over REST and MCP, registered on WordPress 6.9+ only (props [@s3rgiosan](https://github.com/s3rgiosan)).
+- Read-only ability `content-connect/get-related-query-block` that returns Query Loop markup listing a post's related posts, so agents display related content with a live query instead of a hand-picked list (props [@fabiankaegy](https://github.com/fabiankaegy)).
 
 ## [2.0.0] - TBD
 
