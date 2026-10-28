@@ -41,11 +41,38 @@ class QueryBlockIntegration {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param  array $args    Array of arguments for \WP_Query.
-	 * @param  array $request The REST API request.
+	 * @param  array            $args    Array of arguments for \WP_Query.
+	 * @param  \WP_REST_Request $request The REST API request.
 	 * @return array Modified query arguments.
 	 */
 	public function rest_post_query( $args, $request ) {
+
+		if ( ! isset( $request['relationshipQuery'] ) && ! isset( $request['orderByRelationship'] ) ) {
+			return $args;
+		}
+
+		$post_type_object = get_post_type_object( $args['post_type'] ?? 'post' );
+		$can_edit_posts   = $post_type_object && current_user_can( $post_type_object->cap->edit_posts );
+
+		/**
+		 * Filters whether a REST request may filter or order posts by relationship.
+		 *
+		 * The `relationshipQuery` and `orderByRelationship` params reveal which posts are
+		 * related to a given post or user, so by default only users who can edit posts of
+		 * the queried type may use them. The Query Loop block's front-end rendering does
+		 * not go through REST and is not affected.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param bool             $allowed Whether the relationship params are applied.
+		 * @param \WP_REST_Request $request The REST API request.
+		 * @param array            $args    Array of arguments for \WP_Query.
+		 */
+		$allowed = (bool) apply_filters( 'tenup_content_connect_rest_relationship_query_allowed', $can_edit_posts, $request, $args );
+
+		if ( ! $allowed ) {
+			return $args;
+		}
 
 		if ( isset( $request['relationshipQuery'] ) && is_array( $request['relationshipQuery'] ) ) {
 			$args['relationship_query'] = $request['relationshipQuery'];

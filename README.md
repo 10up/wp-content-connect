@@ -497,7 +497,25 @@ Content Connect registers a set of `content-connect/v2` REST endpoints used by t
 - `PUT /content-connect/v2/post/<id>/related` — Add a single related item (`related_id`).
 - `DELETE /content-connect/v2/post/<id>/related` — Remove a single related item (`related_id`).
 
-Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links.
+Post REST responses for post types that support REST also gain `content-connect:relationships` and `content-connect:related` HAL links. The links are added only for users who can edit the post. Use the `tenup_content_connect_add_rest_links` filter to change that:
+
+```php
+// Never expose the links, not even to editors.
+add_filter( 'tenup_content_connect_add_rest_links', '__return_false' );
+```
+
+The Query Loop integration adds `relationshipQuery` and `orderByRelationship` params to the core `wp/v2` post endpoints. They apply only for users who can edit posts of the queried type; for anyone else they are ignored. The Query Loop block's front-end rendering does not use REST and is not affected. Use the `tenup_content_connect_rest_relationship_query_allowed` filter to allow other users, for example on a headless front end:
+
+```php
+add_filter(
+	'tenup_content_connect_rest_relationship_query_allowed',
+	function ( $allowed, $request, $args ) {
+		return $allowed || 'product' === $args['post_type'];
+	},
+	10,
+	3
+);
+```
 
 > The legacy `POST /content-connect/v1/search` endpoint is **deprecated** as of 2.0.0. Use the v2 endpoints above.
 
