@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 2.0.0 is a major rewrite of the editor UI and REST surface. **Stored relationship data and the database schema are unchanged**, and the documented public API is preserved: the relationship objects and their data methods (`add_relationship()`, `delete_relationship()`, `replace_relationships()`, the `save_*_sort_data()` family, etc.), `WP_Query` relationship queries, the helper functions, and the `content-connect/v1/search` endpoint URL all continue to work. No action is required if you use these documented interfaces.
 
-The changes below affect only code that referenced plugin **internals** that were never part of the documented API:
+Apart from the editor UI query filters noted in the last item, the changes below affect only code that referenced plugin **internals** that were never part of the documented API:
 
 - **Moved class:** `TenUp\ContentConnect\API\Search` is now `TenUp\ContentConnect\API\V1\Search`. The `content-connect/v1/search` REST endpoint URL is unchanged.
 - **Removed UI classes:** `UI\MetaBox`, `UI\PostToPost`, `UI\PostToUser`, and `UI\PostUI` were replaced by the React-based `UI\BlockEditor` and `UI\ClassicEditor`.
@@ -18,6 +18,7 @@ The changes below affect only code that referenced plugin **internals** that wer
 - **Relationship internals:** `Relationship::setup()`, `PostToPost::setup()`, `PostToUser::setup()`, and the `$from_ui` / `$to_ui` properties were removed. `Registry::define_post_to_post()` and `define_post_to_user()` no longer instantiate UI objects.
 - **Editor assets:** the `tenup-content-connect` script handle and the `window.ContentConnectData` global were removed. The Classic Editor metabox markup and save flow changed — relationships now persist through the REST v2 API instead of a `save_post` form submission.
 - **Removed filter:** `tenup_content_connect_localize_data`, which only filtered the removed Vue interface's localized payload, no longer fires. The `tenup_content_connect_post_relationship_data` filter is retained (now applied in the data layer, with added `$rel_type`, `$other_post_type`, and `$context` arguments).
+- **Editor UI query filters:** the editor UI no longer runs `tenup_content_connect_search_posts_query_args`, `tenup_content_connect_search_users_query_args`, `tenup_content_connect_post_ui_query_args`, or `tenup_content_connect_post_ui_user_query_args`. The search filters still fire only on the deprecated `content-connect/v1/search` endpoint, and the Post UI filters only on `GET /content-connect/v2/post/{post_id}/relationships?context=embed`. The relationship picker searches through the core `wp/v2/search` and `wp/v2/users` endpoints, so use the core `rest_post_search_query` and `rest_user_query` filters to change search results; the request carries the relationship key in the `content_connect` parameter. Selected items load from `GET /content-connect/v2/post/{post_id}/related`, whose readability rule the `tenup_content_connect_related_posts_readable_where` filter replaces. The `contentConnect.searchResultFilter` and `contentConnect.pickedItemFilter` JavaScript hooks change how search results and selected items are shaped in the picker.
 
 ### Added
 
