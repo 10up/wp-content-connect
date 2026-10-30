@@ -56,11 +56,16 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
+      # The build needs sharp, an optional dependency, so optional deps must install.
       - name: Install Node dependencies
-        run: npm ci --omit=optional
+        run: npm ci
 
       - name: Install dependencies
         run: composer install --ignore-platform-reqs
+
+      # dist/ isn't committed, and the enqueue tests need its asset files.
+      - name: Build assets
+        run: npm run build
 
       - name: Setup Tests
         run: npm run test:setup

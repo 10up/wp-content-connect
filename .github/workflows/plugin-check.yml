@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - trunk
-      - master
   pull_request:
     branches:
       - develop
@@ -32,9 +31,8 @@ jobs:
           path: artifact
 
       - name: Extract built zip
-        run: |
-          mkdir -p "${{ github.event.repository.name }}"
-          unzip -q "artifact/${{ github.event.repository.name }}.zip" -d "${{ github.event.repository.name }}"
+        # The zip already has a top-level wp-content-connect/ folder.
+        run: unzip -q "artifact/${{ github.event.repository.name }}.zip" -d .
 
       - name: Display structure of downloaded files
         run: ls -R
