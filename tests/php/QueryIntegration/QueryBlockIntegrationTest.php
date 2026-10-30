@@ -35,6 +35,21 @@ class QueryBlockIntegrationTest extends ContentConnectTestCase {
 		parent::setUp();
 
 		$this->integration = new QueryBlockIntegration();
+
+		// rest_post_query() only applies relationship params for users who can edit posts.
+		$admin_id = $this->factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+	}
+
+	/**
+	 * Cleans up the test environment.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		wp_set_current_user( 0 );
+
+		parent::tearDown();
 	}
 
 	/**
@@ -128,6 +143,98 @@ class QueryBlockIntegrationTest extends ContentConnectTestCase {
 		$args = $this->integration->rest_post_query( array( 'orderby' => 'date' ), $request );
 
 		$this->assertSame( 'date', $args['orderby'] );
+	}
+
+	/**
+	 * Relationship params should be ignored for anonymous visitors.
+	 *
+	 * @return void
+	 */
+	public function test_rest_post_query_ignores_relationship_params_for_anonymous_users(): void {
+		wp_set_current_user( 0 );
+
+		$request = $this->get_request(
+			array(
+				'relationshipQuery'   => array(
+					array(
+						'name'            => 'post_to_post_basic',
+						'related_to_post' => 5,
+					),
+				),
+				'orderByRelationship' => true,
+			)
+		);
+
+		$args = $this->integration->rest_post_query( array( 'post_type' => 'post' ), $request );
+
+		$this->assertArrayNotHasKey( 'relationship_query', $args );
+		$this->assertArrayNotHasKey( 'orderby', $args );
+	}
+
+	/**
+	 * Relationship params should be ignored for users who cannot edit posts of the queried type.
+	 *
+	 * @return void
+	 */
+	public function test_rest_post_query_ignores_relationship_params_for_users_who_cannot_edit_posts(): void {
+		$subscriber_id = $this->factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		$request = $this->get_request(
+			array(
+				'relationshipQuery' => array(
+					array(
+						'name'            => 'post_to_post_basic',
+						'related_to_post' => 5,
+					),
+				),
+			)
+		);
+
+		$args = $this->integration->rest_post_query( array( 'post_type' => 'post' ), $request );
+
+		$this->assertArrayNotHasKey( 'relationship_query', $args );
+	}
+
+	/**
+	 * The tenup_content_connect_rest_relationship_query_allowed filter can allow anonymous visitors.
+	 *
+	 * @return void
+	 */
+	public function test_relationship_query_allowed_filter_can_allow_anonymous_users(): void {
+		wp_set_current_user( 0 );
+		add_filter( 'tenup_content_connect_rest_relationship_query_allowed', '__return_true' );
+
+		$relationship_query = array(
+			array(
+				'name'            => 'post_to_post_basic',
+				'related_to_post' => 5,
+			),
+		);
+
+		$request = $this->get_request( array( 'relationshipQuery' => $relationship_query ) );
+
+		$args = $this->integration->rest_post_query( array( 'post_type' => 'post' ), $request );
+
+		remove_filter( 'tenup_content_connect_rest_relationship_query_allowed', '__return_true' );
+
+		$this->assertSame( $relationship_query, $args['relationship_query'] );
+	}
+
+	/**
+	 * The filter should not run when the request carries no relationship params.
+	 *
+	 * @return void
+	 */
+	public function test_relationship_query_allowed_filter_skipped_without_relationship_params(): void {
+		$filter = new \MockAction();
+		add_filter( 'tenup_content_connect_rest_relationship_query_allowed', array( $filter, 'filter' ) );
+
+		$this->integration->rest_post_query( array( 'post_type' => 'post' ), $this->get_request( array() ) );
+
+		remove_filter( 'tenup_content_connect_rest_relationship_query_allowed', array( $filter, 'filter' ) );
+
+		$this->assertSame( 0, $filter->get_call_count() );
 	}
 
 	/**

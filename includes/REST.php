@@ -36,7 +36,7 @@ class REST {
 
 		$post_types = get_post_types( array( 'show_in_rest' => true ), 'names' );
 		foreach ( $post_types as $post_type ) {
-			add_filter( "rest_prepare_{$post_type}", array( $this, 'prepare_links' ), 10, 2 );
+			add_filter( "rest_prepare_{$post_type}", array( $this, 'prepare_links' ), 10, 3 );
 		}
 	}
 
@@ -45,13 +45,30 @@ class REST {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param  \WP_REST_Response $response The response object.
-	 * @param  \WP_Post          $post     The post object.
+	 * @param  \WP_REST_Response     $response The response object.
+	 * @param  \WP_Post              $post     The post object.
+	 * @param  \WP_REST_Request|null $request  The request object.
 	 * @return \WP_REST_Response
 	 */
-	public function prepare_links( $response, $post ) {
+	public function prepare_links( $response, $post, $request = null ) {
 
-		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+		$can_edit_post = current_user_can( 'edit_post', $post->ID );
+
+		/**
+		 * Filters whether Content Connect links are added to a post's REST response.
+		 *
+		 * The links point to endpoints that require the `edit_post` capability, so by
+		 * default they are only added for users who can edit the post.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param bool                  $add_links Whether to add the links.
+		 * @param \WP_Post              $post      The post object.
+		 * @param \WP_REST_Request|null $request   The request object.
+		 */
+		$add_links = (bool) apply_filters( 'tenup_content_connect_add_rest_links', $can_edit_post, $post, $request );
+
+		if ( ! $add_links ) {
 			return $response;
 		}
 
