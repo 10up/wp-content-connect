@@ -51,6 +51,38 @@ class QueryBlockIntegrationTest extends ContentConnectTestCase {
 		$this->assertNotFalse(
 			has_filter( 'query_loop_block_query_vars', array( $this->integration, 'modify_query_loop_query' ) )
 		);
+		$this->assertNotFalse(
+			has_filter( 'get_block_type_variations', array( $this->integration, 'add_related_variation' ) )
+		);
+	}
+
+	/**
+	 * The Query Loop block should expose the "Related Content" variation.
+	 *
+	 * @return void
+	 */
+	public function test_query_block_has_related_variation(): void {
+		$variations = \WP_Block_Type_Registry::get_instance()->get_registered( 'core/query' )->get_variations();
+		$related    = wp_list_filter( $variations, array( 'name' => 'content-connect/related' ) );
+
+		$this->assertCount( 1, $related );
+
+		$related = reset( $related );
+
+		$this->assertTrue( $related['attributes']['showRelated'] );
+		$this->assertFalse( $related['attributes']['query']['inherit'] );
+		$this->assertSame( array( 'showRelated' ), $related['isActive'] );
+	}
+
+	/**
+	 * Other block types should not get the variation.
+	 *
+	 * @return void
+	 */
+	public function test_related_variation_is_only_added_to_query_block(): void {
+		$variations = \WP_Block_Type_Registry::get_instance()->get_registered( 'core/paragraph' )->get_variations();
+
+		$this->assertEmpty( wp_list_filter( $variations, array( 'name' => 'content-connect/related' ) ) );
 	}
 
 	/**
