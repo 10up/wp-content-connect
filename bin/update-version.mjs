@@ -7,9 +7,16 @@
  * CHANGELOG.md, since the release's own section repeats them.
  *
  * `--list` prints the files this touches instead, so the release workflow can
- * resolve them when trunk is merged back into develop.
+ * resolve them when trunk is merged back into develop. It runs before
+ * package.json is read, because package.json may still hold conflict markers
+ * at that point.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
+
+if ( process.argv.includes( '--list' ) ) {
+	console.log( [ 'content-connect.php', 'includes/Plugin.php', 'readme.txt', 'package-lock.json', 'CHANGELOG.md' ].join( '\n' ) );
+	process.exit( 0 );
+}
 
 const root = new URL( '../', import.meta.url );
 const read = ( path ) => readFileSync( new URL( path, root ), 'utf8' );
@@ -24,11 +31,6 @@ const replacements = {
 	],
 	'readme.txt': isPrerelease ? [] : [ [ /^(Stable tag:\s+).+$/m, `$1${ version }` ] ],
 };
-
-if ( process.argv.includes( '--list' ) ) {
-	console.log( [ ...Object.keys( replacements ), 'package-lock.json', 'CHANGELOG.md' ].join( '\n' ) );
-	process.exit( 0 );
-}
 
 for ( const [ path, patterns ] of Object.entries( replacements ) ) {
 	let source = read( path );
