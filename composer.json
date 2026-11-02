@@ -55,29 +55,5 @@
         "lint": "phpcs .",
         "lint:compat": "phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 8.2-8.5 --extensions=php --ignore=vendor/,node_modules/,dist/ .",
         "phpstan": "phpstan analyse --memory-limit=1G"
-    },
-    "archive": {
-        "exclude": [
-            "/node_modules",
-            "/tests",
-            "/.github",
-            "/.git*",
-            "/.claude",
-            ".DS_Store",
-            "/.phpunit.result.cache",
-            "/release",
-            "/artifacts",
-            "/bin",
-            "/docs",
-            "/run-tests.sh",
-            "/phpunit*.xml",
-            "/phpstan.neon.dist",
-            "/.wp-env.json",
-            "/.nvmrc",
-            "/build.js",
-            "/CONTRIBUTING.md",
-            "/CODE_OF_CONDUCT.md",
-            "/CREDITS.md"
-        ]
     }
 }

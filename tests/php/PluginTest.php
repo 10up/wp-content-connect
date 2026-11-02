@@ -37,7 +37,9 @@ class PluginTest extends ContentConnectTestCase {
 		$this->assertTrue( defined( 'CONTENT_CONNECT_URL' ) );
 		$this->assertTrue( defined( 'CONTENT_CONNECT_PATH' ) );
 
-		$this->assertSame( '2.0.0', CONTENT_CONNECT_VERSION );
+		// The release workflow bumps both, so they must stay in sync.
+		$header = get_file_data( CONTENT_CONNECT_PATH . 'content-connect.php', array( 'Version' => 'Version' ) );
+		$this->assertSame( $header['Version'], CONTENT_CONNECT_VERSION );
 		$this->assertStringEndsWith( '/', CONTENT_CONNECT_URL );
 		$this->assertStringEndsWith( '/', CONTENT_CONNECT_PATH );
 	}
@@ -85,6 +87,23 @@ class PluginTest extends ContentConnectTestCase {
 
 		$this->assertTrue( $fired, 'The tenup-content-connect-init action should fire.' );
 		$this->assertInstanceOf( Registry::class, $argument );
+	}
+
+	/**
+	 * Tests that the missing build notice only shows to users who manage plugins.
+	 *
+	 * @return void
+	 */
+	public function test_missing_build_notice_is_for_admins_only() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		ob_start();
+		Plugin::instance()->missing_build_notice();
+		$this->assertSame( '', ob_get_clean() );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		ob_start();
+		Plugin::instance()->missing_build_notice();
+		$this->assertStringContainsString( '<code>npm run build</code>', ob_get_clean() );
 	}
 
 	/**

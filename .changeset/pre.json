@@ -1,0 +1,8 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "wp-content-connect": "1.6.0"
+  },
+  "changesets": []
+}

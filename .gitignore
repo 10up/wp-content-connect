@@ -38,3 +38,6 @@ coverage/
 /assets/js/content-connect.js
 /assets/js/content-connect.min.js
 
+
+# Built by CI on release; see .changeset/README.md.
+/dist/

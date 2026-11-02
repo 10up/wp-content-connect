@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - trunk
-      - master
   pull_request:
     branches:
       - develop

@@ -53,17 +53,20 @@ During weekly triage, the tested up to version should be compared against the la
 
 New releases are targeted based on number and severity of changes along with human availability. When a release is targeted, a due date will be assigned to the appropriate milestone.
 
+### Changesets
+
+Every pull request to `develop` that changes how the plugin behaves needs a changeset. Run `npm run changeset`, pick the bump (patch for fixes, minor for features, major for breaking changes), and write the changelog entry. Pull requests that only touch CI, docs or tests can use the `no changeset` label instead. Don't edit `CHANGELOG.md` or version numbers by hand; the release workflow does both.
+
+Built files (`dist/`) are never committed. Run `npm run build` locally to work on the plugin.
+
 ### Release instructions
 
-1. Branch: Starting from `develop`, cut a release branch named `release/X.Y.Z` for your changes.
-2. Version bump: Bump the version number in `content-connect.php`, `includes/Plugin.php`, `package-lock.json` (twice), `package.json`, and `readme.txt` if it does not already reflect the version being released.
-3. Changelog: Add/update the changelog in `CHANGELOG.md`.
-4. Props: update `CREDITS.md` with any new contributors, confirm maintainers are accurate.
-5. Readme updates: Make any other readme changes as necessary. `README.md` is geared toward GitHub and `readme.txt` contains WordPress.org-specific content. The two are slightly different.
-6. Merge: Make a non-fast-forward merge from your release branch to `develop` (or merge the pull request), then do the same for `develop` into `master`, ensuring you pull the most recent changes into `develop` first (`git checkout develop && git pull origin develop && git checkout master && git merge --no-ff develop`). `master` contains the latest stable release.
-7. Push: Push your `master` branch to GitHub (e.g. `git push origin master`).
-8. [Compare](https://github.com/10up/wp-content-connect/compare/master...develop) `master` to `develop` to ensure no additional changes were missed.
-9. Test the pre-release ZIP locally by [downloading](https://github.com/10up/wp-content-connect/actions/workflows/build-release-zip.yml) it from the Build release zip action artifact and installing it locally. Ensure this zip has all the files we expect, that it installs and activates correctly and that all basic functionality is working.
-10. Release: Create a [new release](https://github.com/10up/wp-content-connect/releases/new), naming the tag and the release with the new version number, and targeting the `master` branch.  Paste the changelog from `CHANGELOG.md` into the body of the release and include a link to the [closed issues on the milestone](https://github.com/10up/wp-content-connect/milestone/#?closed=1).
-11. Close the milestone: Edit the [milestone](https://github.com/10up/wp-content-connect/milestone/#) with release date (in the `Due date (optional)` field) and link to GitHub release (in the `Description` field), then close the milestone.
-12. Punt incomplete items: If any open issues or PRs which were milestoned for `X.Y.Z` do not make it into the release, update their milestone to `X.Y.Z+1`, `X.Y+1.0`, `X+1.0.0`, or `Future Release`.
+Releases are automated by `.github/workflows/release.yml`; see `.changeset/README.md` for the details.
+
+1. Prereleases: merging pull requests with changesets into `develop` publishes `X.Y.Z-beta.N` prereleases automatically.
+2. Props: update `CREDITS.md` with any new contributors, confirm maintainers are accurate.
+3. Readme updates: make any other readme changes as necessary. `README.md` is geared toward GitHub and `readme.txt` contains WordPress.org-specific content. The two are slightly different.
+4. Test the latest prerelease zip from the [releases page](https://github.com/10up/wp-content-connect/releases). Ensure the zip has all the files we expect, that it installs and activates correctly and that all basic functionality is working.
+5. Release: open a pull request from `develop` into `trunk` (label it `no changeset`) and merge it. The workflow bumps the version, writes the changelog, builds the plugin, commits the build to the `built` branch, tags it `X.Y.Z`, publishes the GitHub release with the zip attached, and merges `trunk` back into `develop`.
+6. Close the milestone: edit the [milestone](https://github.com/10up/wp-content-connect/milestone/#) with release date (in the `Due date (optional)` field) and link to the GitHub release (in the `Description` field), then close the milestone.
+7. Punt incomplete items: if any open issues or PRs which were milestoned for `X.Y.Z` do not make it into the release, update their milestone to `X.Y.Z+1`, `X.Y+1.0`, `X+1.0.0`, or `Future Release`.
