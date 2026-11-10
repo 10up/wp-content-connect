@@ -28,7 +28,7 @@ class RESTTest extends ContentConnectTestCase {
 		$this->add_post_relations();
 		$this->add_user_relations();
 
-		// prepare_links() gates on read_post, so requests must run as a capable user.
+		// prepare_links() gates on edit_post, so requests must run as a capable user.
 		$admin_id = $this->factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin_id );
 
@@ -321,5 +321,79 @@ class RESTTest extends ContentConnectTestCase {
 		// The core `self` link must be present exactly once.
 		$this->assertArrayHasKey( 'self', $links );
 		$this->assertCount( 1, $links['self'] );
+	}
+
+	/**
+	 * Tests that no links are added for anonymous visitors.
+	 *
+	 * @return void
+	 */
+	public function test_no_links_added_for_anonymous_users() {
+		wp_set_current_user( 0 );
+
+		$request  = new \WP_REST_Request( 'GET', '/wp/v2/posts/1' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'content-connect:relationships', $links );
+		$this->assertArrayNotHasKey( 'content-connect:related', $links );
+	}
+
+	/**
+	 * Tests that no links are added for users who can read but not edit the post.
+	 *
+	 * @return void
+	 */
+	public function test_no_links_added_for_users_who_cannot_edit_the_post() {
+		$subscriber_id = $this->factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		$request  = new \WP_REST_Request( 'GET', '/wp/v2/posts/1' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'content-connect:relationships', $links );
+		$this->assertArrayNotHasKey( 'content-connect:related', $links );
+	}
+
+	/**
+	 * Tests that the tenup_content_connect_add_rest_links filter can add links for anonymous visitors.
+	 *
+	 * @return void
+	 */
+	public function test_add_rest_links_filter_can_enable_links_for_anonymous_users() {
+		wp_set_current_user( 0 );
+		add_filter( 'tenup_content_connect_add_rest_links', '__return_true' );
+
+		$request  = new \WP_REST_Request( 'GET', '/wp/v2/posts/1' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+
+		remove_filter( 'tenup_content_connect_add_rest_links', '__return_true' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'content-connect:relationships', $links );
+		$this->assertArrayHasKey( 'content-connect:related', $links );
+	}
+
+	/**
+	 * Tests that the tenup_content_connect_add_rest_links filter can remove links for editors.
+	 *
+	 * @return void
+	 */
+	public function test_add_rest_links_filter_can_disable_links_for_editors() {
+		add_filter( 'tenup_content_connect_add_rest_links', '__return_false' );
+
+		$request  = new \WP_REST_Request( 'GET', '/wp/v2/posts/1' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+
+		remove_filter( 'tenup_content_connect_add_rest_links', '__return_false' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'content-connect:relationships', $links );
+		$this->assertArrayNotHasKey( 'content-connect:related', $links );
 	}
 }
