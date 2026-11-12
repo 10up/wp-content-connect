@@ -16,6 +16,8 @@ WP Content Connect is a WordPress library that enables direct relationships betw
 
 This plugin allows developers to define and manage connections between posts and users, facilitating complex content relationships within WordPress. It supports both post-to-post and post-to-user associations, offering customizable options for each relationship. WP Content Connect can be utilized as a standalone library or installed as a plugin, providing flexibility in implementation. Developers can define relationships by hooking into the `tenup-content-connect-init` action, specifying parameters such as post types, unique names, and additional arguments to tailor the connections to specific needs. The plugin also integrates with WordPress queries, enabling the retrieval of related content through a new `relationship_query` parameter for `WP_Query`. This feature allows for sophisticated content retrieval based on defined relationships, enhancing the dynamic capabilities of WordPress sites.  
 
+Administrators can also manage relationships without code under Settings → Content Connect: choose the post types to connect, name the relationship, and set up the editor panel on each side, including bidirectional panels. The screen can be turned off with the `CONTENT_CONNECT_ADMIN_UI` constant or the `tenup_content_connect_enable_admin_ui` filter.
+
 == Frequently Asked Questions ==
 
 = Where do I report security bugs found in this plugin? =
