@@ -608,77 +608,25 @@ class RelatedEntities extends AbstractPostRoute {
 	 */
 	protected function get_related_posts( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
 
-		$post_status = $request->get_param( 'post_status' );
-		$page        = (int) $request->get_param( 'page' );
-		$per_page    = (int) $request->get_param( 'per_page' );
-		$order       = $request->get_param( 'order' );
-		$orderby     = $request->get_param( 'orderby' );
+		$page    = (int) $request->get_param( 'page' );
+		$order   = $request->get_param( 'order' );
+		$orderby = $request->get_param( 'orderby' );
 
-		$query_args = array(
-			'post_status'        => $post_status,
-			'paged'              => $page,
-			'posts_per_page'     => $per_page,
-			'relationship_query' => array(
-				array(
-					'name'            => $relationship->name,
-					'related_to_post' => $post->ID,
-				),
-			),
-			'orderby'            => $orderby,
-		);
-
-		if ( $post->post_type === $relationship->from ) {
-			$query_args['post_type'] = $relationship->to;
-		} else {
-			$query_args['post_type'] = $relationship->from;
-		}
+		$query_args                   = $this->get_related_posts_query_args( $post, $request, $relationship );
+		$query_args['paged']          = $page;
+		$query_args['posts_per_page'] = (int) $request->get_param( 'per_page' );
+		$query_args['orderby']        = $orderby;
 
 		if ( 'relationship' !== $orderby ) {
 			$query_args['order'] = $order;
 		}
 
-		$readable_where = '';
-
-		if ( ! empty( $post_status ) ) {
-			// WP_Query's readable permission only handles explicit private statuses, not drafts or `any`.
-			$readable_where = $this->get_readable_posts_where( (array) $query_args['post_type'], wp_parse_list( $post_status ) );
-		}
-
-		/**
-		 * Filters the related-post readability restriction before pagination.
-		 *
-		 * Replace the default restriction to support post-specific authorization.
-		 * The returned SQL must include a leading AND and applies to both the
-		 * results and pagination count queries. An empty string adds no restriction.
-		 * This filter runs even when the default restriction is empty.
-		 *
-		 * @since 2.0.0
-		 *
-		 * @param string             $readable_where SQL WHERE restriction.
-		 * @param \WP_Post           $post           Source post.
-		 * @param \WP_REST_Request   $request        Related entities request.
-		 * @param \TenUp\ContentConnect\Relationships\PostToPost $relationship Relationship being queried.
-		 * @param array              $query_args     Related posts query arguments.
-		 */
-		$readable_where = apply_filters( 'tenup_content_connect_related_posts_readable_where', $readable_where, $post, $request, $relationship, $query_args );
+		$readable_where = $this->get_related_posts_readable_where( $post, $request, $relationship, $query_args );
 
 		// Apply the site's readability restriction before counting and paginating.
-		$filter_readable_posts = static function ( $where, $query ) use ( $readable_where ) {
-			if ( true === $query->get( 'content_connect_readable_only' ) ) {
-				$where .= $readable_where;
-			}
+		$query = $this->query_readable_posts( $query_args, $readable_where );
 
-			return $where;
-		};
-
-		if ( '' !== $readable_where ) {
-			$query_args['content_connect_readable_only'] = true;
-			add_filter( 'posts_where', $filter_readable_posts, 10, 2 );
-		}
-
-		$query = new \WP_Query( $query_args );
-
-		$items       = $query->get_posts();
+		$items       = $query->posts;
 		$total_items = $query->found_posts;
 
 		if ( $total_items < 1 && $page > 1 ) {
@@ -689,11 +637,9 @@ class RelatedEntities extends AbstractPostRoute {
 			$query_args['fields']         = 'ids';
 			$query_args['posts_per_page'] = 1;
 
-			$count_query = new \WP_Query( $query_args );
+			$count_query = $this->query_readable_posts( $query_args, $readable_where );
 			$total_items = $count_query->found_posts;
 		}
-
-		remove_filter( 'posts_where', $filter_readable_posts, 10 );
 
 		if ( empty( $items ) ) {
 			return array(
@@ -801,21 +747,183 @@ class RelatedEntities extends AbstractPostRoute {
 			$valid_ids[] = (int) $related_id;
 		}
 
-		$relationship->replace_related_ids( $post->ID, $valid_ids );
+		// Related posts the user cannot list were never sent, so they stay related, sorted last.
+		$unlisted_ids = array_values( array_diff( $this->get_unlisted_related_ids( $post, $request, $relationship ), $valid_ids ) );
+		$stored_ids   = array_merge( $valid_ids, $unlisted_ids );
+
+		$relationship->replace_related_ids( $post->ID, $stored_ids );
 
 		$is_sortable = $relationship->is_sortable_from( $post );
 
 		if ( $is_sortable ) {
-			$relationship->save_related_sort_data( $post->ID, $valid_ids );
+			$relationship->save_related_sort_data( $post->ID, $stored_ids );
 		}
 
 		$items = $relationship->get_related_ids( $post->ID, $is_sortable );
+		$items = array_values( array_diff( $items, $unlisted_ids ) );
 
 		if ( 'user' === $relationship->get_object_type() ) {
 			return $this->prepare_user_items( $items, $relationship );
 		}
 
 		return $this->prepare_post_items( $items, $relationship );
+	}
+
+	/**
+	 * Builds the query args shared by the related posts list and the unlisted IDs lookup.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  \WP_Post                                                                                      $post         The source post.
+	 * @param  \WP_REST_Request                                                                              $request      The request object.
+	 * @param  \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
+	 * @return array<string, mixed> The WP_Query args.
+	 */
+	protected function get_related_posts_query_args( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
+
+		$query_args = array(
+			'post_status'        => $request->get_param( 'post_status' ),
+			'relationship_query' => array(
+				array(
+					'name'            => $relationship->name,
+					'related_to_post' => $post->ID,
+				),
+			),
+		);
+
+		if ( $post->post_type === $relationship->from ) {
+			$query_args['post_type'] = $relationship->to;
+		} else {
+			$query_args['post_type'] = $relationship->from;
+		}
+
+		return $query_args;
+	}
+
+	/**
+	 * Gets the WHERE restriction that limits related posts to the ones the current user can read.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  \WP_Post                                                                                      $post         The source post.
+	 * @param  \WP_REST_Request                                                                              $request      The request object.
+	 * @param  \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
+	 * @param  array<string, mixed>                                                                          $query_args   The related posts query args.
+	 * @return string The WHERE restriction, or an empty string for no restriction.
+	 */
+	protected function get_related_posts_readable_where( \WP_Post $post, \WP_REST_Request $request, $relationship, array $query_args ) {
+
+		$post_status    = $query_args['post_status'];
+		$readable_where = '';
+
+		if ( ! empty( $post_status ) ) {
+			// WP_Query's readable permission only handles explicit private statuses, not drafts or `any`.
+			$readable_where = $this->get_readable_posts_where( (array) $query_args['post_type'], wp_parse_list( $post_status ) );
+		}
+
+		/**
+		 * Filters the related-post readability restriction before pagination.
+		 *
+		 * Replace the default restriction to support post-specific authorization.
+		 * The returned SQL must include a leading AND and applies to the results and
+		 * pagination count queries, and to the lookup that keeps related posts the user
+		 * cannot list when related items are replaced. An empty string adds no restriction.
+		 * This filter runs even when the default restriction is empty.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param string             $readable_where SQL WHERE restriction.
+		 * @param \WP_Post           $post           Source post.
+		 * @param \WP_REST_Request   $request        Related entities request.
+		 * @param \TenUp\ContentConnect\Relationships\PostToPost $relationship Relationship being queried.
+		 * @param array              $query_args     Related posts query arguments.
+		 */
+		$readable_where = apply_filters( 'tenup_content_connect_related_posts_readable_where', $readable_where, $post, $request, $relationship, $query_args );
+
+		return $readable_where;
+	}
+
+	/**
+	 * Gets the related post IDs the current user cannot list.
+	 *
+	 * The editor lists related posts with `post_status=any`. This runs the same query with the
+	 * same readability restriction, so a post hidden from the list is never removed on save.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  \WP_Post                                                                                      $post         The source post.
+	 * @param  \WP_REST_Request                                                                              $request      The update request.
+	 * @param  \TenUp\ContentConnect\Relationships\PostToPost|\TenUp\ContentConnect\Relationships\PostToUser $relationship The relationship object.
+	 * @return int[] The related post IDs the current user cannot list.
+	 */
+	protected function get_unlisted_related_ids( \WP_Post $post, \WP_REST_Request $request, $relationship ) {
+
+		if ( 'user' === $relationship->get_object_type() ) {
+			return array();
+		}
+
+		$related_ids = array_map( 'intval', $relationship->get_related_ids( $post->ID ) );
+
+		if ( empty( $related_ids ) ) {
+			return array();
+		}
+
+		$list_request = new \WP_REST_Request( 'GET', $request->get_route() );
+		$list_request->set_url_params( $request->get_url_params() );
+		$list_request->set_query_params(
+			array(
+				'rel_key'     => $request->get_param( 'rel_key' ),
+				'rel_type'    => $request->get_param( 'rel_type' ),
+				'post_status' => array( 'any' ),
+			)
+		);
+
+		$query_args                   = $this->get_related_posts_query_args( $post, $list_request, $relationship );
+		$query_args['posts_per_page'] = -1;
+		$query_args['fields']         = 'ids';
+		$query_args['no_found_rows']  = true;
+		$query_args['orderby']        = 'none';
+
+		$readable_where = $this->get_related_posts_readable_where( $post, $list_request, $relationship, $query_args );
+
+		$query      = $this->query_readable_posts( $query_args, $readable_where );
+		$listed_ids = array_map( 'intval', $query->posts );
+
+		return array_values( array_diff( $related_ids, $listed_ids ) );
+	}
+
+	/**
+	 * Runs a related posts query with the readability restriction added to its WHERE clause.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  array<string, mixed> $query_args     The WP_Query args.
+	 * @param  string               $readable_where The WHERE restriction, or an empty string for none.
+	 * @return \WP_Query
+	 */
+	protected function query_readable_posts( array $query_args, $readable_where ) {
+
+		if ( '' === $readable_where ) {
+			return new \WP_Query( $query_args );
+		}
+
+		$filter_readable_posts = static function ( $where, $query ) use ( $readable_where ) {
+			if ( true === $query->get( 'content_connect_readable_only' ) ) {
+				$where .= $readable_where;
+			}
+
+			return $where;
+		};
+
+		$query_args['content_connect_readable_only'] = true;
+
+		add_filter( 'posts_where', $filter_readable_posts, 10, 2 );
+
+		$query = new \WP_Query( $query_args );
+
+		remove_filter( 'posts_where', $filter_readable_posts, 10 );
+
+		return $query;
 	}
 
 	/**
