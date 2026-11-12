@@ -101,6 +101,7 @@ class Plugin {
 			new API\V2\Route\Relationships(),
 			new API\V2\Post\Route\Relationships(),
 			new API\V2\Post\Route\RelatedEntities(),
+			new Abilities(),
 		);
 
 		foreach ( $modules as $module ) {

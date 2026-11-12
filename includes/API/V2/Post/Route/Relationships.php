@@ -18,42 +18,55 @@ class Relationships extends AbstractPostRoute {
 	 */
 	public function register_routes() {
 
-		$params = $this->get_route_params();
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/relationships',
 			array(
-				'args' => array(
-					'id'        => $params['id'],
-					'rel_type'  => array(
-						'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
-						'type'              => 'string',
-						'default'           => 'any',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-						'enum'              => array( 'any', 'post-to-post', 'post-to-user' ),
-					),
-					'post_type' => array(
-						'description'       => __( 'The post type to filter relationships by.', 'wp-content-connect' ),
-						'type'              => 'string',
-						'default'           => '',
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => 'rest_validate_request_arg',
-					),
-					'context'   => array(
-						'description'       => __( 'Scope under which the request is made; determines fields present in response.', 'wp-content-connect' ),
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_key',
-						'validate_callback' => 'rest_validate_request_arg',
-						'enum'              => array( 'view', 'embed' ),
-					),
-				),
+				'args' => $this->get_collection_params(),
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
+			),
+		);
+	}
+
+	/**
+	 * Retrieves the query params for the post relationships collection.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return array
+	 */
+	public function get_collection_params() {
+
+		$params = $this->get_route_params();
+
+		return array(
+			'id'        => $params['id'],
+			'rel_type'  => array(
+				'description'       => __( 'The relationship type to filter relationships by.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'any',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
+				'enum'              => array( 'any', 'post-to-post', 'post-to-user' ),
+			),
+			'post_type' => array(
+				'description'       => __( 'The post type to filter post-to-post relationships by.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
+			),
+			'context'   => array(
+				'description'       => __( 'Scope under which the request is made; determines fields present in response. "embed" includes the related posts and users for each relationship.', 'wp-content-connect' ),
+				'type'              => 'string',
+				'default'           => 'view',
+				'sanitize_callback' => 'sanitize_key',
+				'validate_callback' => 'rest_validate_request_arg',
+				'enum'              => array( 'view', 'embed' ),
 			),
 		);
 	}
