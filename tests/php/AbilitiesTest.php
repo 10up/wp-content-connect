@@ -23,6 +23,7 @@ class AbilitiesTest extends ContentConnectTestCase {
 		'content-connect/get-relationships',
 		'content-connect/get-post-relationships',
 		'content-connect/get-related-items',
+		'content-connect/get-related-query-block',
 	);
 
 	/**
@@ -374,5 +375,111 @@ class AbilitiesTest extends ContentConnectTestCase {
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'rest_relationship_not_found', $result->get_error_code() );
+	}
+
+	/**
+	 * Tests that get-related-query-block returns Query Loop markup that renders the related posts.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_query_block_renders_related_posts() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'ability-query-block' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'ability-query-block' );
+
+		$source    = $this->factory()->post->create( array( 'post_title' => 'Query Block Source' ) );
+		$related   = $this->factory()->post->create( array( 'post_title' => 'Query Block Related' ) );
+		$unrelated = $this->factory()->post->create( array( 'post_title' => 'Query Block Unrelated' ) );
+
+		$registry->get_post_to_post_relationship_by_key( $rel_key )->add_relationship( $source, $related );
+
+		$result = wp_get_ability( 'content-connect/get-related-query-block' )->execute(
+			array(
+				'post_id' => $source,
+				'rel_key' => $rel_key,
+			)
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertTrue( $result['attributes']['showRelated'] );
+		$this->assertSame( $rel_key, $result['attributes']['relationshipKey'] );
+		$this->assertSame( 'post', $result['attributes']['query']['postType'] );
+		$this->assertSame( 3, $result['attributes']['query']['perPage'] );
+		$this->assertSame(
+			array(
+				array(
+					'name'            => 'ability-query-block',
+					'related_to_post' => $source,
+				),
+			),
+			$result['attributes']['query']['relationshipQuery']
+		);
+
+		$blocks = parse_blocks( $result['markup'] );
+
+		$this->assertSame( 'core/query', $blocks[0]['blockName'] );
+		$this->assertSame( $result['attributes'], $blocks[0]['attrs'] );
+
+		$html = do_blocks( $result['markup'] );
+
+		$this->assertStringContainsString( 'Query Block Related', $html );
+		$this->assertStringNotContainsString( 'Query Block Unrelated', $html );
+	}
+
+	/**
+	 * Tests that get-related-query-block rejects a relationship that does not apply to the post.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_query_block_unknown_relationship() {
+		$result = wp_get_ability( 'content-connect/get-related-query-block' )->execute(
+			array(
+				'post_id' => 1,
+				'rel_key' => 'does-not-exist',
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_relationship_not_found', $result->get_error_code() );
+	}
+
+	/**
+	 * Tests that get-related-query-block rejects a post type the relationship does not relate to.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_query_block_rejects_unrelated_post_type() {
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'car', 'ability-query-block-type' );
+		$rel_key = $registry->get_relationship_key( 'post', 'car', 'ability-query-block-type' );
+
+		$result = wp_get_ability( 'content-connect/get-related-query-block' )->execute(
+			array(
+				'post_id'   => 1,
+				'rel_key'   => $rel_key,
+				'post_type' => 'page',
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_invalid_param', $result->get_error_code() );
+	}
+
+	/**
+	 * Tests that get-related-query-block is denied to users who cannot edit the post.
+	 *
+	 * @return void
+	 */
+	public function test_get_related_query_block_requires_edit_post() {
+		wp_set_current_user( 0 );
+
+		$result = wp_get_ability( 'content-connect/get-related-query-block' )->execute(
+			array(
+				'post_id' => 1,
+				'rel_key' => 'any',
+			)
+		);
+
+		$this->assertWPError( $result );
 	}
 }

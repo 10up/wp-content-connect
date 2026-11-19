@@ -58,7 +58,7 @@ class Abilities {
 			self::CATEGORY,
 			array(
 				'label'       => __( 'Content Connect', 'wp-content-connect' ),
-				'description' => __( 'Post-to-post and post-to-user relationships. These abilities read relationship data. To display related posts on the site, use a Query Loop (core/query) block filtered by the relationship, which stays in sync when relationships change.', 'wp-content-connect' ),
+				'description' => __( 'Post-to-post and post-to-user relationships. These abilities read relationship data. To display related posts on the site, use a Query Loop (core/query) block filtered by the relationship, which stays in sync when relationships change. content-connect/get-related-query-block returns the markup for one.', 'wp-content-connect' ),
 			)
 		);
 	}
@@ -101,7 +101,7 @@ class Abilities {
 			'content-connect/get-post-relationships',
 			array(
 				'label'               => __( 'Get Post Relationships', 'wp-content-connect' ),
-				'description'         => __( 'Lists the relationships that apply to a post, optionally including the related posts and users for each one. To display related posts on the site, use a Query Loop (core/query) block filtered by the relationship instead of copying the related IDs into content.', 'wp-content-connect' ),
+				'description'         => __( 'Lists the relationships that apply to a post, optionally including the related posts and users for each one. To display related posts on the site, use the markup from content-connect/get-related-query-block instead of copying the related IDs into content.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => self::get_input_schema( self::get_post_input_args( ( new PostRelationshipsRoute() )->get_collection_params() ) ),
 				'output_schema'       => array(
@@ -124,7 +124,7 @@ class Abilities {
 			'content-connect/get-related-items',
 			array(
 				'label'               => __( 'Get Related Items', 'wp-content-connect' ),
-				'description'         => __( 'Lists the published posts or the users related to a post through one relationship, with pagination and ordering. Use it to inspect a relationship, not to build content: to display related posts on the site, use a Query Loop (core/query) block filtered by the relationship. A Query Loop updates when relationships change; IDs copied into a hand-picked list do not.', 'wp-content-connect' ),
+				'description'         => __( 'Lists the published posts or the users related to a post through one relationship, with pagination and ordering. Use it to inspect a relationship, not to build content: to display related posts on the site, use the Query Loop (core/query) markup from content-connect/get-related-query-block. A Query Loop updates when relationships change; IDs copied into a hand-picked list do not.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => self::get_input_schema( self::get_post_input_args( $related_args ) ),
 				'output_schema'       => array(
@@ -139,6 +139,58 @@ class Abilities {
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_get_related_items' ),
+				'permission_callback' => array( $this, 'can_edit_input_post' ),
+				'meta'                => self::get_read_only_meta(),
+			)
+		);
+
+		wp_register_ability(
+			'content-connect/get-related-query-block',
+			array(
+				'label'               => __( 'Get Related Query Block', 'wp-content-connect' ),
+				'description'         => __( 'Returns the markup for a Query Loop (core/query) block that lists the posts related to a post through one post-to-post relationship. Insert the markup into that post\'s content to display its related posts; the list stays in sync when relationships change. The inner blocks are a starting point and can be changed.', 'wp-content-connect' ),
+				'category'            => self::CATEGORY,
+				'input_schema'        => array(
+					'type'                 => 'object',
+					'properties'           => array(
+						'post_id'   => array(
+							'type'        => 'integer',
+							'minimum'     => 1,
+							'description' => __( 'The post whose related posts the Query Loop lists. The markup is meant for this post\'s content.', 'wp-content-connect' ),
+						),
+						'rel_key'   => array(
+							'type'        => 'string',
+							'description' => __( 'The key of a post-to-post relationship that applies to the post, as returned by content-connect/get-post-relationships.', 'wp-content-connect' ),
+						),
+						'post_type' => array(
+							'type'        => 'string',
+							'description' => __( 'The related post type to list. Defaults to the first related post type of the relationship.', 'wp-content-connect' ),
+						),
+						'per_page'  => array(
+							'type'        => 'integer',
+							'minimum'     => 1,
+							'maximum'     => 100,
+							'default'     => 3,
+							'description' => __( 'The number of posts to show.', 'wp-content-connect' ),
+						),
+					),
+					'required'             => array( 'post_id', 'rel_key' ),
+					'additionalProperties' => false,
+				),
+				'output_schema'       => array(
+					'type'       => 'object',
+					'properties' => array(
+						'markup'     => array(
+							'type'        => 'string',
+							'description' => __( 'Serialized block markup, ready to insert into post content.', 'wp-content-connect' ),
+						),
+						'attributes' => array(
+							'type'        => 'object',
+							'description' => __( 'The core/query block attributes used in the markup.', 'wp-content-connect' ),
+						),
+					),
+				),
+				'execute_callback'    => array( $this, 'execute_get_related_query_block' ),
 				'permission_callback' => array( $this, 'can_edit_input_post' ),
 				'meta'                => self::get_read_only_meta(),
 			)
@@ -255,6 +307,111 @@ class Abilities {
 			'items'       => self::prepare_items( (array) $response->get_data() ),
 			'total'       => (int) ( $headers['X-WP-Total'] ?? 0 ),
 			'total_pages' => (int) ( $headers['X-WP-TotalPages'] ?? 0 ),
+		);
+	}
+
+	/**
+	 * Builds Query Loop markup that lists the posts related to a post.
+	 *
+	 * The block attributes match what the block editor's Query Loop extension
+	 * stores, so the block opens in the editor unchanged and renders through
+	 * the `query_loop_block_query_vars` integration.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param  array|null $input Ability input.
+	 * @return array|\WP_Error
+	 */
+	public function execute_get_related_query_block( $input = null ) {
+
+		$params  = (array) $input;
+		$post_id = (int) ( $params['post_id'] ?? 0 );
+		$rel_key = (string) ( $params['rel_key'] ?? '' );
+
+		$response = self::dispatch(
+			sprintf( '/content-connect/v2/post/%d/relationships', $post_id ),
+			array( 'rel_type' => 'post-to-post' )
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$relationships = wp_list_filter( (array) $response->get_data(), array( 'rel_key' => $rel_key ) );
+		$relationship  = reset( $relationships );
+
+		if ( empty( $relationship ) ) {
+			return new \WP_Error(
+				'rest_relationship_not_found',
+				__( 'No post-to-post relationship with this key applies to the post.', 'wp-content-connect' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$post_types = (array) $relationship['post_type'];
+		$post_type  = (string) ( $params['post_type'] ?? reset( $post_types ) );
+
+		if ( ! in_array( $post_type, $post_types, true ) ) {
+			return new \WP_Error(
+				'rest_invalid_param',
+				/* translators: %s: Comma-separated list of post types. */
+				sprintf( __( 'The post type must be one of: %s.', 'wp-content-connect' ), implode( ', ', $post_types ) ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$attributes = array(
+			'query'           => array(
+				'perPage'             => (int) ( $params['per_page'] ?? 3 ),
+				'pages'               => 0,
+				'offset'              => 0,
+				'postType'            => $post_type,
+				'order'               => 'desc',
+				'orderBy'             => 'date',
+				'author'              => '',
+				'search'              => '',
+				'exclude'             => array(),
+				'sticky'              => '',
+				'inherit'             => false,
+				'orderByRelationship' => ! empty( $relationship['sortable'] ),
+				'relationshipQuery'   => array(
+					array(
+						'name'            => $relationship['rel_name'],
+						'related_to_post' => $post_id,
+					),
+				),
+			),
+			'showRelated'     => true,
+			'relationshipKey' => $rel_key,
+		);
+
+		$block = array(
+			'blockName'    => 'core/query',
+			'attrs'        => $attributes,
+			'innerBlocks'  => array(
+				array(
+					'blockName'    => 'core/post-template',
+					'attrs'        => array(),
+					'innerBlocks'  => array(
+						array(
+							'blockName'    => 'core/post-title',
+							'attrs'        => array( 'isLink' => true ),
+							'innerBlocks'  => array(),
+							'innerHTML'    => '',
+							'innerContent' => array(),
+						),
+					),
+					'innerHTML'    => "\n\n",
+					'innerContent' => array( "\n", null, "\n" ),
+				),
+			),
+			'innerHTML'    => '<div class="wp-block-query"></div>',
+			'innerContent' => array( '<div class="wp-block-query">', null, '</div>' ),
+		);
+
+		return array(
+			'markup'     => serialize_block( $block ),
+			'attributes' => $attributes,
 		);
 	}
 
