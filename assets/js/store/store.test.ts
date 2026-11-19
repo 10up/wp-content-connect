@@ -106,6 +106,15 @@ describe('relationships selector', () => {
 			filtered,
 		);
 	});
+
+	it('returns the same empty object on each call when there is no data', () => {
+		expect(select(STORE_NAME).getRelationships(null)).toBe(
+			select(STORE_NAME).getRelationships(null),
+		);
+		expect(select(STORE_NAME).getRelationships(404)).toBe(
+			select(STORE_NAME).getRelationships(404),
+		);
+	});
 });
 
 describe('relatedEntities selector', () => {
@@ -127,6 +136,17 @@ describe('relatedEntities selector', () => {
 				rel_type: 'post-to-post',
 			}),
 		).toEqual(entities);
+	});
+
+	it('returns the same empty array on each call when there is no data', () => {
+		const options = () => ({ rel_key: 'missing', rel_type: 'post-to-post' });
+
+		expect(select(STORE_NAME).getRelatedEntities(null, options())).toBe(
+			select(STORE_NAME).getRelatedEntities(null, options()),
+		);
+		expect(select(STORE_NAME).getRelatedEntities(404, options())).toBe(
+			select(STORE_NAME).getRelatedEntities(404, options()),
+		);
 	});
 });
 

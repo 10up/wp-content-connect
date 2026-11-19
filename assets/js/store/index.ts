@@ -32,6 +32,15 @@ export function getRelationshipsKey(postId: number, options?: api.GetRelationshi
 }
 
 /**
+ * Empty selector results.
+ *
+ * The selectors return these shared values when there is no data, so that
+ * `useSelect` gets the same reference on each call.
+ */
+const EMPTY_RELATIONSHIPS: Record<string, { rel_key: string; rel_type: string }> = {};
+const EMPTY_RELATED_ENTITIES: ContentConnectRelatedEntities = [];
+
+/**
  * Store defaults
  */
 const DEFAULT_STATE: ContentConnectState = {
@@ -207,18 +216,18 @@ export const store = createReduxStore(STORE_NAME, {
 	selectors: {
 		getRelationships(state: ContentConnectState, postId: number | null, options?: api.GetRelationshipsOptions): Record<string, { rel_key: string; rel_type: string }> {
 			if (postId === null) {
-				return {};
+				return EMPTY_RELATIONSHIPS;
 			}
 			const key = getRelationshipsKey(postId, options);
-			return state.relationships[key] || {};
+			return state.relationships[key] || EMPTY_RELATIONSHIPS;
 		},
 		getRelatedEntities: createSelector(
 			(state: ContentConnectState, postId: number | null, options: api.GetRelatedEntitiesOptions): ContentConnectRelatedEntities => {
 				if (postId === null || !options?.rel_key) {
-					return [];
+					return EMPTY_RELATED_ENTITIES;
 				}
 				const key = getRelatedEntitiesKey(postId, options.rel_key);
-				return state.relatedEntities[key] || [];
+				return state.relatedEntities[key] || EMPTY_RELATED_ENTITIES;
 			},
 			(state, postId, options) => {
 				if (postId === null || !options?.rel_key) {
