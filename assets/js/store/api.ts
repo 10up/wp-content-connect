@@ -31,6 +31,7 @@ export type GetRelatedEntitiesOptions = {
 	orderby?: string;
 	per_page?: number;
 	page?: number;
+	post_status?: string | string[];
 }
 
 export async function getRelatedEntities(

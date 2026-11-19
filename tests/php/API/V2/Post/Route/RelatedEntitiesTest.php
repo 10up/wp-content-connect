@@ -1243,4 +1243,141 @@ class RelatedEntitiesTest extends ContentConnectTestCase {
 
 		return rest_do_request( $request );
 	}
+
+	/**
+	 * Tests that POST keeps related posts the user cannot read and leaves them out of the response.
+	 *
+	 * @return void
+	 */
+	public function test_post_keeps_related_posts_the_user_cannot_read() {
+		$contributor_id = $this->factory()->user->create( array( 'role' => 'contributor' ) );
+		$author_id      = $this->factory()->user->create( array( 'role' => 'author' ) );
+
+		$source_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => $contributor_id,
+			)
+		);
+
+		$public_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+
+		$other_draft_id = $this->factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => $author_id,
+			)
+		);
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-keep-unreadable' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-keep-unreadable' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( $source_id, $public_id );
+		$relationship->add_relationship( $source_id, $other_draft_id );
+
+		wp_set_current_user( $contributor_id );
+
+		$request = new \WP_REST_Request( 'POST', "/content-connect/v2/post/{$source_id}/related" );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'related_ids', array() );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array(), $response->get_data() );
+		$this->assertSame( array( $other_draft_id ), array_map( 'intval', $relationship->get_related_ids( $source_id ) ) );
+	}
+
+	/**
+	 * Tests that POST keeps trashed related posts and still removes omitted readable drafts.
+	 *
+	 * @return void
+	 */
+	public function test_post_keeps_trashed_related_posts() {
+		wp_set_current_user( $this->user_id );
+
+		$source_id  = $this->factory()->post->create();
+		$public_id  = $this->factory()->post->create( array( 'post_status' => 'publish' ) );
+		$draft_id   = $this->factory()->post->create( array( 'post_status' => 'draft' ) );
+		$trashed_id = $this->factory()->post->create( array( 'post_status' => 'trash' ) );
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-keep-trashed' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-keep-trashed' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+
+		foreach ( array( $public_id, $draft_id, $trashed_id ) as $related_id ) {
+			$relationship->add_relationship( $source_id, $related_id );
+		}
+
+		$request = new \WP_REST_Request( 'POST', "/content-connect/v2/post/{$source_id}/related" );
+		$request->set_param( 'rel_key', $rel_key );
+		$request->set_param( 'rel_type', 'post-to-post' );
+		$request->set_param( 'related_ids', array( $public_id ) );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array( $public_id ), wp_list_pluck( $response->get_data(), 'id' ) );
+		$this->assertEqualsCanonicalizing(
+			array( $public_id, $trashed_id ),
+			array_map( 'intval', $relationship->get_related_ids( $source_id ) )
+		);
+	}
+
+	/**
+	 * Tests that POST keeps related posts hidden by the readability filter.
+	 *
+	 * @return void
+	 */
+	public function test_post_keeps_related_posts_hidden_by_readability_filter() {
+		global $wpdb;
+
+		wp_set_current_user( $this->user_id );
+
+		$source_id = $this->factory()->post->create();
+		$shown_id  = $this->factory()->post->create( array( 'post_status' => 'publish' ) );
+		$hidden_id = $this->factory()->post->create( array( 'post_status' => 'publish' ) );
+
+		$registry = get_registry();
+		$registry->define_post_to_post( 'post', 'post', 'test-keep-filtered' );
+		$rel_key = $registry->get_relationship_key( 'post', 'post', 'test-keep-filtered' );
+
+		$relationship = $registry->get_post_to_post_relationship_by_key( $rel_key );
+		$relationship->add_relationship( $source_id, $shown_id );
+		$relationship->add_relationship( $source_id, $hidden_id );
+
+		$filter = static function () use ( $wpdb, $hidden_id ) {
+			return $wpdb->prepare( " AND {$wpdb->posts}.ID != %d", $hidden_id );
+		};
+
+		add_filter( 'tenup_content_connect_related_posts_readable_where', $filter );
+
+		try {
+			$request = new \WP_REST_Request( 'POST', "/content-connect/v2/post/{$source_id}/related" );
+			$request->set_param( 'rel_key', $rel_key );
+			$request->set_param( 'rel_type', 'post-to-post' );
+			$request->set_param( 'related_ids', array( $shown_id ) );
+
+			$response = rest_do_request( $request );
+		} finally {
+			remove_filter( 'tenup_content_connect_related_posts_readable_where', $filter );
+		}
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array( $shown_id ), wp_list_pluck( $response->get_data(), 'id' ) );
+		$this->assertEqualsCanonicalizing(
+			array( $shown_id, $hidden_id ),
+			array_map( 'intval', $relationship->get_related_ids( $source_id ) )
+		);
+	}
 }
