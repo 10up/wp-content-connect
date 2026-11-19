@@ -58,7 +58,7 @@ class Abilities {
 			self::CATEGORY,
 			array(
 				'label'       => __( 'Content Connect', 'wp-content-connect' ),
-				'description' => __( 'Post-to-post and post-to-user relationships.', 'wp-content-connect' ),
+				'description' => __( 'Post-to-post and post-to-user relationships. These abilities read relationship data. To display related posts on the site, use a Query Loop (core/query) block filtered by the relationship, which stays in sync when relationships change.', 'wp-content-connect' ),
 			)
 		);
 	}
@@ -101,7 +101,7 @@ class Abilities {
 			'content-connect/get-post-relationships',
 			array(
 				'label'               => __( 'Get Post Relationships', 'wp-content-connect' ),
-				'description'         => __( 'Lists the relationships that apply to a post, optionally including the related posts and users for each one.', 'wp-content-connect' ),
+				'description'         => __( 'Lists the relationships that apply to a post, optionally including the related posts and users for each one. To display related posts on the site, use a Query Loop (core/query) block filtered by the relationship instead of copying the related IDs into content.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => self::get_input_schema( self::get_post_input_args( ( new PostRelationshipsRoute() )->get_collection_params() ) ),
 				'output_schema'       => array(
@@ -124,7 +124,7 @@ class Abilities {
 			'content-connect/get-related-items',
 			array(
 				'label'               => __( 'Get Related Items', 'wp-content-connect' ),
-				'description'         => __( 'Lists the published posts or the users related to a post through one relationship, with pagination and ordering.', 'wp-content-connect' ),
+				'description'         => __( 'Lists the published posts or the users related to a post through one relationship, with pagination and ordering. Use it to inspect a relationship, not to build content: to display related posts on the site, use a Query Loop (core/query) block filtered by the relationship. A Query Loop updates when relationships change; IDs copied into a hand-picked list do not.', 'wp-content-connect' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => self::get_input_schema( self::get_post_input_args( $related_args ) ),
 				'output_schema'       => array(
@@ -411,7 +411,10 @@ class Abilities {
 			'properties' => array(
 				'rel_key'     => array( 'type' => 'string' ),
 				'rel_type'    => array( 'type' => 'string' ),
-				'rel_name'    => array( 'type' => 'string' ),
+				'rel_name'    => array(
+					'type'        => 'string',
+					'description' => __( 'The relationship name, used as `name` in a relationship query.', 'wp-content-connect' ),
+				),
 				'object_type' => array( 'type' => 'string' ),
 				'labels'      => $side['labels'],
 				'sortable'    => $side['sortable'],
@@ -455,7 +458,10 @@ class Abilities {
 				array(
 					'rel_key'     => array( 'type' => 'string' ),
 					'rel_type'    => array( 'type' => 'string' ),
-					'rel_name'    => array( 'type' => 'string' ),
+					'rel_name'    => array(
+						'type'        => 'string',
+						'description' => __( 'The relationship name, used as `name` in a relationship query.', 'wp-content-connect' ),
+					),
 					'object_type' => array( 'type' => 'string' ),
 					'post_type'   => array(
 						'type'        => 'array',
