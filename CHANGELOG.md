@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+
+- "Related Content" variation of the Query Loop block, with relationship filtering turned on, so editors and agents can find the related posts loop by name (props [@fabiankaegy](https://github.com/fabiankaegy)).
+
 ## [2.0.0] - TBD
 
 ### Breaking Changes

@@ -12,6 +12,67 @@ class QueryBlockIntegration {
 	public function setup() {
 		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'modify_query_loop_query' ), 10, 2 );
+		add_filter( 'get_block_type_variations', array( $this, 'add_related_variation' ), 10, 2 );
+	}
+
+	/**
+	 * Adds a "Related Content" variation to the Query Loop block.
+	 *
+	 * The variation turns on the block editor's relationship filtering, so the
+	 * loop lists the posts related to the current post. Registering it on the
+	 * server exposes it in the block types REST API as well as the inserter.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param  array          $variations Block variations.
+	 * @param  \WP_Block_Type $block_type The block type.
+	 * @return array Block variations.
+	 */
+	public function add_related_variation( $variations, $block_type ) {
+
+		if ( 'core/query' !== $block_type->name ) {
+			return $variations;
+		}
+
+		$variations[] = array(
+			'name'        => 'content-connect/related',
+			'title'       => __( 'Related Content', 'wp-content-connect' ),
+			'description' => __( 'Lists the posts related to the current post through a relationship. The list stays in sync when relationships change.', 'wp-content-connect' ),
+			'keywords'    => array(
+				__( 'related', 'wp-content-connect' ),
+				__( 'relationship', 'wp-content-connect' ),
+				'content connect',
+			),
+			'scope'       => array( 'inserter', 'block' ),
+			'isActive'    => array( 'showRelated' ),
+			'attributes'  => array(
+				'showRelated' => true,
+				'query'       => array(
+					'perPage'  => 3,
+					'pages'    => 0,
+					'offset'   => 0,
+					'postType' => 'post',
+					'order'    => 'desc',
+					'orderBy'  => 'date',
+					'author'   => '',
+					'search'   => '',
+					'exclude'  => array(),
+					'sticky'   => '',
+					'inherit'  => false,
+				),
+			),
+			'innerBlocks' => array(
+				array(
+					'core/post-template',
+					array(),
+					array(
+						array( 'core/post-title', array( 'isLink' => true ) ),
+					),
+				),
+			),
+		);
+
+		return $variations;
 	}
 
 	/**

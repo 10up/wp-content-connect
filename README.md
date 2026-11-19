@@ -255,6 +255,22 @@ while this will not work (orderby will be ignored):
 'orderby' => 'relationship',
 ```
 
+## Query Loop Block
+
+Content Connect adds a **Related** panel to the Query Loop (`core/query`) block. Turn on **Only show related entities** to limit the loop to the posts related to the current post, or to a source post you pick. When more than one relationship applies to the queried post type, pick one. Sortable relationships keep their relationship order by default.
+
+The **Related Content** block variation inserts a Query Loop with this filtering already turned on. Use it to display related content rather than a hand-picked list of posts. The loop updates when relationships change, and a hand-picked list does not.
+
+The panel stores the relationship query in the block's `query` attribute, which is what the block renders from. `showRelated` and `relationshipKey` hold the panel state:
+
+```html
+<!-- wp:query {"query":{"perPage":3,"postType":"course","inherit":false,"orderByRelationship":true,"relationshipQuery":[{"name":"courses","related_to_post":4}]},"showRelated":true,"relationshipKey":"university_course_courses"} -->
+<div class="wp-block-query"><!-- wp:post-template -->
+<!-- wp:post-title {"isLink":true} /-->
+<!-- /wp:post-template --></div>
+<!-- /wp:query -->
+```
+
 ## Manually Managing Relationships
 
 If you choose to not use the built in UIs for relationships, you'll need to manually update relationships. **DO NOT** try and work directly with the database tables. Instead, work with the following API methods. The underlying implementations may need to change from time to time, but the following methods should continue to function if the underlying implementations need to change.
