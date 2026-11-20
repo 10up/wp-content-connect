@@ -20,54 +20,23 @@ class PostToPost extends Relationship {
 	 */
 	public $to;
 
-	/**
-	 * The UI Object for the "from" portion of the relationship, if the from UI is enabled
-	 *
-	 * @var \TenUp\ContentConnect\UI\PostToPost
-	 */
-	public $from_ui;
-
-	/**
-	 * The UI Object for the "to" portion of the relationship, if the to UI is enabled
-	 *
-	 * @var \TenUp\ContentConnect\UI\PostToPost
-	 */
-	public $to_ui;
-
 	public function __construct( $from, $to, $name, $args = array() ) {
 		if ( ! post_type_exists( $from ) ) {
-			throw new \Exception( "Post Type {$from} does not exist. Post types must exist to create a relationship" );
+			throw new \Exception( esc_html( "Post Type {$from} does not exist. Post types must exist to create a relationship" ) );
 		}
 
 		$to = (array) $to;
-		foreach( $to as $to_post_type ) {
+		foreach ( $to as $to_post_type ) {
 			if ( ! post_type_exists( $to_post_type ) ) {
-				throw new \Exception( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" );
+				throw new \Exception( esc_html( "Post Type {$to_post_type} does not exist. Post types must exist to create a relationship" ) );
 			}
 		}
 
 		$this->from = $from;
-		$this->to = $to;
-		$this->id = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
-		
+		$this->to   = $to;
+		$this->id   = strtolower( get_class( $this ) ) . "-{$name}-{$from}-" . implode( '.', $to );
+
 		parent::__construct( $name, $args );
-	}
-
-	public function setup() {
-		if ( $this->enable_from_ui === true ) {
-			$this->from_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->from, $this->from_labels, $this->from_sortable );
-			$this->from_ui->setup();
-		}
-
-		// Make sure CPT is not the same as "from" so we don't get a duplicate, then register if enabled
-		if ( $this->to !== $this->from && $this->enable_to_ui === true ) {
-			// Currently, only support a default UI when the "to" end is a single post type
-			if ( count( $this->to ) === 1 ) {
-				$this->to_ui = new \TenUp\ContentConnect\UI\PostToPost( $this, $this->to[0], $this->to_labels, $this->to_sortable );
-				$this->to_ui->setup();
-			}
-		}
-
 	}
 
 	/**
@@ -80,7 +49,7 @@ class PostToPost extends Relationship {
 	public function get_related_object_ids( $post_id, $order_by_relationship = false ) {
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
-		$db = $table->get_db();
+		$db    = $table->get_db();
 
 		$table_name = esc_sql( $table->get_table_name() );
 
@@ -91,17 +60,20 @@ class PostToPost extends Relationship {
 		}
 
 		if ( $post_type == $this->from ) {
-			$where_post_types = array_map( function( $value ) {
-				return "'" . esc_sql( $value ) . "'";
-			}, $this->to );
+			$where_post_types = array_map(
+				function ( $value ) {
+					return "'" . esc_sql( $value ) . "'";
+				},
+				$this->to
+			);
 			$where_post_types = implode( ', ', $where_post_types );
-			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type IN ({$where_post_types})", $post_id, $this->name );
+			$query            = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type IN ({$where_post_types})", $post_id, $this->name );
 		} else {
 			$query = $db->prepare( "SELECT p2p.id1 as ID, p.post_type FROM {$table_name} AS p2p INNER JOIN {$db->posts} as p on p2p.id1 = p.ID WHERE p2p.id2 = %d and p2p.name = %s and p.post_type = %s", $post_id, $this->name, $this->from );
 		}
 
 		if ( $order_by_relationship ) {
-			$query .= " ORDER BY p2p.order = 0, p2p.order ASC";
+			$query .= ' ORDER BY p2p.order = 0, p2p.order ASC';
 		}
 
 		$objects = $db->get_results( $query );
@@ -126,16 +98,25 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->replace(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
+			array(
+				'id1'  => $pid1,
+				'id2'  => $pid2,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 		$table->replace(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
+			array(
+				'id1'  => $pid2,
+				'id2'  => $pid1,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 
 		/**
 		 * Fires after a relationship has been added
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -151,16 +132,25 @@ class PostToPost extends Relationship {
 		$table = Plugin::instance()->get_table( 'p2p' );
 
 		$table->delete(
-			array( 'id1' => $pid1, 'id2' => $pid2, 'name' => $this->name ),
+			array(
+				'id1'  => $pid1,
+				'id2'  => $pid2,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 		$table->delete(
-			array( 'id1' => $pid2, 'id2' => $pid1, 'name' => $this->name ),
+			array(
+				'id1'  => $pid2,
+				'id2'  => $pid1,
+				'name' => $this->name,
+			),
 			array( '%d', '%d', '%s' )
 		);
 
 		/**
 		 * Fires after a relationship has been deleted
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -183,18 +173,19 @@ class PostToPost extends Relationship {
 		$current_ids = $this->get_related_object_ids( $post_id );
 
 		$delete_ids = array_diff( $current_ids, $related_ids );
-		$add_ids = array_diff( $related_ids, $current_ids );
+		$add_ids    = array_diff( $related_ids, $current_ids );
 
-		foreach( $delete_ids as $delete ) {
+		foreach ( $delete_ids as $delete ) {
 			$this->delete_relationship( $post_id, $delete );
 		}
 
-		foreach( $add_ids as $add ) {
+		foreach ( $add_ids as $add ) {
 			$this->add_relationship( $post_id, $add );
 		}
 
 		/**
 		 * Fires after a relationship has been replaced
+		 *
 		 * @since 1.3.0
 		 *
 		 * @param int $pid1 ID of the first item
@@ -224,27 +215,107 @@ class PostToPost extends Relationship {
 
 		$data = array();
 
-		foreach( $ordered_ids as $id ) {
-			$order++;
+		foreach ( $ordered_ids as $id ) {
+			++$order;
 
 			$data[] = array(
-				'id1' => $id,
-				'id2' => $object_id,
-				'name' => $this->name,
-				'order' => $order
+				'id1'   => $id,
+				'id2'   => $object_id,
+				'name'  => $this->name,
+				'order' => $order,
 			);
 		}
-		
+
 		$fields = array(
-			'id1' => '%d',
-			'id2' => '%d',
-			'name' => '%s',
+			'id1'   => '%d',
+			'id2'   => '%d',
+			'name'  => '%s',
 			'order' => '%d',
 		);
 
 		/** @var \TenUp\ContentConnect\Tables\PostToPost $table */
 		$table = Plugin::instance()->get_table( 'p2p' );
 		$table->replace_bulk( $fields, $data );
+
+		/**
+		 * Fires after a relationship order has been updated
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param int    $object_id   ID of the object we're ordering on (post ID, or user ID for user-to-post).
+		 * @param int[]  $ordered_ids Ordered IDs of the related objects.
+		 * @param string $name        Relationship name.
+		 * @param string $type        Relationship type (post-to-post|post-to-user|user-to-post).
+		 */
+		do_action( 'tenup-content-connect-update-relationships-order', $object_id, $ordered_ids, $this->name, 'post-to-post' );
 	}
 
+	/**
+	 * Returns the object type of the entities related through this relationship.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string Always 'post' for post-to-post relationships.
+	 */
+	public function get_object_type() {
+		return 'post';
+	}
+
+	/**
+	 * Returns the IDs related to the given object for this relationship.
+	 *
+	 * Uniform accessor used by callers that manage post-to-post and post-to-user
+	 * relationships through the same interface.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int  $object_id             The source post ID.
+	 * @param  bool $order_by_relationship Whether to order by the stored relationship order.
+	 * @return array The related post IDs.
+	 */
+	public function get_related_ids( $object_id, $order_by_relationship = false ) {
+		return $this->get_related_object_ids( $object_id, $order_by_relationship );
+	}
+
+	/**
+	 * Replaces the related IDs for the given object with the provided set.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int   $object_id   The source post ID.
+	 * @param  int[] $related_ids The related post IDs to store.
+	 * @return void
+	 */
+	public function replace_related_ids( $object_id, $related_ids ) {
+		$this->replace_relationships( $object_id, $related_ids );
+	}
+
+	/**
+	 * Saves the sort order of the related IDs for the given object.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  int   $object_id   The source post ID.
+	 * @param  int[] $ordered_ids The related post IDs in the desired order.
+	 * @return void
+	 */
+	public function save_related_sort_data( $object_id, $ordered_ids ) {
+		$this->save_sort_data( $object_id, $ordered_ids );
+	}
+
+	/**
+	 * Determines whether the relationship is sortable from the given post's side.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param  \WP_Post $post The source post.
+	 * @return bool Whether the relationship is sortable from this post's side.
+	 */
+	public function is_sortable_from( \WP_Post $post ) {
+		if ( $post->post_type === $this->from ) {
+			return (bool) $this->from_sortable;
+		}
+
+		return (bool) $this->to_sortable;
+	}
 }

@@ -62,37 +62,52 @@ abstract class Relationship {
 	 */
 	public $to_sortable;
 
+	/**
+	 * The max number of selectable items
+	 *
+	 * @var int
+	 */
+	public $from_max_items;
+
+	/**
+	 * The max number of selectable items
+	 *
+	 * @var int
+	 */
+	public $to_max_items;
+
 	public function __construct( $name, $args = array() ) {
 		$this->name = $name;
 
 		$defaults = array(
 			'from' => array(
 				'enable_ui' => true,
-				'sortable' => false,
-				'labels' => array(
+				'max_items' => 100,
+				'sortable'  => false,
+				'labels'    => array(
 					'name' => $name,
 				),
 			),
-			'to' => array(
+			'to'   => array(
 				'enable_ui' => false,
-				'sortable' => false,
-				'labels' => array(
+				'max_items' => 100,
+				'sortable'  => false,
+				'labels'    => array(
 					'name' => $name,
-				)
+				),
 			),
 		);
 
 		$args = array_replace_recursive( $defaults, $args );
 
 		$this->enable_from_ui = $args['from']['enable_ui'];
-		$this->from_sortable = $args['from']['sortable'];
-		$this->from_labels = $args['from']['labels'];
+		$this->from_sortable  = $args['from']['sortable'];
+		$this->from_labels    = $args['from']['labels'];
+		$this->from_max_items = $args['from']['max_items'];
 
 		$this->enable_to_ui = $args['to']['enable_ui'];
-		$this->to_sortable = $args['to']['sortable'];
-		$this->to_labels = $args['to']['labels'];
+		$this->to_sortable  = $args['to']['sortable'];
+		$this->to_labels    = $args['to']['labels'];
+		$this->to_max_items = $args['to']['max_items'];
 	}
-
-	abstract function setup();
-
 }

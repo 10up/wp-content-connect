@@ -64,7 +64,7 @@ class UserRelationshipQuery {
 
 		if ( $this->has_valid_segments() ) {
 			$this->where = $this->generate_where_clause();
-			$this->join = $this->generate_join_clause();
+			$this->join  = $this->generate_join_clause();
 		}
 	}
 
@@ -76,12 +76,12 @@ class UserRelationshipQuery {
 	 */
 	public function format_segments() {
 		// Check for any top level keys that should be moved into a nested segment
-		$valid_keys = array(
+		$valid_keys  = array(
 			'related_to_post',
 			'name',
 		);
 		$new_segment = array();
-		foreach( $valid_keys as $key ) {
+		foreach ( $valid_keys as $key ) {
 			if ( isset( $this->relationship_query[ $key ] ) ) {
 				$new_segment[ $key ] = $this->relationship_query[ $key ];
 				unset( $this->relationship_query[ $key ] );
@@ -91,10 +91,10 @@ class UserRelationshipQuery {
 			$this->segments[] = $new_segment;
 		}
 
-		foreach( $this->relationship_query as $key => $segment ) {
+		foreach ( $this->relationship_query as $key => $segment ) {
 			if ( is_array( $segment ) && $this->is_valid_segment( $segment ) ) {
 				$this->segments[] = $segment;
-			} else if ( strtolower( $key ) == 'relation' ) {
+			} elseif ( strtolower( $key ) == 'relation' ) {
 				$this->relation = in_array( strtolower( $segment ), array( 'and', 'or' ) ) ? strtoupper( $segment ) : 'AND';
 			}
 		}
@@ -126,7 +126,7 @@ class UserRelationshipQuery {
 			return false;
 		}
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			if ( $this->is_valid_segment( $segment ) ) {
 				return true;
 			}
@@ -140,13 +140,13 @@ class UserRelationshipQuery {
 	 */
 	public function generate_where_clause() {
 		global $wpdb;
-		$where= '';
+		$where = '';
 
 		$wherecount = 1;
 
 		$where_parts = array();
 
-		foreach( $this->segments as $segment ) {
+		foreach ( $this->segments as $segment ) {
 			// Only generate the clause if this is a valid relationship
 			if ( $relationship = $this->get_relationship_for_segment( $segment ) ) {
 				$where_parts[] = $wpdb->prepare( "(p2u{$wherecount}.post_id = %d and p2u{$wherecount}.name = %s)", $segment['related_to_post'], $segment['name'] );
@@ -154,12 +154,12 @@ class UserRelationshipQuery {
 
 			// Only increment counter no "AND" relations, when we are joining a table for each segment
 			if ( $this->relation === 'AND' ) {
-				$wherecount++;
+				++$wherecount;
 			}
 		}
 
 		if ( ! empty( $where_parts ) ) {
-			$where = " and (" . implode( " {$this->relation} ", $where_parts ) . ")";
+			$where = ' and (' . implode( " {$this->relation} ", $where_parts ) . ')';
 		}
 
 		return $where;
@@ -188,7 +188,7 @@ class UserRelationshipQuery {
 
 				// Only increment counter no "AND" relations, when we are joining a table for each segment
 				if ( $this->relation === 'AND' ) {
-					$joincount++;
+					++$joincount;
 				}
 			}
 		}
@@ -212,10 +212,9 @@ class UserRelationshipQuery {
 		if ( ! $related_to_post ) {
 			return false;
 		}
-		
+
 		$relationship = $registry->get_post_to_user_relationship( $related_to_post->post_type, $segment['name'] );
 
 		return $relationship;
 	}
-
 }

@@ -1,6 +1,6 @@
 {
   "name": "wp-content-connect",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "WordPress library that enables direct relationships for posts to posts and posts to users.",
   "homepage": "https://github.com/10up/wp-content-connect",
   "license": "GPL-3.0-or-later",
@@ -15,21 +15,47 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-js": "browserify -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js",
-    "watch-js": "watchify -v -t vueify -e assets/js/src/content-connect.js -o assets/js/content-connect.js"
+    "start": "10up-toolkit build --watch",
+    "build": "10up-toolkit build",
+    "format-js": "10up-toolkit format-js",
+    "lint-js": "10up-toolkit lint-js",
+    "lint-style": "10up-toolkit lint-style",
+    "test": "10up-toolkit test-unit-jest",
+    "makepot": "wpi18n makepot && echo '.pot file updated'",
+    "archive": "mkdir -p release && composer archive --file=release/$npm_package_name --format=zip",
+    "wp-env:start": "wp-env start",
+    "wp-env:stop": "wp-env stop",
+    "wp-env:clean": "wp-env clean all",
+    "wp-env:destroy": "wp-env destroy",
+    "test:setup": "npm run wp-env:start",
+    "test:php": "wp-env run tests-cli bash -c 'cd wp-content/plugins/wp-content-connect && [ ! -d vendor ] && composer install --no-interaction --quiet; vendor/bin/phpunit -c phpunit.xml'",
+    "test:e2e": "playwright test --config=tests/e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config=tests/e2e/playwright.config.ts --ui",
+    "test:e2e:setup": "npm run wp-env:start && wp-env run tests-cli wp content-connect-example generate",
+    "test:e2e:reset": "wp-env run tests-cli wp content-connect-example delete --yes && wp-env run tests-cli wp content-connect-example generate"
+  },
+  "dependencies": {
+    "@10up/block-components": "^1.22.4",
+    "10up-toolkit": "^7.0.0"
+  },
+  "10up-toolkit": {
+    "entry": {
+      "block-editor": "assets/js/index.ts",
+      "classic-editor": "assets/js/classic-editor.tsx",
+      "admin-styles": "assets/css/admin-styles.css"
+    }
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-runtime": "^6.26.0",
-    "browserify": "^16.2.3",
-    "node-sass": "^9.0.0",
-    "vue": "^2.4.4",
-    "vue-resource": "^1.5.3",
-    "vuedraggable": "^2.14.1",
-    "vueify": "^9.4.1",
-    "watchify": "^4.0.0"
+    "@playwright/test": "^1.40.0",
+    "@wordpress/api-fetch": "^7.18.0",
+    "@wordpress/e2e-test-utils-playwright": "^2.0.0",
+    "@wordpress/data": "^10.18.0",
+    "@wordpress/edit-post": "^8.18.0",
+    "@wordpress/editor": "^14.18.0",
+    "@wordpress/env": "^12.0.0",
+    "@wordpress/html-entities": "^4.18.0",
+    "@wordpress/url": "^4.18.0",
+    "core-js": "^3.38.0",
+    "node-wp-i18n": "^1.2.7"
   }
 }

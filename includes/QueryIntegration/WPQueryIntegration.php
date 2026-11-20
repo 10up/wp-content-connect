@@ -67,18 +67,17 @@ class WPQueryIntegration {
 			return $orderby;
 		}
 
-		$segment = $query->relationship_query->segments[0];
+		$segment      = $query->relationship_query->segments[0];
 		$relationship = $query->relationship_query->get_relationship_for_segment( $segment );
 
 		// the order = 0 part puts any zero values (defaults) last to account for cases when they were adding from the
 		// other side of the relationship
 		if ( $relationship instanceof PostToPost ) {
-			$orderby = "p2p1.order = 0, p2p1.order ASC";
-		} else if ( $relationship instanceof  PostToUser ) {
-			$orderby = "p2u1.post_order = 0, p2u1.post_order ASC";
+			$orderby = 'p2p1.order = 0, p2p1.order ASC';
+		} elseif ( $relationship instanceof PostToUser ) {
+			$orderby = 'p2u1.post_order = 0, p2u1.post_order ASC';
 		}
 
 		return $orderby;
 	}
-
 }

@@ -23,7 +23,7 @@ class UserQueryIntegration {
 			$relationship_query = new UserRelationshipQuery( $query->query_vars['relationship_query'] );
 
 			$query->query_where .= $relationship_query->where;
-			$query->query_from .= $relationship_query->join;
+			$query->query_from  .= $relationship_query->join;
 
 			$this->sortable_orderby( $query, $relationship_query );
 
@@ -58,13 +58,12 @@ class UserQueryIntegration {
 		 * Using this method, we can order by any values we do have in meta, and THEN for any remaining relationships
 		 * in the relation table, we order by the original order by value that was on the WP_Query
 		 */
-		$segment = $relationship_query->segments[0];
+		$segment      = $relationship_query->segments[0];
 		$relationship = $relationship_query->get_relationship_for_segment( $segment );
 
 		if ( $relationship instanceof PostToUser ) {
 			// Puts 0 last, since these are just defaults
-			$query->query_orderby = "ORDER BY p2u1.user_order = 0, p2u1.user_order ASC";
+			$query->query_orderby = 'ORDER BY p2u1.user_order = 0, p2u1.user_order ASC';
 		}
 	}
-
 }
